@@ -1,0 +1,2 @@
+Smoothing: RAW
+Baseline: arpls(lam=1e6)

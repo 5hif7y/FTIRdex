@@ -1,0 +1,5 @@
+smoothing_window: 3
+baseline_method: detrend
+kernel: rbf
+gamma: 1.0
+alpha: 0.01

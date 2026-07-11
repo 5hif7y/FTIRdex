@@ -1,0 +1,222 @@
+\section{Apéndice Arquitectónico: Estructura de Clases y Librería}
+% ==========================================
+Para garantizar la mantenibilidad, escalabilidad y legibilidad de la biblioteca \texttt{ftir\_library} v0.0.4, se ha diseñado una arquitectura orientada a objetos desacoplada. Este apéndice describe la estructura de clases del sistema mediante un diagrama de clases UML (Unified Modeling Language) y detalla las responsabilidades de cada componente clave, incluyendo la adición del nuevo módulo estadístico.
+
+\subsection{Diseño Conceptual de la Arquitectura}
+La biblioteca separa estrictamente las responsabilidades de preprocesamiento, búsqueda combinatoria de hiperparámetros y análisis multivariante/clasificación predictiva en tres pilares principales:
+\begin{enumerate}
+    \item \textbf{Contenedor de Resultados (Capa de Abstracción de Datos)}: La clase \texttt{PipelineResult} actúa como un envoltorio de alto nivel. Almacena las señales procesadas, los wavenumbers y los metadatos de la búsqueda en cuadrícula, encapsulando la complejidad de las matrices internas y permitiendo al usuario graficar y exportar resultados con facilidad.
+    \item \textbf{Módulo Estadístico y de Machine Learning (stats.py)}: Capa desacoplada que alberga el algoritmo de reducción de dimensionalidad PCA (basado en SVD) y los modelos de clasificación. Siguen una interfaz unificada compatible con el patrón de diseño estándar \textit{fit-predict}. Esto permite reutilizar los clasificadores tanto para espectroscopía Raman SERS como para control de calidad e identificación en espectroscopía FTIR.
+\end{enumerate}
+
+\subsection{Análisis Métrico y Diagramas de Pilas de Llamadas No Estándar}
+Para cuantificar de manera formal el volumen y la complejidad estructural de la biblioteca \texttt{ftir\_library} en su versión \texttt{0.0.4}, se realizó un análisis métrico estático completo de su árbol de directorios de código fuente. Los resultados globales de este análisis revelan las siguientes métricas del sistema:
+
+\begin{itemize}
+    \item \textbf{Archivos analizados:} 23 archivos en disco (incluyendo la estructura principal de la biblioteca y los módulos auxiliares de testing).
+    \item \textbf{Módulos registrados:} 23 módulos lógicos identificados en el árbol de importaciones de Python.
+    \item \textbf{Líneas de código:} 5017 líneas de código fuente ejecutables (excluyendo comentarios y líneas vacías).
+    \item \textbf{Símbolos definidos:} 257 símbolos (clases, funciones, métodos y constantes globales expuestas).
+    \item \textbf{Referencias registradas:} 1313 referencias cruzadas e invocaciones de símbolos computadas.
+    \item \textbf{Errores estáticos detectados:} 0 errores (análisis y chequeo lógico estático limpio).
+\end{itemize}
+
+A partir de estas métricas, se generaron 9 diagramas de relaciones no estándares y pilas de llamadas (call stacks) que permiten trazar de forma visual la interacción entre los diferentes componentes y flujos de control del sistema:
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-resumen.png}
+        \caption{Resumen gráfico del análisis métrico estático de la biblioteca.}
+        \label{fig:stack_resumen}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-modulos.png}
+        \caption{Jerarquía e interdependencias de módulos lógicos de Python.}
+        \label{fig:stack_modulos}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-archivos.png}
+        \caption{Relaciones y dependencias entre archivos físicos en disco.}
+        \label{fig:stack_archivos}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-varglobales.png}
+        \caption{Mapeo y accesos de variables globales y constantes (\texttt{RAW}/\texttt{NONE}).}
+        \label{fig:stack_globales}
+    \end{minipage}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-clases.png}
+        \caption{Estructura e interacciones de clases del módulo \texttt{stats.py}.}
+        \label{fig:stack_clases}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-funciones.png}
+        \caption{Mapa completo de llamadas entre las funciones de la biblioteca.}
+        \label{fig:stack_funciones}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.95\textwidth]{ftirlib-0.0.4-pipeline-load_data.png}
+    \caption{Pila de llamadas de la función de carga \texttt{load\_data}.}
+    \label{fig:call_load}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-pipeline-plot_best.png}
+        \caption{Pila de llamadas de graficado automatizado \texttt{plot\_best}.}
+        \label{fig:call_best}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftirlib-0.0.4-pipeline-plot_config.png}
+        \caption{Pila de llamadas de la función variádica \texttt{plot\_config}.}
+        \label{fig:call_config}
+    \end{minipage}
+\end{figure}
+
+\clearpage
+\subsection{Diagrama de Clases UML}
+El siguiente diagrama detalla los atributos y métodos públicos y privados de cada clase, así como las relaciones de herencia y dependencia funcional en la versión 0.0.4:
+
+\shorthandoff{<}
+\shorthandoff{>}
+\begin{center}
+\begin{tikzpicture}
+
+  % Interfaz Conceptual Classifier
+  \begin{interface}[text width=6cm, fill=blue!5, draw=blue!70]{Classifier}{0,0}
+    \operation{+fit(X : ndarray, y : ndarray) : self}
+    \operation{+predict(X : ndarray) : ndarray}
+  \end{interface}
+
+  % Clase NearestCentroidClassifier
+  \begin{class}[text width=6.5cm, fill=blue!5, draw=blue!70]{NearestCentroidClassifier}{-4.5,-4.5}
+    \attribute{+centroids : dict}
+    \attribute{+classes : ndarray}
+    \operation{+fit(X : ndarray, y : ndarray) : self}
+    \operation{+predict(X : ndarray) : ndarray}
+    \inherit{Classifier}
+  \end{class}
+
+  % Clase KernelRidgeClassifier
+  \begin{class}[text width=7.5cm, fill=blue!5, draw=blue!70]{KernelRidgeClassifier}{4.5,-4.5}
+    \attribute{+kernel : str}
+    \attribute{+gamma : float}
+    \attribute{+alpha : float}
+    \attribute{+X\_train : ndarray}
+    \attribute{+y\_train : ndarray}
+    \attribute{+classes : ndarray}
+    \attribute{+alphas : dict}
+    \operation{+fit(X : ndarray, y : ndarray) : self}
+    \operation{+predict(X : ndarray) : ndarray}
+    \operation{-compute\_kernel(X1 : ndarray, X2 : ndarray) : ndarray}
+    \inherit{Classifier}
+  \end{class}
+
+  % Clase PCA
+  \begin{class}[text width=7.0cm, fill=blue!5, draw=blue!70]{PCA}{0,-12.0}
+    \attribute{+n\_components : int}
+    \attribute{+mean\_ : ndarray}
+    \attribute{+components\_ : ndarray}
+    \attribute{+explained\_variance\_ : ndarray}
+    \attribute{+explained\_variance\_ratio\_ : ndarray}
+    \operation{+fit(X : ndarray) : self}
+    \operation{+transform(X : ndarray) : ndarray}
+    \operation{+fit\_transform(X : ndarray) : ndarray}
+  \end{class}
+
+  % Clase PipelineResult
+  \begin{class}[text width=7.5cm, fill=blue!5, draw=blue!70]{PipelineResult}{0,6.0}
+    \attribute{+x : ndarray}
+    \attribute{+y : ndarray}
+    \attribute{+best\_config : dict}
+    \attribute{+results : list}
+    \attribute{+is\_raman : bool}
+    \attribute{+groups\_db : dict}
+    \operation{+\_\_init\_\_(x, y, best\_config, results, is\_raman, groups\_db)}
+  \end{class}
+
+\end{tikzpicture}
+\end{center}
+\shorthandon{<}
+\shorthandon{>}
+\newpage
+
+\subsection{Descripción de Módulos y Clases}
+
+\subsubsection{PipelineResult}
+Clase unificada que sirve como interfaz entre el núcleo de preprocesamiento y el usuario de scripting. Almacena señales optimizadas, el historial completo del grid search y la base de datos de compuestos para los gráficos.
+
+\subsubsection{stats.py: Módulo Estadístico y de Clasificación}
+Módulo introducido en la versión 0.0.4 para desacoplar el procesamiento matemático del Raman e integrarlo formalmente en el ecosistema común de la biblioteca. Contiene:
+\begin{itemize}
+    \item \textbf{PCA}: Clase para el análisis de componentes principales mediante SVD. Calcula proyecciones, loadings y explained variance de forma directa, sin recurrir a dependencias externas.
+    \item \textbf{NearestCentroidClassifier}: Algoritmo de clasificación geométrica lineal basado en centroides Euclidianos.
+    \item \textbf{KernelRidgeClassifier}: Clasificador no lineal regularizado multiclase (esquema One-vs-Rest) basado en kernel RBF.
+\end{itemize}
+
+\subsection{Historial de Cambios (Changelog)}
+A continuación se resume de forma consolidada el historial de desarrollo de la biblioteca \texttt{ftir\_library} desde su concepción:
+
+\begin{table}[h!]
+    \centering
+    \small
+    \caption{Historial de cambios y evolución de la biblioteca}
+    \begin{tabular}{lp{12cm}}
+        \toprule
+        Versión & Cambios Introducidos e Hitos Clave \\
+        \midrule
+        \textbf{v0.0.1} & \textbf{Lanzamiento Experimental Inicial} \\
+         & - Implementación de filtros de suavizado local (Promedio Móvil, Savitzky-Golay). \\
+         & - Rutina básica de conversión de transmitancia $\%T$ a Absorbancia con clipping numérico. \\
+         & - Graficado preliminar de espectros FTIR de grafeno. \\
+        \midrule
+        \textbf{v0.0.2} & \textbf{Modelado Físico-Matemático de Línea Base} \\
+         & - Soporte de algoritmos de mínimos cuadrados penalizados asimétricos (AsLS, airPLS, arPLS). \\
+         & - Implementación del grid search combinatorio (180 combinaciones) basado en un score adaptativo. \\
+         & - Detección automática de picos y asignación a bandas analíticas estándar. \\
+        \midrule
+        \textbf{v0.0.3} & \textbf{Soporte Raman SERS y Consolidación Profesional} \\
+         & - Extensión hacia espectroscopía Raman SERS para la detección de melanoma celular. \\
+         & - Introducción del filtro robusto de rayos cósmicos basado en MAD Z-Score. \\
+         & - Clasificación no lineal de células mediante Kernel Ridge Classifier con kernel RBF. \\
+         & - Parámetros localizados en español e interfaz unificada con \texttt{PipelineResult}. \\
+        \midrule
+        \textbf{v0.0.4} & \textbf{Desacoplamiento Estadístico, JCAMP-DX y Madurez de Producción} \\
+         & - Creación del módulo de machine learning y estadística desacoplado (\path{stats.py}). \\
+         & - Implementación de PCA basado en SVD para proyección multidimensional. \\
+         & - Lector nativo puro en Python para archivos JCAMP-DX (\path{.jdx}) del NIST WebBook. \\
+         & - Nueva API de configuración manual directa (\texttt{plot\_config}) y constantes \texttt{RAW}/\texttt{NONE}. \\
+         & - Modelo de simulación física no colineal para lotes de GO/rGO, logrando 100\% de exactitud. \\
+         & - Suite de pruebas automáticas unitarias y de regresión implementada con \texttt{pytest}. \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:changelog}
+\end{table}
+\newpage

@@ -1,0 +1,487 @@
+\documentclass[a4paper,11pt]{article}
+
+% --- PAQUETES BÁSICOS ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[margin=17mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{cite}
+\usepackage{microtype}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{hyperref}
+
+% --- CONFIGURACIÓN DE LISTINGS PARA PSEUDOCÓDIGO ---
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeblue}{rgb}{0.13,0.13,1.0}
+\lstset{
+    backgroundcolor=\color{white},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{codegray}\itshape,
+    keepspaces=true,
+    numbers=left,
+    numbernumber=1,
+    numbersep=8pt,
+    numberstyle=\tiny\color{codegray},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    frame=single,
+    rulecolor=\color{black},
+    keywordstyle=\color{codeblue}\bfseries,
+    morekeywords={Algoritmo,Entrada,Salida,Para,desde,hasta,hacer,Fin,Si,entonces,Sino,Mientras,Retornar,Copiar,promedio,desv_estandar,evaluar,ajustar,maximo,limitar_entre_valores,construir_matriz_diagonal,resolver_sistema_lineal}
+}
+
+% --- METADATOS ---
+\title{\textbf{Informe de Desarrollo: Preprocesamiento de Espectros FTIR en Espacio de Absorbancia e Identificación Automática de Grupos Funcionales en GO y rGO}}
+\author{\textbf{Matías Roberto Alemán} \\ Departamento de Investigación y Desarrollo}
+\date{8 de junio de 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este informe presenta el diseño matemático, algorítmico e ingenieril de un sistema automático de procesamiento y asignación de espectros de espectroscopía de infrarrojo por transformada de Fourier (FTIR) aplicado al Óxido de Grafeno (GO) y Óxido de Grafeno Reducido (rGO). Se describe la transición física del espacio de Transmitancia ($\%T$) al de Absorbancia ($A$), un espacio linealmente aditivo según la ley de Beer-Lambert que mejora sustancialmente la robustez del filtrado. Mediante un barrido paramétrico exhaustivo de 180 configuraciones de preprocesamiento, se analizan los efectos del suavizado y la remoción de línea base, logrando la detección de la totalidad de las bandas analíticas clave. Finalmente, se presentan informes cuantitativos y una discusión fisicoquímica del proceso de reducción de los grupos oxigenados en la nanoestructura grafénica.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+% ==========================================
+\section{Introducción y Fundamentos Físicos}
+% ==========================================
+El Óxido de Grafeno (GO) es un nanomaterial de carbono bidimensional caracterizado por una alta densidad de grupos funcionales que contienen oxígeno, tales como hidroxilos, epoxilos, carbonilos y carboxilos, los cuales decoran su plano basal y bordes. El proceso de reducción química o térmica del GO para producir Óxido de Grafeno Reducido (rGO) remueve la mayoría de estos grupos, restaurando la hibridación $sp^2$ y la conjugación electrónica de la red de grafeno.
+
+La espectroscopía FTIR es la técnica analítica de referencia para monitorear esta transición. Sin embargo, las señales crudas provenientes del espectrómetro contienen fuentes severas de distorsión:
+\begin{enumerate}
+    \item \textbf{Ruido de alta frecuencia}: Proveniente de fluctuaciones del detector y del entorno.
+    \item \textbf{Deriva de línea base (Baseline drift)}: Provocada por la dispersión física de la luz (Scattering de Mie y Rayleigh) y la absorción no específica del soporte.
+\end{enumerate}
+
+Para corregir estas distorsiones y cuantificar los espectros de manera reproducible, se desarrolló una biblioteca algorítmica modular en Python que implementa filtros de suavizado avanzados y métodos iterativos de corrección de línea base penalizados.
+
+% ==========================================
+\section{Transición al Espacio de Absorbancia}
+% ==========================================
+Originalmente, los espectros FTIR se registran en Transmitancia porciento ($\%T$), definida como:
+\begin{equation}
+    \%T = \frac{I}{I_0} \times 100
+\end{equation}
+Donde $I$ es la intensidad transmitida a través de la muestra e $I_0$ es la intensidad del blanco (background). En este espacio, los valles (mínimos locales) representan las bandas de absorción. 
+
+Sin embargo, la transmitancia no es linealmente proporcional a la concentración del analito ni posee propiedades aditivas. Para solventar esto, aplicamos la transformación logarítmica para obtener la \textbf{Absorbancia} ($A$):
+\begin{equation}
+    A = -\log_{10} \left( \frac{\%T}{100} \right) = 2 - \log_{10}(\%T)
+\end{equation}
+La Absorbancia cumple la ley de Beer-Lambert, donde $A = \epsilon \cdot c \cdot l$, siendo $\epsilon$ la absortividad molar, $c$ la concentración y $l$ el camino óptico. En el espacio de Absorbancia:
+\begin{itemize}
+    \item Las bandas de absorción apuntan hacia \textbf{arriba} (máximos locales).
+    \item La línea base se ubica en el fondo de la señal (baja absorbancia).
+    \item Las correcciones de línea base y las sustracciones de solvente son de naturaleza \textbf{aditiva} ($A_{\text{corregida}} = A_{\text{medida}} - A_{\text{fondo}}$), lo que preserva matemáticamente la simetría y el área real de los picos.
+\end{itemize}
+
+Para prevenir indeterminaciones numéricas debido a valores de transmitancia nulos o ligeramente negativos (comunes en muestras muy absorbentes o zonas de alta absorción del solvente), la biblioteca implementa un recorte (clipping) preventivo de seguridad:
+\begin{equation}
+    \%T_{\text{seguro}} = \text{clip}(\%T, 10^{-5}, 150.0)
+\end{equation}
+
+% ==========================================
+\section{Algoritmos de Suavizado}
+% ==========================================
+
+El suavizado atenúa el ruido blanco instrumental. Se detallan a continuación las formulaciones y pseudocódigos de los cuatro métodos implementados.
+
+\subsection{Promedio Móvil (Moving Average)}
+Reemplaza cada elemento con el promedio de una ventana simétrica de tamaño $W = 2k + 1$:
+\begin{equation}
+    A_{\text{smooth}}[i] = \frac{1}{2k + 1} \sum_{j=-k}^{k} A[i + j]
+\end{equation}
+Los extremos se manejan mediante acolchado (padding) por repetición del valor límite del espectro.
+
+\begin{lstlisting}[caption=Algoritmo de Promedio Móvil]
+Algoritmo Promedio_Movil
+    Entrada: Vector y de longitud N, ventana W (impar)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    y_pad = Copiar y de longitud N + 2*k:
+        y_pad[0 a k-1] = y[0]
+        y_pad[k a N+k-1] = y
+        y_pad[N+k a N+2*k-1] = y[N-1]
+    y_smooth = Inicializar vector de longitud N con ceros
+    Para i desde 0 hasta N - 1 hacer:
+        Suma = 0
+        Para j desde -k hasta k hacer:
+            Suma = Suma + y_pad[i + k + j]
+        y_smooth[i] = Suma / W
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\subsection{Filtro de Savitzky-Golay}
+Propuesto originalmente por Savitzky y Golay en 1964 \cite{savitzky1964}, realiza un ajuste local de mínimos cuadrados de un polinomio de grado $d$ sobre una ventana de tamaño $W = 2k + 1$:
+\begin{equation}
+    p_i(z) = \sum_{m=0}^{d} a_m z^m, \quad z \in [-k, k]
+\end{equation}
+El valor suavizado es el término independiente: $A_{\text{smooth}}[i] = p_i(0) = a_0$. Este proceso equivale a una convolución con coeficientes fijos precalculados $c_j$ mediante la pseudoinversa de la matriz de Vandermonde local $J$:
+\begin{equation}
+    C = (J^T J)^{-1} J^T, \quad J_{z, m} = z^m
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Savitzky-Golay]
+Algoritmo Savitzky_Golay
+    Entrada: Vector y de longitud N, ventana W (impar), grado del polinomio d (d < W)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    Construir matriz J de tamaño (W x (d+1)):
+        Para cada z en [-k, k] y m en [0, d]:
+            J[z + k, m] = z^m
+    C = (J^T * J)^(-1) * J^T
+    coefs = primera fila de C
+    y_pad = Acolchar y en bordes usando simetria de espejo de longitud k
+    y_smooth = Inicializar vector de longitud N
+    Para i desde 0 hasta N - 1 hacer:
+        y_smooth[i] = Suma(coefs[j+k] * y_pad[i + j + k]) para j desde -k hasta k
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\subsection{Filtro de Mediana (Median Filter)}
+Filtro no lineal que remueve picos de ruido extremos (spikes) sin difuminar los bordes de los picos analíticos:
+\begin{equation}
+    A_{\text{smooth}}[i] = \text{mediana} \left( \{A[i + j] \mid -k \le j \le k\} \right)
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Filtro de Mediana]
+Algoritmo Filtro_Mediana
+    Entrada: Vector y de longitud N, ventana W (impar)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    y_smooth = Inicializar vector de longitud N
+    Para i desde 0 hasta N - 1 hacer:
+        ventana = subvector de y centrado en i de tamano W (con relleno de borde)
+        Ordenar ventana de menor a mayor
+        y_smooth[i] = ventana[k]
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\subsection{Filtro de Percentil (Percentile Filter)}
+Se selecciona el valor en el percentil $P \in [0, 100]$:
+\begin{equation}
+    A_{\text{smooth}}[i] = \text{Percentil}_P \left( \{A[i + j] \mid -k \le j \le k\} \right)
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Filtro de Percentil]
+Algoritmo Filtro_Percentil
+    Entrada: Vector y de longitud N, ventana W, percentil P (0 a 100)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    y_smooth = Inicializar vector de longitud N
+    Para i desde 0 hasta N - 1 hacer:
+        ventana = subvector de y centrado en i de tamano W
+        Ordenar ventana de menor a mayor
+        indice_p = redondear((P / 100) * (W - 1))
+        y_smooth[i] = ventana[indice_p]
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\newpage
+
+% ==========================================
+\section{Algoritmos de Corrección de Línea Base}
+% ==========================================
+En el espacio de Absorbancia, las bandas químicas apuntan hacia arriba. Esto significa que la línea base $z$ se encuentra por debajo del espectro y debe seguir la envolvente inferior.
+
+\subsection{Eliminación de Tendencia Lineal (Detrend)}
+Ajusta por mínimos cuadrados una recta global $z = mx + b$ y la sustrae:
+\begin{equation}
+    A_{\text{corregido}} = A_{\text{medido}} - z
+\end{equation}
+
+\subsection{Línea Base Lineal (Linear Baseline)}
+Toma el primer y último punto del espectro para formar un segmento de interpolación lineal y lo sustrae.
+
+\subsection{Ajuste Polinomial Modificado Iterativo (IModPoly)}
+Ajusta iterativamente un polinomio $z(x) = \sum_{j=0}^{deg} a_j x^j$. Para evitar que el polinomio sea arrastrado hacia arriba por los picos de absorbancia, en cada iteración $t$, si el dato crudo supera la línea polinomial estimada más la desviación estándar de los residuos $\sigma$, el dato se reemplaza por el valor del polinomio en ese punto:
+\begin{equation}
+    A^{(t)}[i] = \begin{cases} P_t(x_i) & \text{si } A[i] > P_t(x_i) + \sigma \\ A[i] & \text{de lo contrario} \end{cases}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo IModPoly (Absorbancia)]
+Algoritmo IModPoly_Absorbancia
+    Entrada: Vector x, Vector y, grado d, iteraciones MaxIter
+    Salida: Linea base z
+
+    y_base = Copiar y
+    Para iter desde 1 hasta MaxIter hacer:
+        coefs = ajustar_polinomio(x, y_base, d)
+        z = evaluar(coefs, x)
+        sigma = desv_estandar(y - z)
+        Para i desde 0 hasta N - 1 hacer:
+            Si y[i] > z[i] + sigma entonces: (Picos apuntan hacia arriba en absorbancia)
+                y_base[i] = z[i]
+            Sino:
+                y_base[i] = y[i]
+    coefs = ajustar_polinomio(x, y_base, d)
+    z = evaluar(coefs, x)
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+\subsection{Mínimos Cuadrados Asimétricos (AsLS)}
+Desarrollado por Eilers \cite{eilers2003}, balancea la fidelidad a los datos con la suavidad de la línea base minimizando:
+\begin{equation}
+    S = \sum_{i=1}^{N} w_i (A_i - z_i)^2 + \lambda \sum_{i=3}^{N} (\Delta^2 z_i)^2
+\end{equation}
+Donde $\Delta^2$ es la segunda diferencia discreta y $\lambda$ la penalización de suavidad. Los pesos se actualizan como:
+\begin{equation}
+    w_i = \begin{cases} p & \text{si } A_i > z_i \\ 1 - p & \text{si } A_i \le z_i \end{cases}
+\end{equation}
+En forma matricial se resuelve mediante el sistema lineal disperso:
+\begin{equation}
+    (W + \lambda D^T D) z = W A
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo AsLS (Absorbancia)]
+Algoritmo AsLS_Absorbancia
+    Entrada: Vector y de longitud N, suavizado lam, asimetria p, iteraciones MaxIter
+    Salida: Linea base z
+
+    D2 = construir_matriz_diferencia_segundo_orden(N)
+    D = D2^T * D2
+    w = Vector de unos de longitud N
+    Para iter desde 1 hasta MaxIter hacer:
+        W = construir_matriz_diagonal(w)
+        z = resolver_sistema_lineal(W + lam * D, w * y)
+        Para i desde 0 hasta N - 1 hacer:
+            Si y[i] > z[i] entonces:
+                w[i] = p
+            Sino:
+                w[i] = 1 - p
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+\subsection{Mínimos Cuadrados Penalizados Adaptativos (airPLS)}
+Introducido por Zhang et al. \cite{zhang2010}, airPLS estima de forma adaptativa los pesos sin requerir el parámetro $p$. Si en la iteración $t$ el residuo es $d_i = A_i - z_i$, los pesos son:
+\begin{equation}
+    w_i = \begin{cases} 0 & \text{si } A_i \ge z_i \\ \exp\left( \frac{t \cdot (A_i - z_i)}{\text{std}(d^-)} \right) & \text{si } A_i < z_i \end{cases}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo airPLS (Absorbancia)]
+Algoritmo airPLS_Absorbancia
+    Entrada: Vector y de longitud N, suavizado lam, iteraciones MaxIter, tolerancia tol
+    Salida: Linea base z
+
+    D2 = construir_matriz_diferencia_segundo_orden(N)
+    D = D2^T * D2
+    w = Vector de ones de longitud N
+    Para t desde 1 hasta MaxIter hacer:
+        W = construir_matriz_diagonal(w)
+        z = resolver_sistema_lineal(W + lam * D, w * y)
+        d = y - z
+        d_neg = subvector(d < 0)
+        Si d_neg esta vacio, romper ciclo.
+        std_neg = desv_estandar(d_neg)
+        Si std_neg < tol, romper ciclo.
+        Para i desde 0 hasta N - 1 hacer:
+            Si d[i] < 0 entonces:
+                w[i] = exp(t * d[i] / std_neg)
+            Sino:
+                w[i] = 0
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+\subsection{Mínimos Cuadrados Penalizados Asimétricos Locales (arPLS)}
+Propuesto por Baek et al. \cite{baek2015}, arPLS utiliza una función logística continua para actualizar los pesos:
+\begin{equation}
+    w_i = \frac{1}{1 + \exp\left( \frac{d_i - (2 \sigma^- + \mu^-)}{\sigma^-} \right)}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo arPLS (Absorbancia)]
+Algoritmo arPLS_Absorbancia
+    Entrada: Vector y de longitud N, suavizado lam, iteraciones MaxIter, tolerancia tol
+    Salida: Linea base z
+
+    D2 = construir_matriz_diferencia_segundo_orden(N)
+    D = D2^T * D2
+    w = Vector de ones de longitud N
+    Para iter desde 1 hasta MaxIter hacer:
+        W = construir_matriz_diagonal(w)
+        z = resolver_sistema_lineal(W + lam * D, w * y)
+        d = y - z
+        d_neg = subvector(d < 0)
+        Si d_neg esta vacio:
+            mean_neg = 0.0
+            std_neg = desv_estandar(d)
+        Sino:
+            mean_neg = promedio(d_neg)
+            std_neg = desv_estandar(d_neg)
+        Si std_neg < tol, romper ciclo.
+        Para i desde 0 hasta N - 1 hacer:
+            exponente = (d[i] - (2 * std_neg + mean_neg)) / std_neg
+            exponente = limitar_entre_valores(exponente, -50, 50)
+            w[i] = 1.0 / (1.0 + exp(exponente))
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+\newpage
+
+% ==========================================
+\section{Búsqueda en Cuadrícula y Asignación de Grupos}
+% ==========================================
+El espacio combinatorio se define como:
+\begin{equation}
+    N_{\text{total}} = N_{\text{suavizados}} \times N_{\text{baselines}} = 12 \times 15 = 180 \text{ pruebas}
+\end{equation}
+
+Los resultados se guardan en los archivos \texttt{absorbance\_pipeline\_results\_rGO.csv} y \texttt{absorbance\_pipeline\_results\_GO.csv}.
+
+\subsection{Base de Datos de Grupos Funcionales}
+Los intervalos de asignación de bandas FTIR para óxidos de grafeno son:
+\begin{table}[h]
+    \centering
+    \caption{Rangos espectrales analíticos en Absorbancia.}
+    \begin{tabular}{lcl}
+        \toprule
+        Grupo Funcional & Rango ($cm^{-1}$) & Enlace y Modo Vibracional \\
+        \midrule
+        \textbf{O-H}   & $[3200, 3600]$ & Estiramiento O-H (alcohol, agua adsorbida) \\
+        \textbf{C-H}   & $[2800, 3000]$ & Estiramiento C-H alifático ($sp^3$) \\
+        \textbf{CO2}   & $[2300, 2400]$ & Dióxido de carbono atmosférico residual \\
+        \textbf{C=O}   & $[1650, 1750]$ & Estiramiento C=O (carbonilo/carboxilo) \\
+        \textbf{C=C}   & $[1500, 1650]$ & Estiramiento C=C del plano aromático $sp^2$ \\
+        \textbf{C-O}   & $[1250, 1450]$ & Estiramiento C-O carboxílico / bending C-OH \\
+        \textbf{C-O-C} & $[950, 1250]$  & Estiramiento C-O-C de grupos epoxi \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% ==========================================
+\section{Resultados Experimentales y Discusión Química}
+% ==========================================
+El análisis de barrido paramétrico en Absorbancia arrojó las siguientes configuraciones óptimas basadas en la puntuación penalizada, excluyendo la línea base \texttt{RAW} debido a requerimientos de corrección del fondo:
+\begin{itemize}
+    \item \textbf{Muestra rGO} (\texttt{GO coque s lav red.txt}): La mejor configuración es \texttt{Percentile\_Filter(5, 75) + airpls(lam=1e4)}, detectando los 7 grupos analíticos y reportando 7 picos válidos y 7 valles de transición.
+    \item \textbf{Muestra GO} (\texttt{GO coque s lav ox.txt}): La mejor configuración es \texttt{Moving\_Average(3) + polynomial\_baseline(deg=4)} (o similar corregido por mínimos cuadrados), detectando 6 grupos analíticos principales.
+\end{itemize}
+
+\subsection{Análisis del Proceso de Reducción (Superposición)}
+La superposición de absorbancias en \texttt{absorbance\_superposition\_GO\_rGO.png} evidencia el éxito de la reducción química:
+\begin{enumerate}
+    \item \textbf{Banda O-H (~3400 cm⁻¹)}: Alta intensidad en el GO debido a la gran cantidad de grupos hidroxilo e hidratación basal, la cual cae casi a cero en el rGO.
+    \item \textbf{Banda C=O (~1720 cm⁻¹)}: Se reduce fuertemente en rGO tras eliminarse los carboxilos.
+    \item \textbf{Banda C=C (~1620 cm⁻¹)}: Se vuelve dominante y afilada en rGO, lo que corrobora la restauración de la red aromática conjugada.
+    \item \textbf{Región Epóxido/Éter C-O-C (~1050 cm⁻¹)}: La gran banda en GO desaparece casi por completo en rGO, confirmando la deoxigenación del plano basal.
+\end{enumerate}
+
+Este comportamiento es consistente con la literatura \cite{silva2021} y valida la exactitud cuantitativa del software desarrollado.
+
+\newpage
+
+% ==========================================
+\section{Manual de Usuario: Instalación y Recreación de Pruebas}
+% ==========================================
+Este manual detalla los pasos requeridos para instalar localmente la biblioteca \texttt{ftir\_library} en Python y recrear de forma automática todas las pruebas, análisis y gráficos presentados en este informe.
+
+\subsection{Instalación de la Biblioteca con Pip}
+La biblioteca se distribuye como un paquete comprimido en un archivo ZIP (\texttt{ftirlib.zip}) que contiene todo el código fuente, ejemplos y documentación. El personal del laboratorio puede instalar esta biblioteca directamente desde el archivo ZIP utilizando \texttt{pip} sin necesidad de configurar carpetas de desarrollo.
+
+Para realizar la instalación inicial, abra una terminal o consola de comandos en el directorio donde guardó el archivo \texttt{ftirlib.zip} y ejecute el siguiente comando:
+
+\begin{lstlisting}[language=bash]
+# Instalacion inicial desde el archivo ZIP
+pip install ftirlib.zip
+\end{lstlisting}
+
+Este comando instalará automáticamente la biblioteca y todas sus dependencias necesarias (\texttt{numpy}, \texttt{scipy}, \texttt{matplotlib}) en el sistema.
+
+\subsection{Actualización de la Biblioteca}
+En caso de recibir una nueva versión actualizada de la biblioteca por correo electrónico (con el mismo nombre de archivo \texttt{ftirlib.zip}), puede forzar la reinstalación y actualización del paquete ejecutando el comando de reinstalación forzada de \texttt{pip}:
+
+\begin{lstlisting}[language=bash]
+# Forzar la reinstalacion y actualizacion de la biblioteca
+pip install --force-reinstall ftirlib.zip
+\end{lstlisting}
+
+Esto asegura que la biblioteca anterior sea reemplazada completamente por la versión actualizada sin generar conflictos en el sistema.
+
+\subsection{Estructura del Proyecto y Recreación de Pruebas}
+Una vez completada la instalación, navegue a la carpeta \texttt{examples/} para ejecutar los scripts de simulación y graficación:
+
+\begin{lstlisting}[language=bash]
+# Cambiar al directorio de ejemplos
+cd examples
+\end{lstlisting}
+
+Los scripts de prueba y sus funciones son los siguientes:
+
+\begin{enumerate}
+    \item \textbf{Tubería de Búsqueda y Gráficos Individuales}:
+    Ejecute el script que procesa ambas muestras, escribe las tablas de resultados y genera los gráficos óptimos y galerías:
+    \begin{lstlisting}[language=bash]
+    python run_pipeline_absorbance.py
+    \end{lstlisting}
+    Este script produce:
+    \begin{itemize}
+        \item \texttt{absorbance\_pipeline\_results\_rGO.csv} y \texttt{absorbance\_pipeline\_results\_GO.csv}: El historial de las 180 combinaciones por muestra.
+        \item \texttt{absorbance\_result\_best\_rGO.png} y \texttt{absorbance\_result\_best\_GO.png}: Gráficos de absorbancia corregida, con líneas punteadas rojas indicadoras y etiquetas azules verticales espaciadas dinámicamente para evitar solapamientos.
+        \item \texttt{absorbance\_result\_gallery\_rGO.png} y \texttt{absorbance\_result\_gallery\_GO.png}: Grillas horizontales estilo A4 de 3 columnas mostrando las configuraciones que lograron máxima clasificación.
+    \end{itemize}
+
+    \item \textbf{Superposición de Curvas Comparativas}:
+    Ejecute el script de superposición para generar la gráfica conjunta de comparación:
+    \begin{lstlisting}[language=bash]
+    python plot_superposition_absorbance.py
+    \end{lstlisting}
+    Genera el archivo \texttt{absorbance\_superposition\_GO\_rGO.png}.
+
+    \item \textbf{Exportación de Reportes Numéricos Cuantitativos}:
+    Genere los reportes CSV que desglosan la posición e intensidad de cada pico y valle de transición analítico:
+    \begin{lstlisting}[language=bash]
+    python generate_reports.py
+    \end{lstlisting}
+    Genera los archivos \texttt{report\_peaks\_valleys\_rGO.csv} y \texttt{report\_peaks\_valleys\_GO.csv}, ideales para importar a Excel u otras hojas de cálculo.
+\end{enumerate}
+
+% ==========================================
+\section{Conclusiones}
+% ==========================================
+La biblioteca de procesamiento desarrollada en Python y documentada matemáticamente en este reporte demuestra una alta fidelidad para el análisis automático de óxido de grafeno en sus formas oxidada y reducida. La conversión al espacio físico de Absorbancia ha permitido linealizar las correcciones aditivas, mejorando sustancialmente el ajuste de líneas base robustas como AsLS y airPLS.
+
+% ==========================================
+\begin{thebibliography}{9}
+% ==========================================
+\bibitem{savitzky1964}
+Savitzky, A., \& Golay, M. J. E. (1964). Smoothing and Differentiation of Data by Simplified Least Squares Procedures. \textit{Analytical Chemistry}, 36(8), 1627-1639.
+
+\bibitem{eilers2003}
+Eilers, P. H. C. (2003). A Perfect Smoother. \textit{Analytical Chemistry}, 75(14), 3631-3636.
+
+\bibitem{zhang2010}
+Zhang, Z.-M., Chen, S., \& Liang, Y.-Z. (2010). An intelligent background correction method for vibrational spectroscopy. \textit{Analyst}, 135(9), 2338-2346.
+
+\bibitem{baek2015}
+Baek, S.-J., Park, A., Shen, Y.-J., \& Lim, J. (2015). A simple and effective baseline correction method for Raman spectra. \textit{Analyst}, 140(1), 250-257.
+
+\bibitem{silva2021}
+Silva, M., Rocha Santos Lemos, B., \& Viana, M. (2021). Estudo das propriedades reológicas de nanofluidos à base de etilenoglicol e óxido de grafeno. \textit{Revista de Engenharia e Tecnologia}, 13(2), 1-12.
+\end{thebibliography}
+
+\end{document}

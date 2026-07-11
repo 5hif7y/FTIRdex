@@ -1,0 +1,424 @@
+\section{Manual de Desarrollo e Interfaz de Alto Nivel (API Python)}
+% ==========================================
+Para facilitar el uso de la biblioteca para los usuarios destinados, se implementó una interfaz de alto nivel que oculta la manipulación manual de decenas de parámetros. Esta API simplificada exporta constantes globales y funciones unificadas de auto-detección y parametrización automática.
+
+\subsection{Firmas de la API de Alto Nivel}
+\begin{itemize}
+    \item \texttt{x, y = load\_data(filepath, format\_type=None)}: Carga los datos espectroscópicos. Permite especificar manualmente el formato de la muestra mediante las constantes importadas \texttt{FTIR} o \texttt{SERS}, o por texto (\texttt{"FTIR"}, \texttt{"SERS"}). Si se omite, auto-detecta según la extensión del archivo (.csv $\rightarrow$ SERS, .txt $\rightarrow$ FTIR, .jdx/.dx $\rightarrow$ FTIR JCAMP-DX).
+    \item \texttt{generate\_report(x, y, output\_csv=None, space=None, groups\_db=None)}: Genera y guarda un reporte de bandas moleculares y picos en formato CSV. Admite la especificación opcional de una base de datos de compuestos personalizada mediante \texttt{groups\_db}.
+    \item \texttt{analysis = run\_analysis(x, y, space=None, groups\_db=None)}: Corre el barrido combinatorio completo de 180 combinaciones y devuelve un contenedor de tipo \texttt{PipelineResult}. Admite la especificación opcional de una base de datos de compuestos personalizada mediante \texttt{groups\_db}.
+    \item \texttt{n = get\_approvednumber(analysis)}: Determina dinámicamente cuántas combinaciones del grid search son consideradas óptimas o aprobadas (aquellas que logran la máxima detección de bandas analíticas de interés sin línea base RAW).
+    \item \texttt{plot\_best(analysis, output\_image, mode="box", space="absorbance")}: Grafica el espectro preprocesado óptimo marcando las bandas. Permite configurar el marcado en modo líneas (\texttt{"lines"}) o cajas (\texttt{"boxes"} o \texttt{"box"}). Utiliza la base de datos de compuestos (\texttt{groups\_db}) almacenada en \texttt{analysis} si está presente.
+    \item \texttt{plot\_gallery(analysis, output\_prefix, max\_plots=9, mode="box", space="absorbance")}: Genera subplots horizontales $3 \times 1$ de las mejores $max\_plots$ configuraciones bajo el modo visual indicado. Utiliza la base de datos de compuestos (\texttt{groups\_db}) almacenada en \texttt{analysis} si está presente.
+\end{itemize}
+
+\subsection{Configuración Manual Simplificada y Constantes RAW/NONE}
+La biblioteca versión 0.0.4 incorpora la función \texttt{plot\_config} y los alias/constantes globales \texttt{RAW} y \texttt{NONE} (ambos insensibles a mayúsculas) para permitir al usuario graficar espectros bajo configuraciones manuales específicas, o desactivar partes del procesamiento espectral de manera directa. 
+
+La función se ha diseñado con una estructura variádica flexible para maximizar la usabilidad en scripts interactivos:
+
+\begin{lstlisting}[language=Python, caption=Firma de la funcion variadica plot\_config]
+def plot_config(x, y, smooth_algorithm, baseline_algorithm, *args, **kwargs):
+\end{lstlisting}
+
+La función requiere obligatoriamente los parámetros posicionales \texttt{x, y, smooth\_algorithm} y \texttt{baseline\_algorithm}. El argumento \texttt{output\_image} (la ruta del archivo de imagen de salida) también es obligatorio, pero puede suministrarse en cualquier posición libre dentro de los argumentos posicionales adicionales (\texttt{*args}) o por palabra clave (\texttt{**kwargs}). Los demás parámetros adoptan valores por defecto y son extraídos automáticamente:
+\begin{itemize}
+    \item \texttt{space='absorbance'}: Espacio espectral de graficado (absorbancia o transmitancia).
+    \item \texttt{prominence=0.02} y \texttt{distance=15}: Parámetros de detección de picos de scipy.
+    \item \texttt{mode='lines'}: Tipo de etiquetado en el gráfico (líneas con \texttt{"lines"} o cajas con \texttt{"box"}).
+    \item \texttt{groups\_db=None} y \texttt{group\_order=None}: Base de datos de grupos funcionales y su orden de dibujo.
+    \item \texttt{invert\_x=True}: Controla la inversión del eje de número de onda.
+\end{itemize}
+
+\noindent El comportamiento de las constantes y desactivaciones del pipeline es el siguiente:
+\begin{itemize}
+    \item \textbf{Desactivación de Suavizado}: Si \texttt{smooth\_algorithm} es \texttt{RAW} o \texttt{NONE}, se omite el filtro de suavizado.
+    \item \textbf{Desactivación de Línea Base}: Si \texttt{baseline\_algorithm} es \texttt{RAW} o \texttt{NONE}, se omite la corrección de deriva.
+    \item \textbf{Detección y Modo Crudo}: Si ambos algoritmos son \texttt{RAW} o \texttt{NONE}, la identificación de picos y el etiquetado de bandas moleculares se desactivan por defecto, a menos que el usuario proporcione explícitamente una base de datos de grupos funcionales (\texttt{groups\_db}) o una secuencia de etiquetado (\texttt{group\_order}). Esto permite al investigador realizar la identificación de bandas sobre la absorbancia o transmitancia original no procesada.
+\end{itemize}
+
+\subsubsection{Ejemplo de Identificación de Picos sobre Espectro Crudo (RAW/RAW)}
+A continuación se ejemplifica el uso de la API variádica para graficar un espectro de óxido de grafeno en absorbancia sin aplicar ningún filtrado de suavizado ni corrección de línea base, pero manteniendo activa la detección e indicación de picos mediante un diccionario de compuestos personalizado (\texttt{custom\_db}):
+
+\begin{lstlisting}[language=Python, caption=Deteccion de picos en espectro de absorbancia crudo usando plot\_config]
+from ftir_library import load_data, plot_config, RAW, FTIR
+
+# 1. Cargar espectro FTIR crudo en transmitancia
+x, y = load_data("GO coque s lav ox.txt", FTIR)
+
+# 2. Definir base de datos de bandas personalizada
+custom_db = {
+    "O-H (Estiramiento)": (3000, 3600),
+    "C=O (Carbonilo)": (1650, 1750),
+    "C-O (Estiramiento)": (950, 1100)
+}
+
+# 3. Graficar absorbancia cruda con picos detectados y rotulados
+# Notar que output_image se pasa de manera variadica al final
+plot_config(
+    x, y, 
+    RAW, RAW, 
+    space='absorbance', 
+    mode='lines', 
+    groups_db=custom_db,
+    prominence=0.015,
+    output_image="images/custom_raw_peaks_GO.png"
+)
+\end{lstlisting}
+
+El gráfico generado por este script se presenta en la figura~\ref{fig:custom_raw_peaks_go}. En él se aprecia cómo se realiza la identificación y rotulado lineal de los picos de interés directamente sobre la señal cruda con deriva de línea base.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{custom_raw_peaks_GO.png}
+    \caption{Visualización en absorbancia cruda de la muestra de óxido de grafeno con indicación de picos moleculares mediante base de datos personalizada en modo líneas (suavizado y línea base en modo RAW).}
+    \label{fig:custom_raw_peaks_go}
+\end{figure}
+
+\subsection{Código de Ejemplo Integrado}
+El siguiente listado de código ejemplifica el flujo de trabajo final simplificado utilizando la biblioteca:
+
+\begin{lstlisting}[language=Python, caption=Flujo de analisis utilizando constantes y numero adaptativo de galerias]
+from ftir_library import (
+    load_data, generate_report, run_analysis, 
+    plot_best, plot_gallery, get_approvednumber, 
+    plot_config, RAW, NONE, FTIR, SERS
+)
+
+# 1. CASO DE APLICACION I: ANALISIS DE MUESTRA FTIR
+print("Analizando espectro FTIR de Grafeno...")
+x_f, y_f = load_data("GO coque s lav ox.txt", FTIR)
+
+# Base de datos opcional y personalizada de compuestos y bandas
+custom_db = {
+    "Grafeno Carbonilo (C=O)": (1680, 1750),
+    "Grafeno Aromatico (C=C)": (1550, 1630),
+    "Grafeno Epoxido (C-O-C)": (850, 1000)
+}
+
+generate_report(x_f, y_f, "friendly_report_FTIR.csv", groups_db=custom_db)
+analysis_f = run_analysis(x_f, y_f, groups_db=custom_db)
+print(f"Mejor configuracion FTIR: {analysis_f.best_config}")
+
+# Obtener numero exacto de configuraciones exitosas
+n_f = get_approvednumber(analysis_f)
+print(f"Configuraciones FTIR aprobadas: {n_f}")
+
+# Graficar mejor ajuste con lineas e imprimir galeria con cajas
+plot_best(analysis_f, "images/friendly_best_FTIR.png", "lines")
+plot_gallery(analysis_f, "images/friendly_gallery_FTIR", n_f, "boxes")
+
+# Graficar espectro crudo sin marcar picos
+plot_config(x_f, y_f, RAW, RAW, "images/friendly_raw_FTIR.png", space="transmittance")
+\end{lstlisting}
+
+\subsection{Visualización de Espectros en Transmitancia y Absorbancia}
+La API simplificada permite graficar el espectro preprocesado óptimo tanto en el espacio de Transmitancia como en el de Absorbancia, controlándolo mediante el parámetro opcional \texttt{space}. 
+
+A continuación se presentan los ejemplos de uso y los gráficos generados para cada espacio:
+
+\vspace{0.4cm}
+
+% --- MUESTRA EN TRANSMITANCIA ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Graficar en Transmitancia
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("GO coque s lav ox.txt", FTIR)
+res = run_analysis(x, y)
+plot_best(
+    res, 
+    "friendly_best_FTIR_trans.png", 
+    mode="box", 
+    space="transmittance"
+)
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=0.9\textwidth]{friendly_best_FTIR_trans.png}
+        \captionof{figure}{Muestra FTIR en Transmitancia}
+    \end{minipage}
+\end{minipage}
+
+\vspace{0.6cm}
+
+% --- MUESTRA EN ABSORBANCIA ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Graficar en Absorbancia
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("GO coque s lav ox.txt", FTIR)
+res = run_analysis(x, y)
+plot_best(
+    res, 
+    "friendly_best_FTIR_abs.png", 
+    mode="box", 
+    space="absorbance"
+)
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=0.9\textwidth]{friendly_best_FTIR_abs.png}
+        \captionof{figure}{Muestra FTIR en Absorbancia}
+    \end{minipage}
+\end{minipage}
+
+\vspace{0.6cm}
+
+\subsection{Soporte Local de Parámetros en Español y Buenas Prácticas}
+Para facilitar la adopción y accesibilidad del software por parte de investigadores y técnicos locales en laboratorios clínicos y de nanotecnología, la versión \texttt{0.0.3} de la biblioteca introduce soporte para varios parámetros en español de uso frecuente:
+\begin{itemize}
+    \item \texttt{space}: Se admite \mbox{\texttt{"transmitancia"}} y \mbox{\texttt{"absorbancia"}} como equivalentes de \mbox{\texttt{"transmittance"}} y \mbox{\texttt{"absorbance"}}.
+    \item \texttt{mode}: Se admite \mbox{\texttt{"lineas"}} y \mbox{\texttt{"cajas"}} como equivalentes de \mbox{\texttt{"lines"}} y \mbox{\texttt{"box"}}.
+\end{itemize}
+
+Sin embargo, dado que el inglés es el estándar predominante a nivel global en programación, instrumentación analítica y documentación científica, la biblioteca emite un mensaje de advertencia (\texttt{UserWarning}) para instar al usuario a familiarizarse gradualmente con los parámetros en inglés. El mensaje es el siguiente:
+
+\begin{center}
+\textit{Advertencia: Esta biblioteca admite comandos y parámetros en español para facilitar su adopción y accesibilidad. No obstante, recomendamos familiarizarse gradualmente con la terminología en inglés, ya que constituye el estándar predominante en documentación científica, programación e instrumentación analítica.}
+\end{center}
+
+El listado de código \ref{lst:spanish_params} muestra cómo se invoca de manera local y cómo se dispara el warning indicando la línea del script origen:
+
+\begin{lstlisting}[language=Python, label=lst:spanish_params, caption=Uso de parametros en espanol y advertencia resultante]
+# Script de prueba (test1.py)
+from ftir_library import load_data, run_analysis, plot_best, FTIR
+x, y = load_data("GO coque s lav ox.txt", FTIR)
+
+# La llamada con "transmitancia" procesa los datos y emite la advertencia
+res = run_analysis(x, y, space="transmitancia")
+
+# La llamada con "lineas" y "transmitancia" tambien emite advertencias
+plot_best(res, "best_GO.png", mode="lineas", space="transmitancia")
+\end{lstlisting}
+
+\subsection{Configuración de Base de Datos de Compuestos Personalizada (groups\_db)}
+La biblioteca \texttt{ftir\_library} permite al usuario definir bases de datos personalizadas de compuestos y sus respectivos rangos de números de onda (wavenumbers) para el análisis automatizado y etiquetado de bandas. Esto resulta de gran utilidad cuando se trabaja con compuestos distintos al óxido de grafeno estándar o biomarcadores celulares predefinidos.
+
+La base de datos personalizada se estructura como un diccionario en Python, donde las claves son cadenas que representan el nombre de la banda o grupo funcional, y los valores son tuplas de dos elementos conteniendo los límites inferior y superior del rango de números de onda (en $\text{cm}^{-1}$):
+
+\begin{lstlisting}[language=Python, caption=Definición de base de datos personalizada]
+custom_db = {
+    "Grupo Hidroxilo (O-H)": (3200, 3600),
+    "Enlace Carbonilo (C=O)": (1680, 1750),
+    "Enlace Aromatico (C=C)": (1500, 1650),
+    "Estiramiento C-O-C": (950, 1200)
+}
+\end{lstlisting}
+
+Esta base de datos se pasa como argumento opcional \texttt{groups\_db} a las funciones \texttt{run\_analysis} o \texttt{generate\_report}. El objeto contenedor de resultados \texttt{PipelineResult} resultante de \texttt{run\_analysis} almacena automáticamente esta estructura en su atributo \texttt{groups\_db}.
+
+Al invocar los métodos de graficado \texttt{plot\_best} y \texttt{plot\_gallery}, la biblioteca detecta la presencia de esta base de datos dentro del objeto de análisis y dibuja los marcados de bandas (tanto en modo \texttt{"lines"} como \texttt{"box"} / \texttt{"boxes"}) utilizando los nombres y rangos provistos por el usuario. Esto elimina la necesidad de modificar el código interno de la biblioteca para dar soporte a nuevos compuestos químicos.
+
+\clearpage
+\subsection{Guía de Instalación y Configuración del Entorno de Desarrollo}
+% ==========================================
+Esta sección proporciona una guía de instalación paso a paso, redactada de forma rigurosa y formal, orientada a usuarios y técnicos que deseen desplegar y ejecutar la biblioteca en un entorno Windows comercial o de laboratorio.
+
+\subsubsection{Instalación de Python en Windows}
+Para ejecutar el software se requiere un intérprete de Python en su versión 3 (soportado desde 3.8 en adelante). A continuación, se detalla el procedimiento formal para su instalación:
+
+\begin{enumerate}
+    \item \textbf{Descarga}: Acceda a la página oficial de Python en \url{https://www.python.org/downloads/windows/} y descargue el instalador ejecutable correspondiente a la arquitectura de su procesador (típicamente \textit{Windows installer 64-bit}, ver figura \ref{fig:py_download}).
+    \item \textbf{Parámetros Críticos del Instalador}: Al ejecutar el instalador (figura \ref{fig:py_install_clean}), se deben configurar las siguientes opciones básicas:
+    \begin{itemize}
+        \item \textbf{Add python.exe to PATH (CRÍTICO)}: Debe marcarse esta casilla en la parte inferior del instalador. Esto añade las rutas del intérprete y del administrador de paquetes \texttt{pip} a las variables de entorno del sistema, permitiendo que Python pueda comunicarse con el sistema operativo y cualquier consola de terminal de forma global.
+        \item \textbf{Use admin privileges when installing py.exe}: Esta opción debe marcarse si usted posee permisos de administrador en el equipo.
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{python-descarga-todoenuno.png}
+    \caption{Página de descargas de instaladores de Python para Windows.}
+    \label{fig:py_download}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{python-instalacion-limpia.png}
+        \caption{Instalador de Python con las casillas de PATH y Admin habilitadas.}
+        \label{fig:py_install_clean}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{python-instalacion-limpia-fin.png}
+        \caption{Pantalla de finalización exitosa de la instalación limpia.}
+        \label{fig:py_install_clean_fin}
+    \end{minipage}
+\end{figure}
+
+\begin{table}[h!]
+    \centering
+    \small
+    \caption{Diferencia en el comportamiento del entorno según privilegios de administrador}
+    \begin{tabular}{lp{6.5cm}p{6.5cm}}
+        \toprule
+        Característica & Habilitado (Con privilegios Admin) & Deshabilitado (Instalación Local) \\
+        \midrule
+        \textbf{Python Launcher (\texttt{py.exe})} & Instalación global en \path{C:\Windows\}. & Instalado localmente en el perfil del usuario. \\
+        \textbf{Acceso al Sistema} & \textbf{Todos los usuarios} del equipo pueden invocar la herramienta \texttt{py}. & \textbf{Solo el usuario} que instaló Python puede invocar la herramienta. \\
+        \textbf{Ruta Core de Python} & Se desbloquea la ruta \path{C:\Program Files\} para todos. & Limitado al directorio oculto local \path{AppData} del usuario. \\
+        \textbf{Permisos de UAC} & Requiere confirmación de administrador de Windows. & Se instala silenciosamente sin requerir contraseña. \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:admin_vs_local}
+\end{table}
+
+El componente \texttt{py.exe} actúa como el \textbf{Python Launcher para Windows}. Si el sistema posee múltiples versiones de Python (como 3.11 y 3.14), digitar \texttt{py} en la consola redirige de forma automática la ejecución a la sub-versión activa más moderna, leyendo las directivas \textit{shebang} (p. ej., \texttt{\#!/usr/bin/env python}) al inicio de los archivos para asegurar compatibilidad. Si se actualiza una versión existente (figura \ref{fig:py_upgrade}), el instalador conservará las configuraciones de PATH previas (figura \ref{fig:py_upgrade_fin}).
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{python-upgrade-instalador.png}
+        \caption{Instalador detectando actualización sobre versión existente.}
+        \label{fig:py_upgrade}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{python-upgrade-instalador-fin.png}
+        \caption{Finalización exitosa del asistente de actualización de Python.}
+        \label{fig:py_upgrade_fin}
+    \end{minipage}
+\end{figure}
+
+Para validar que la instalación se realizó de manera satisfactoria y que la consola reconoce las variables de entorno, abra la línea de comandos de Windows (\texttt{cmd.exe}) y ejecute:
+\begin{lstlisting}[language=bash]
+python --version
+\end{lstlisting}
+El sistema debe retornar el número de versión instalado (p. ej., \texttt{Python 3.14.4}), tal como se observa en la secuencia de terminales de la figura \ref{fig:cmd_terminals}.
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{terminal-cmd-0.png}
+        \caption{Ejecución de cmd.exe.}
+        \label{fig:cmd_0}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{terminal-cmd-1.png}
+        %\caption{Comprobación del instalador de paquetes pip.}
+        \caption{Verificación de versión de Python en cmd.exe.}
+        \label{fig:cmd_1}
+    \end{minipage}
+    
+    \vspace{0.3cm}
+    
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{terminal-cmd-2.png}
+        %\caption{Entrada al modo interactivo de Python.}
+        \caption{Creación de script Python con neovim.}
+        \label{fig:cmd_2}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{terminal-cmd-3.png}
+        %\caption{Ejecución interactiva y salida mediante exit().}
+        \caption{Edición de script Python con neovim.}
+        \label{fig:cmd_3}
+    \end{minipage}
+    \centering
+    \includegraphics[width=0.48\textwidth]{terminal-cmd-4.png}
+    \caption{Ejecución de script para validación del entorno Python en consola cmd.}
+    \label{fig:cmd_terminals}
+\end{figure}
+
+\subsubsection{Configuración de Visual Studio Code y Extensión de Python}
+Visual Studio Code (VS Code) es un editor ligero y extensible. Por sí solo puede visualizar y editar código Python, pero carece de mecanismos nativos de análisis lógico y ejecución contextual. Para transformarlo en un entorno de desarrollo integrado (IDE) completo, se requiere la extensión oficial de Python mantenida por Microsoft:
+
+\begin{enumerate}
+    \item \textbf{Descarga e Instalación}: Descargue el instalador ejecutable de VS Code desde la página oficial (figuras \ref{fig:vscode_download_0} y \ref{fig:vscode_download_1}). Durante el proceso de instalación, configure las opciones para agregar el editor al PATH y registrar el soporte de archivos de código comunes (figura \ref{fig:vscode_install_options}).
+    \item \textbf{Instalación de la Extensión Oficial}: Abra VS Code, navegue a la pestaña de extensiones (\textit{Extensions}, atajo \texttt{Ctrl+Shift+X}) y busque \path{ms-python.python} (Python Extension for VS Code por Microsoft). Instale la extensión de manera directa.
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{vs-code-descarga-0.png}
+        \caption{Página principal de descargas de VS Code.}
+        \label{fig:vscode_download_0}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{vs-code-descarga.png}
+        \caption{Enlaces de descarga directa para arquitecturas específicas.}
+        \label{fig:vscode_download_1}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{VSCode-instalador-opciones.png}
+    \caption{Instalador de Visual Studio Code con opciones de integración habilitadas.}
+    \label{fig:vscode_install_options}
+\end{figure}
+
+La instalación de la extensión de Python aporta de forma inmediata los siguientes beneficios técnicos en proyectos científicos:
+\begin{itemize}
+    \item \textbf{Autocompletado Inteligente (IntelliSense)}: Utiliza análisis semántico para sugerir variables, clases, módulos y firmas de funciones a medida que el usuario escribe (p. ej., sugiriendo \texttt{load\_data} y mostrando su docstring explicativo).
+    \item \textbf{Análisis Estático (Linting)}: Advierte al usuario sobre problemas sintácticos y lógicos comunes (como variables no definidas o funciones mal llamadas) en tiempo real, sin necesidad de ejecutar el script.
+    \item \textbf{Depurador Integrado (Debugger)}: Permite pausar la ejecución en líneas seleccionadas (\textit{breakpoints}), avanzar paso a paso e inspeccionar el estado exacto de los vectores de números de onda y espectros en memoria.
+    \item \textbf{Soporte de Cuadernos Jupyter (\path{.ipynb})}: Permite ejecutar celdas de forma interactiva y visualizar las gráficas de absorbancia y picos generadas directamente dentro de la interfaz del editor, acelerando la exploración experimental de datos.
+    \item \textbf{Gestión de Entornos Virtuales e Intérpretes}: Detecta automáticamente los entornos virtuales (\texttt{venv}, \texttt{conda}) y permite alternar dinámicamente entre múltiples intérpretes de Python instalados en el sistema desde la esquina inferior derecha de la ventana del editor.
+\end{itemize}
+
+\subsubsection{Instalación de dependencias del ecosistema Python}
+Para el correcto funcionamiento y validación de la biblioteca \texttt{ftir\_library}, es necesario instalar los paquetes fundamentales de cálculo numérico, procesamiento científico, graficado y automatización de pruebas unitarias. Se recomienda encarecidamente al usuario ejecutar el siguiente comando en la línea de comandos de Windows (\texttt{cmd.exe} o PowerShell) para instalar de forma directa todas las dependencias necesarias:
+
+\begin{lstlisting}[language=bash, caption=Instalacion de las dependencias de la biblioteca mediante pip]
+pip install numpy scipy matplotlib pytest
+\end{lstlisting}
+
+\subsubsection{Pruebas en Herramientas de Terminal CLI y Scripting Directo / Aislado}
+\begin{itemize}
+    \item \textbf{Terminales y NeoVim}: Si el desarrollador dispone de herramientas de desarrollo basadas en consola y CLI, puede validar de forma directa y ágil su instalación en la consola cmd escribiendo \texttt{python} y ejecutando el clásico script de verificación:
+    \begin{lstlisting}[language=Python]
+print("Hello World de comprobacion")
+    \end{lstlisting}
+    \item \textbf{Scripting Directo / Entorno Aislado}: En laboratorios donde no se permite realizar instalaciones globales en el sistema o modificar variables de entorno debido a políticas de seguridad de TI, la biblioteca \texttt{ftir\_library} puede ser ejecutada de manera local e independiente. Para ello, basta con almacenar el código fuente de la biblioteca en una carpeta del proyecto (p. ej., en una carpeta \path{src}) e importar el directorio dinámicamente al inicio del script utilizando el listado de código \ref{lst:isolated_run}:
+    
+    \begin{lstlisting}[language=Python, label=lst:isolated_run, caption=Importacion dinamica y aislada de ftirlib sin instalacion global]
+import sys
+
+# Inserta la ruta local del codigo de la biblioteca
+#sys.path.insert(0, "./ftirlib_0.0.4/src")
+# O inserta la ruta local del paquete
+sys.path.insert(0, "./ftirlib_0.0.4.zip")
+
+from ftir_library import load_data, run_analysis
+x, y = load_data("GO coque s lav ox.txt")
+analysis = run_analysis(x, y)
+print("Pipeline ejecutado exitosamente en entorno aislado.")
+    \end{lstlisting}
+\end{itemize}
+\newpage

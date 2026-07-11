@@ -1,0 +1,181 @@
+Smoothing,Baseline,N_Groups_Detected,Detected_Groups,N_Peaks_Detected,N_Noise_Peaks,Score_Std,Score_Penalized
+RAW,RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+RAW,detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+RAW,linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+RAW,polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+RAW,polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+RAW,polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+RAW,"asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,33,12,-21
+RAW,"asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,33,13,-20
+RAW,"asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,33,13,-20
+RAW,airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,33,13,-20
+RAW,airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,33,13,-20
+RAW,airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+RAW,arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+RAW,arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+RAW,arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,33,12,-21
+Moving_Average(3),RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,33,11,-22
+Moving_Average(3),linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,33,11,-22
+Moving_Average(3),polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),"asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+Moving_Average(3),"asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),"asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,34,11,-23
+Moving_Average(3),arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+Moving_Average(3),arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+Moving_Average(3),arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+Moving_Average(5),RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Moving_Average(5),detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+Moving_Average(5),linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+Moving_Average(5),polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+Moving_Average(5),polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,30,12,-18
+Moving_Average(5),polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+Moving_Average(5),"asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+Moving_Average(5),"asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+Moving_Average(5),"asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Moving_Average(5),airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+Moving_Average(5),airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Moving_Average(5),airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Moving_Average(5),arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+Moving_Average(5),arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,30,12,-18
+Moving_Average(5),arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+Moving_Average(7),RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+Moving_Average(7),detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+Moving_Average(7),linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+Moving_Average(7),polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+Moving_Average(7),polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+Moving_Average(7),polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,31,11,-20
+Moving_Average(7),"asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,31,11,-20
+Moving_Average(7),"asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+Moving_Average(7),"asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+Moving_Average(7),airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,31,11,-20
+Moving_Average(7),airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,31,11,-20
+Moving_Average(7),airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,31,11,-20
+Moving_Average(7),arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",36,29,11,-18
+Moving_Average(7),arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,31,11,-20
+Moving_Average(7),arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+"Savitzky_Golay(7, 2)",RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)","asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(7, 2)","asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)","asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Savitzky_Golay(7, 2)",arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(7, 2)",arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(7, 2)",arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,33,12,-21
+"Savitzky_Golay(11, 2)",RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(11, 2)",detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(11, 2)",linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(11, 2)",polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(11, 2)",polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(11, 2)",polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(11, 2)","asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(11, 2)","asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(11, 2)","asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(11, 2)",airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(11, 2)",airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(11, 2)",airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(11, 2)",arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(11, 2)",arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(11, 2)",arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Savitzky_Golay(15, 3)",RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,29,12,-17
+"Savitzky_Golay(15, 3)",linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)","asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Savitzky_Golay(15, 3)","asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)","asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+"Savitzky_Golay(15, 3)",arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,29,12,-17
+"Savitzky_Golay(15, 3)",arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+Median_Filter(3),RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+Median_Filter(3),detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(3),linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(3),polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+Median_Filter(3),polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(3),polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(3),"asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,33,12,-21
+Median_Filter(3),"asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,34,12,-22
+Median_Filter(3),"asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+Median_Filter(3),airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(3),airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+Median_Filter(3),airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(3),arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+Median_Filter(3),arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,35,12,-23
+Median_Filter(3),arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(5),RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(5),detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+Median_Filter(5),linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+Median_Filter(5),polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+Median_Filter(5),polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+Median_Filter(5),polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+Median_Filter(5),"asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,34,13,-21
+Median_Filter(5),"asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,33,13,-20
+Median_Filter(5),"asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+Median_Filter(5),airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,33,13,-20
+Median_Filter(5),airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,33,13,-20
+Median_Filter(5),airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(5),arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+Median_Filter(5),arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",43,35,12,-23
+Median_Filter(5),arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,34,12,-22
+Median_Filter(7),RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Median_Filter(7),detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+Median_Filter(7),linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(7),polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+Median_Filter(7),polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Median_Filter(7),polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Median_Filter(7),"asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+Median_Filter(7),"asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+Median_Filter(7),"asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",35,28,11,-17
+Median_Filter(7),airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,30,12,-18
+Median_Filter(7),airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,29,12,-17
+Median_Filter(7),airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+Median_Filter(7),arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,29,13,-16
+Median_Filter(7),arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+Median_Filter(7),arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Percentile_Filter(5, 25)",RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,30,12,-18
+"Percentile_Filter(5, 25)",detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Percentile_Filter(5, 25)",linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Percentile_Filter(5, 25)",polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+"Percentile_Filter(5, 25)",polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,30,12,-18
+"Percentile_Filter(5, 25)",polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+"Percentile_Filter(5, 25)","asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",42,34,12,-22
+"Percentile_Filter(5, 25)","asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Percentile_Filter(5, 25)","asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,30,12,-18
+"Percentile_Filter(5, 25)",airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+"Percentile_Filter(5, 25)",airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Percentile_Filter(5, 25)",airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,29,12,-17
+"Percentile_Filter(5, 25)",arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Percentile_Filter(5, 25)",arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,32,13,-19
+"Percentile_Filter(5, 25)",arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21
+"Percentile_Filter(5, 75)",RAW,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,31,11,-20
+"Percentile_Filter(5, 75)",detrend,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+"Percentile_Filter(5, 75)",linear_baseline,4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+"Percentile_Filter(5, 75)",polynomial_baseline(deg=2),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+"Percentile_Filter(5, 75)",polynomial_baseline(deg=3),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,30,13,-17
+"Percentile_Filter(5, 75)",polynomial_baseline(deg=4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+"Percentile_Filter(5, 75)","asls(lam=1e4, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",41,33,12,-21
+"Percentile_Filter(5, 75)","asls(lam=1e5, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,31,13,-18
+"Percentile_Filter(5, 75)","asls(lam=1e6, p=0.001)",4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",38,30,12,-18
+"Percentile_Filter(5, 75)",airpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Percentile_Filter(5, 75)",airpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",37,30,11,-19
+"Percentile_Filter(5, 75)",airpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",36,30,10,-20
+"Percentile_Filter(5, 75)",arpls(lam=1e4),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,31,12,-19
+"Percentile_Filter(5, 75)",arpls(lam=1e5),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",40,32,12,-20
+"Percentile_Filter(5, 75)",arpls(lam=1e6),4,"Amida I, Fosfatos (ADN/ARN), Lípidos (C-H), Proteínas/Lípidos",39,32,11,-21

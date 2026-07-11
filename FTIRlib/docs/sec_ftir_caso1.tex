@@ -1,0 +1,85 @@
+\section{Caso de Aplicación I: Automatización de análisis químico FTIR para la caracterización de muestras de grafeno (GO y rGO)}
+% ==========================================
+
+\subsection{Fundamento Físico de FTIR y Comparativa con Medios Acuosos}
+La espectroscopía FTIR registra la absorción de luz infrarroja por enlaces que presentan variaciones en su momento dipolar neto. Es especialmente idónea para caracterizar el proceso de desoxigenación y reducción química del Óxido de Grafeno (GO) a Óxido de Grafeno Reducido (rGO) en estado sólido, identificando la evolución de las bandas asociadas a los grupos carbonilo, epóxido e hidroxilo.
+
+Es importante destacar que el FTIR posee una seria limitación física general en medios acuosos o húmedos: la molécula de agua líquida ($H_2O$) posee una sección eficaz de absorción infrarroja extremadamente fuerte en las bandas de flexión y estiramiento H-O-H (que satura el espectro y enmascara otras señales moleculares). Aunque las muestras sólidas de GO analizadas en esta biblioteca no presentaron indicios de contaminación o pérdida de calidad por humedad (mostrando espectros nítidos y secos tras su preparación), esta limitación física de la técnica FTIR justifica metodológicamente la introducción de la espectroscopía Raman SERS en el Caso II para el análisis directo de suspensiones celulares en medios líquidos.
+
+\subsection{Procesamiento Espectral en Absorbancia}
+Los detectores registradores de FTIR registran originalmente la intensidad en Transmitancia porcentual ($\%T$):
+\begin{equation}
+    \%T = \frac{I}{I_0} \times 100
+\end{equation}
+Para cumplir con la ley de Beer-Lambert (proporcionalidad lineal respecto a la concentración) y permitir operaciones aditivas directas para la sustracción de solventes y derivas de fondo, la biblioteca convierte automáticamente la señal a Absorbancia ($A$):
+\begin{equation}
+    A = 2 - \log_{10}(\%T)
+\end{equation}
+Para la implementación computacional, se aplica un truncamiento (clipping) de $\%T$ en el rango $[10^{-5}, 150.0]$ para garantizar estabilidad numérica frente a valores nulos o derivados ruidosos.
+
+\subsection{Algoritmos de Suavizado y Corrección de Línea Base}
+Para mitigar el ruido instrumental y el Mie Scattering (difracción de línea base por microestructuras), la biblioteca implementa:
+\begin{itemize}
+    \item \textbf{Suavizado}: Filtro Savitzky-Golay (ajuste polinomial local) de grado $d$ y ventana $W=2k+1$ \cite{savitzky1964}, y filtro de percentiles local.
+    \item \textbf{Línea Base}: Algoritmo de Mínimos Cuadrados Penalizados Asimétricos (AsLS) \cite{eilers2003} y su variante airPLS (Adaptive Iterative Reweighted Penalized Least Squares) \cite{zhang2010}, que minimizan:
+    \begin{equation}
+        S = \sum_{i=1}^{N} w_i (y_i - z_i)^2 + \lambda \sum_{i=3}^{N} (\Delta^2 z_i)^2
+    \end{equation}
+    donde el sistema disperso resultante $(W + \lambda D^T D) z = W y$ se resuelve eficientemente mediante factorizaciones de Cholesky dispersas.
+\end{itemize}
+
+\subsection{Optimización de Parámetros y Búsqueda en Cuadrícula}
+Se realiza una búsqueda en cuadrícula combinatoria evaluando 180 variantes de preprocesamiento. La bondad del ajuste se evalúa usando un Score que premia la detección de grupos funcionales válidos ($N_g$), picos totales ($N_v$) y penaliza el ruido residual ($N_{\text{ruido}}$) con un peso $w_n$:
+\begin{equation}
+    Score = N_v + N_g - w_n \cdot N_{\text{ruido}}
+\end{equation}
+La base de datos de bandas FTIR empleada incluye: O-H ($3200-3600\text{ cm}^{-1}$), C-H ($2800-3000\text{ cm}^{-1}$), CO2 ($2300-2400\text{ cm}^{-1}$), C=O ($1650-1750\text{ cm}^{-1}$), C=C ($1500-1650\text{ cm}^{-1}$), C-O ($1250-1450\text{ cm}^{-1}$), y C-O-C ($950-1250\text{ cm}^{-1}$).
+
+\subsection{Resultados Experimentales de la Reducción de GO a rGO}
+El barrido óptimo determinó:
+\begin{itemize}
+    \item \textbf{rGO}: Percentile Filter (5, 75) + airPLS ($\lambda=10^4$). Detecta los 7 grupos analíticos principales.
+    \item \textbf{GO}: Promedio Móvil (3) + Línea Base Polinomial ($deg=4$). Detecta 6 grupos.
+\end{itemize}
+En la figura \ref{fig:super_abs} se observa la desaparición de las bandas de hidroxilos ($\sim 3400\text{ cm}^{-1}$) y epóxidos C-O-C ($\sim 1050\text{ cm}^{-1}$), confirmando la restauración de la red sp$^2$ de carbono aromático en el rGO (banda C=C a $1620\text{ cm}^{-1}$). La galería FTIR se detalla en la figura \ref{fig:galeria_ftir_go}, y la comparación de marcado en modo líneas vs cajas se aprecia en las figuras \ref{fig:ftir_lines} y \ref{fig:ftir_box}.
+
+\newpage
+% --- SECCIÓN DE IMÁGENES ---
+\newpage
+\subsection{Figuras de Espectroscopía FTIR}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{absorbance_superposition_GO_rGO.png}
+    \caption{Superposición comparativa de absorbancia de GO (azul) y rGO (negro).}
+    \label{fig:super_abs}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\textwidth]{absorbance_result_gallery_GO_part1.png}
+    \caption{Lote $3 \times 1$ de configuraciones óptimas en Absorbancia para GO.}
+    \label{fig:galeria_ftir_go}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftir_demo_lines.png}
+        \caption{Espectro FTIR GO en modo líneas.}
+        \label{fig:ftir_lines}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ftir_demo_box.png}
+        \caption{Espectro FTIR GO en modo cajas.}
+        \label{fig:ftir_box}
+    \end{minipage}
+\end{figure}
+
+\newpage
+
+
+
+% ==========================================

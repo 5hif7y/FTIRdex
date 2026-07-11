@@ -1,0 +1,2 @@
+Smoothing: Percentile_Filter(5, 75)
+Baseline: airpls(lam=1e4)

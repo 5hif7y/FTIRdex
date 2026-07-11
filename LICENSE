@@ -1,0 +1,67 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2026
+Owner: Ing. Mendoza Pablo Nicolás.
+DEV: Alemán Matías Roberto.
+All Rights Reserved.
+
+Software Title:
+FTIRdex
+
+Code author:
+Alemán Matías Roberto.
+
+Institution:
+Centro de Investigación y Desarrollo en Ciencias y Tecnología de Materiales (CITEMA)
+Universidad Tecnológica Nacional Facultad Regional La Plata (UTN FRLP)
+
+1. Ownership
+
+This software and all associated source code, documentation,
+algorithms, models, specifications, and related materials are the
+intellectual property of Mendoza Pablo Nicolás unless otherwise stated.
+
+2. License Grant
+
+The only authorized user of this software is the
+Centro de Investigación y Desarrollo en Ciencias y Tecnología de Materiales (CITEMA)
+of the
+Universidad Tecnológica Nacional – Facultad Regional La Plata (UTN FRLP).
+
+The software may be executed, studied, and maintained only
+for internal institutional purposes.
+
+No ownership rights are transferred.
+
+3. Restrictions
+
+Without prior written authorization from the copyright holder,
+the following actions are prohibited:
+
+- Redistribution.
+- Commercial use.
+- Public deployment.
+- Modification for redistribution.
+- Sublicensing.
+- Reverse engineering when prohibited by applicable law.
+- Use by any third party.
+
+4. Repository
+
+This repository is published exclusively for version control,
+documentation, collaboration, auditing, and archival purposes.
+Publication on Git hosting services does not constitute permission
+to use, copy, modify, or distribute the software.
+
+5. Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+6. Contact
+
+For development inquiries:
+
+Alemán Matías Roberto
+aleman_matias@outlook.com   (personal contact)
+maleman@alu.frlp.utn.edu.ar (academic contact)
+

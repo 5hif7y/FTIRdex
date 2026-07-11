@@ -1,0 +1,76 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Package
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy scipy matplotlib pillow
+
+      - name: Configure CMake
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Create Portable Zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path build\Release\* -DestinationPath FTIRdex-portable.zip
+
+      - name: Compile Inno Setup Installer
+        shell: pwsh
+        run: |
+          iscc.exe installer.iss
+
+      - name: Create Source Tarball
+        shell: bash
+        run: |
+          tar --exclude='./build' --exclude='./.git' --exclude='./.github' -czf FTIRdex-source.tar.gz .
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FTIRdex-Build-Artifacts
+          path: |
+            FTIRdex-portable.zip
+            output/FTIRdex-Installer-x64.exe
+            FTIRdex-source.tar.gz
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            FTIRdex-portable.zip
+            output/FTIRdex-Installer-x64.exe
+            FTIRdex-source.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

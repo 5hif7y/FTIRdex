@@ -1,0 +1,10 @@
+LICENSE.md
+README.md
+pyproject.toml
+src/ftir_library/__init__.py
+src/ftir_library/core.py
+src/ftir_library.egg-info/PKG-INFO
+src/ftir_library.egg-info/SOURCES.txt
+src/ftir_library.egg-info/dependency_links.txt
+src/ftir_library.egg-info/requires.txt
+src/ftir_library.egg-info/top_level.txt

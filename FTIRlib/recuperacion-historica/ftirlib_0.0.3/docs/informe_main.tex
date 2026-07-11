@@ -1,0 +1,117 @@
+\documentclass[a4paper,11pt]{article}
+
+% --- PAQUETES BÁSICOS ---
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[margin=17mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\graphicspath{ {../examples/images/} }
+\usepackage{booktabs}
+\usepackage{cite}
+\usepackage{microtype}
+\usepackage{listings}
+\usepackage{color}
+\usepackage[
+    colorlinks=false,           % No colorear el texto, solo subrayar
+    linkbordercolor={1 0 0},    % Color del subrayado (RGB: rojo)
+    pdfborderstyle={/S/U/W 0.5}   % /S/U = underline, W = grosor (1pt)
+]{hyperref}
+\renewcommand{\lstlistingname}{Listado de código}
+\usepackage{capt-of}
+\usepackage{tikz}
+\usepackage{pgf-umlcd}
+
+% --- CONFIGURACIÓN DE LISTINGS PARA PSEUDOCÓDIGO ---
+\definecolor{commentgreen}{rgb}{0.1, 0.45, 0.15}
+\definecolor{keywordbordeaux}{rgb}{0.55, 0.0, 0.15}
+\lstset{
+    backgroundcolor=\color{white},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{commentgreen}\itshape,
+    keepspaces=true,
+    numbers=left,
+    stepnumber=1,
+    numbersep=8pt,
+    numberstyle=\tiny\color{commentgreen},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    frame=single,
+    rulecolor=\color{black},
+    keywordstyle=\color{keywordbordeaux}\bfseries,
+    morekeywords={Algoritmo,Entrada,Salida,Para,desde,hasta,hacer,Fin,Si,entonces,Sino,Mientras,Retornar,Copiar,promedio,desv_estandar,evaluar,ajustar,maximo,limitar_entre_valores,construir_matriz_diagonal,resolver_sistema_lineal,calcular_kernel,mediana_movil,mediana_absoluta_desviacion,filtrar_rayos_cosmicos,normalizar_vector,estimar_mator_ponderado,construir_matriz_diagonal_identidad,construir_matriz_diagonal_vacia,calcular_matriz_diferencias_segundo_orden,promedio_morfologias,buscar_valores,suma,abs,calcular_matriz_kernel_rbf,diccionario_vacio,Vector_de_ceros,Identidad,load_data,run_analysis,plot_best,plot_gallery,get_approvednumber,get_approved_count,generate_report,FTIR,SERS,remove_cosmic_rays,normalize_spectra,KernelRidgeClassifier,NearestCentroidClassifier,Promedio_Movil,Savitzky_Golay,Filtro_Mediana,Filtro_Percentil,Filtrar_Rayos_Cosmicos,IModPoly_Absorbancia,AsLS_Absorbancia,airPLS_Absorbancia,arPLS_Absorbancia,Busqueda_Cuadricula,Kernel_Ridge_Multiclase_OvR,Generar_Reporte_Numerico,mediana,exp,buscar_indices,aplicar_filtro_mediana_movil,ajustar_polinomio,construir_matriz_diferencia_segundo_orden,subvector,aplicar_suavizado,aplicar_linea_base,detectar_picos,asignar_grupos,calcular_score,buscar_maximos_locales,buscar_grupo_asociado,Escribir_CSV},
+    emph={load_data,run_analysis,plot_best,generate_report,plot_gallery,get_approvednumber,parte_entera,redondear,len,agregar},
+    emphstyle=\color{keywordbordeaux}\bfseries
+}
+
+% --- METADATOS ---
+\title{\textbf{Informe de Desarrollo (v0.0.3): \\Preprocesamiento de Espectros FTIR y Clasificación Oncológica Celular mediante Espectroscopía Raman SERS}}
+\author{\textbf{Matías Roberto Alemán}}
+\date{13 de junio de 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este informe presenta el diseño matemático, algorítmico e ingenieril del sistema automático de procesamiento y análisis espectroscópico integrado en la versión 0.0.3 de la biblioteca. El sistema está diseñado para abordar dos técnicas espectroscópicas de alta relevancia biomédica y fisicoquímica: la espectroscopía infrarroja por transformada de Fourier (FTIR) aplicada al análisis estructural del Óxido de Grafeno (GO y rGO), y la espectroscopía Raman SERS (Surface-Enhanced Raman Spectroscopy) aplicada al diagnóstico automático de células cancerosas (melanoma). Se detallan los algoritmos de suavizado local (Savitzky-Golay, percentiles), remoción de deriva de línea base (AsLS, airPLS, arPLS) y el filtro determinista de rayos cósmicos basado en desviaciones absolutas respecto a la mediana (MAD). Para la clasificación diagnóstica se describe el clasificador Kernel Ridge con kernel RBF, el cual alcanzó una precisión del 99.58\% y sensibilidad del 99.21\% en el dataset celular (+1900 espectros), demostrando idoneidad y robustez para diagnóstico médico auxiliar. Finalmente, se presenta una nueva interfaz simplificada de scripting que facilita su uso integrado.
+\end{abstract}
+
+\vspace{0.2cm}
+\noindent\hrulefill
+\vspace{0.2cm}
+
+\noindent\textbf{\large Historial de Objetivos y Versiones}
+\begin{table}[h!]
+    \small
+    \centering
+    \begin{tabular}{lclp{8.5cm}}
+        \toprule
+        Fecha & Versión & Tipo de Hito & Detalle y Entregables \\
+        \midrule
+        01/06/2026 & -- & Planificación & Introducción al problema y definición del alcance. \\
+        05/06/2026 & -- & Modelado & Modelado de la mecánica de trabajo y asignación del problema. \\
+        08/06/2026 & v0.0.1 & Experimental & Versión experimental inicial (\path{Informe_Tecnico_Informal.pdf} / \path{entregar-FTIR-alpha-0.0.1.zip}). \\
+        09/06/2026 & v0.0.2 & Prototipo & Prototipo de librería (\path{Informe_Tecnico_FTIR_alpha-0.0.2.pdf} / \path{ftirlib_0.0.2.zip}). \\
+        10/06/2026 & -- & Extensión & Prueba de extensión hacia RAMAN SERS aplicado a estudios oncológicos. Unificación de soporte FTIR y RAMAN SERS. \\
+        12/06/2026 & -- & Extensión & Automatización de muestreo FTIR contra bases de datos. \\
+        13/06/2026 & v0.0.3 & Profesional & Versión actual de uso profesional (\path{Informe_Tecnico_alpha-0.0.3.pdf} / \path{ftirlib_0.0.3.zip}). \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\vspace{0.1cm}
+\noindent\hrulefill
+\vspace{0.3cm}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ==========================================
+
+\input{sec_intro}
+\clearpage
+\input{sec_ftir_caso1}
+\clearpage
+\input{sec_sers_caso2}
+\clearpage
+\input{sec_ftir_caso3}
+\clearpage
+\input{sec_manual}
+\clearpage
+\input{sec_apendice}
+\clearpage
+\input{sec_apendice_arch}
+\clearpage
+\input{sec_conclusiones}
+\clearpage
+\input{sec_bibliografia}
+
+\end{document}

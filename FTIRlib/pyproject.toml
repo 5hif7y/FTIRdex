@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ftir_library"
+version = "0.0.4"
+description = "Biblioteca avanzada para preprocesamiento y analisis de espectros FTIR"
+readme = "README.md"
+authors = [{ name = "Matias Roberto Aleman" }]
+license = { text = "Uso interno confidencial" }
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib"
+]
+requires-python = ">=3.8"
+
+[tool.setuptools.packages.find]
+where = ["src"]

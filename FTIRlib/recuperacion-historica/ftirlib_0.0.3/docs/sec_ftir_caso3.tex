@@ -1,0 +1,274 @@
+\section{Caso de Aplicación III: Automatización de muestreo contra bases de datos FTIR}
+% ==========================================
+El análisis espectroscópico de muestras complejas sintetizadas en laboratorio o adquiridas en el campo se beneficia enormemente de la automatización del preprocesamiento y el mapeo de bandas contra bases de datos de referencia. En esta sección se presenta la evaluación del núcleo computacional de la biblioteca sobre dos conjuntos de datos FTIR externos de alta relevancia en nanotecnología y biomateriales:
+
+\begin{enumerate}
+    \item \textbf{Dataset de Óxido de Grafeno (GO) a diferentes grados de oxidación}: Compuesto por archivos ASCII (.ASC) exportados por espectrómetros PerkinElmer, conteniendo lecturas de transmitancia en función del número de onda, con codificación de texto Latin-1 y metadatos de cabecera.
+    \item \textbf{Dataset de Hidroxiapatita (HAp) sintetizada por método hidrotermal}: Compuesto por archivos CSV conteniendo lecturas de absorbancia en función de la longitud de onda física (convertida a número de onda) tras su adquisición.
+\end{enumerate}
+
+Para evaluar la versatilidad de la biblioteca sin introducir sesgos artificiales ni forzar la semejanza de los espectros, se aplicó la búsqueda en cuadrícula combinatoria estándar (grid search) de 180 configuraciones sobre cada compuesto. A continuación, se presenta para cada muestra el script de carga y procesamiento, seguido de la visualización de la mejor configuración en espacio de Transmitancia (marcado en cajas) y en espacio de Absorbancia (marcado en cajas).
+
+\vspace{0.4cm}
+
+% --- COMPUESTO 1: GO_2G ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Carga y analisis de GO_2G
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("GO_2G.ASC", FTIR)
+res = run_analysis(x, y)
+plot_best(res, "best_GO_2G.png")
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_go_2g_trans.png}
+        \captionof{figure}{Transmitancia (GO 2G)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_go_2g_abs.png}
+        \captionof{figure}{Absorbancia (GO 2G)}
+    \end{minipage}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize \textbf{Cita:} Paper: Sardinha, A. F., et al. (2020) \cite{sardinha2020} | Dataset: "FTIR spectra of Graphene oxide" \cite{dataset_sardinha} (DOI: 10.17632/4j2hxyrcf6.1)
+    \end{center}
+\end{minipage}
+\vspace{0.6cm}
+
+% --- COMPUESTO 2: GO_2,5G ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Carga y analisis de GO_2.5G
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("GO_2,5G.ASC", FTIR)
+res = run_analysis(x, y)
+plot_best(res, "best_GO_2_5G.png")
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_go_2_5g_trans.png}
+        \captionof{figure}{Transmitancia (GO 2.5G)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_go_2_5g_abs.png}
+        \captionof{figure}{Absorbancia (GO 2.5G)}
+    \end{minipage}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize \textbf{Cita:} Paper: Sardinha, A. F., et al. (2020) \cite{sardinha2020} | Dataset: "FTIR spectra of Graphene oxide" \cite{dataset_sardinha} (DOI: 10.17632/4j2hxyrcf6.1)
+    \end{center}
+\end{minipage}
+\vspace{0.6cm}
+
+% --- COMPUESTO 3: GO_3G ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Carga y analisis de GO_3G
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("GO_3G.ASC", FTIR)
+res = run_analysis(x, y)
+plot_best(res, "best_GO_3G.png")
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_go_3g_trans.png}
+        \captionof{figure}{Transmitancia (GO 3G)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_go_3g_abs.png}
+        \captionof{figure}{Absorbancia (GO 3G)}
+    \end{minipage}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize \textbf{Cita:} Paper: Sardinha, A. F., et al. (2020) \cite{sardinha2020} | Dataset: "FTIR spectra of Graphene oxide" \cite{dataset_sardinha} (DOI: 10.17632/4j2hxyrcf6.1)
+    \end{center}
+\end{minipage}
+\vspace{0.6cm}
+
+% --- COMPUESTO 4: OG_4 ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Carga y analisis de OG_4
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("OG_4_Original.ASC", FTIR)
+res = run_analysis(x, y)
+plot_best(res, "best_OG_4.png")
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_og_4_trans.png}
+        \captionof{figure}{Transmitancia (OG 4)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_og_4_abs.png}
+        \captionof{figure}{Absorbancia (OG 4)}
+    \end{minipage}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize \textbf{Cita:} Paper: Sardinha, A. F., et al. (2020) \cite{sardinha2020} | Dataset: "FTIR spectra of Graphene oxide" \cite{dataset_sardinha} (DOI: 10.17632/4j2hxyrcf6.1)
+    \end{center}
+\end{minipage}
+\vspace{0.6cm}
+
+% --- COMPUESTO 5: OG_5 ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Carga y analisis de OG_5
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("OG_5_Original.ASC", FTIR)
+res = run_analysis(x, y)
+plot_best(res, "best_OG_5.png")
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_og_5_trans.png}
+        \captionof{figure}{Transmitancia (OG 5)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_og_5_abs.png}
+        \captionof{figure}{Absorbancia (OG 5)}
+    \end{minipage}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize \textbf{Cita:} Paper: Sardinha, A. F., et al. (2020) \cite{sardinha2020} | Dataset: "FTIR spectra of Graphene oxide" \cite{dataset_sardinha} (DOI: 10.17632/4j2hxyrcf6.1)
+    \end{center}
+\end{minipage}
+\vspace{0.6cm}
+
+% --- COMPUESTO 6: HAp250 ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Carga y analisis de HAp250
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("HAp250.csv", FTIR)
+res = run_analysis(x, y)
+plot_best(res, "best_HAp250.png")
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_hap250_trans.png}
+        \captionof{figure}{Transmitancia (HAp250)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_hap250_abs.png}
+        \captionof{figure}{Absorbancia (HAp250)}
+    \end{minipage}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize \textbf{Cita:} Paper: Figueroa-Rosales, E. X., et al. (2023) \cite{figueroa2023} | Dataset: "FTIR \& PL raw data" \cite{dataset_figueroa} (DOI: 10.17632/mhk9g942sr.1)
+    \end{center}
+\end{minipage}
+\vspace{0.6cm}
+
+% --- COMPUESTO 7: HAp400 ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.36\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Carga y analisis de HAp400
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("HAp400.csv", FTIR)
+res = run_analysis(x, y)
+plot_best(res, "best_HAp400.png")
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_hap400_trans.png}
+        \captionof{figure}{Transmitancia (HAp400)}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.30\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=\textwidth]{case3_hap400_abs.png}
+        \captionof{figure}{Absorbancia (HAp400)}
+    \end{minipage}
+    \vspace{0.1cm}
+    \begin{center}
+        \scriptsize \textbf{Cita:} Paper: Figueroa-Rosales, E. X., et al. (2023) \cite{figueroa2023} | Dataset: "FTIR \& PL raw data" \cite{dataset_figueroa} (DOI: 10.17632/mhk9g942sr.1)
+    \end{center}
+\end{minipage}
+\vspace{0.4cm}
+
+\newpage
+% ==========================================

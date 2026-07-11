@@ -1,0 +1,2 @@
+Smoothing: Moving_Average(7)
+Baseline: polynomial_baseline(deg=4)

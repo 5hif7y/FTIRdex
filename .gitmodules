@@ -1,0 +1,3 @@
+[submodule "libnativegui"]
+	path = libnativegui
+	url = https://github.com/5hif7y/libnativegui.git

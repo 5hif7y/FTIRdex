@@ -1,0 +1,100 @@
+\section{Apéndice de Pruebas Históricas y Evolución de Prototipos Espectrales}
+% =========================================================================
+Este apéndice documenta formalmente la auditoría histórica de las etapas de desarrollo y pruebas que precedieron a la consolidación de la versión \texttt{0.0.4} de la biblioteca \texttt{ftir\_library}. El desarrollo se estructuró de forma iterativa y acumulativa a través de prototipos cerrados, los cuales han sido debidamente auditados y restaurados en el espacio de trabajo para garantizar la trazabilidad de los experimentos científicos y de ingeniería.
+
+% ==========================================
+\subsection{Auditoría de Directorios y Evolución de Hitos}
+% ==========================================
+El ciclo de vida del proyecto abarcó cinco versiones principales de desarrollo y dos conjuntos auxiliares de recursos. A continuación, se detalla la estructura física de directorios auditada en el sistema, ordenada cronológicamente:
+
+\begin{table}[h!]
+    \small
+    \centering
+    \caption{Auditoría formal de directorios de desarrollo e hitos de experimentación}
+    \begin{tabular}{p{4.5cm}p{3.0cm}p{9.0cm}}
+        \toprule
+        Directorio Auditado & Fecha de Registro & Hito y Contenido Científico-Técnico \\
+        \midrule
+        \path{primeros-experimentos-0.0.0} & 07 de junio de 2026 & Pruebas iniciales de concepto en Python. Carga preliminar de datos ASCII e implementación de filtros de suavizado en scripts planos de un solo uso. \\
+        \path{entregar-FTIR-alpha-0.0.1} & 08 de junio de 2026 & Primera versión experimental empaquetada. Implementa el suavizado lineal básico (Promedio Móvil y Savitzky-Golay) y el primer borrador del informe técnico. \\
+        \path{ftirlib_0.0.2} & 09 de junio de 2026 & Introducción de algoritmos robustos de línea base (AsLS, airPLS, arPLS) y el primer motor de búsqueda en cuadrícula parametrizada (Grid Search) para FTIR. \\
+        \path{ftirlib_0.0.3} & 13 de junio de 2026 & Extensión a espectroscopía Raman SERS. Incorporación del filtro de rayos cósmicos por desviación absoluta respecto a la mediana (MAD) y clasificación celular por Kernel Ridge. \\
+        \path{ftirlib_0.0.4} & 20 de junio de 2026 & Versión final de producción. Desacoplamiento del módulo estadístico (\path{stats.py}), implementación de PCA mediante SVD, soporte nativo JCAMP-DX y la API variádica \texttt{plot\_config}. \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:auditoria_directorios}
+\end{table}
+
+% ==========================================
+\subsection{Minimización y Recreación de Experimentos Históricos}
+% ==========================================
+Con el fin de validar el comportamiento exacto de los algoritmos implementados a lo largo del historial del proyecto, se ha recreado una suite de experimentos sobre la muestra patrón de Óxido de Grafeno (\texttt{GO coque s lav ox.txt}). Cada experimento se ha minimizado mediante una galería gráfica en disposición $3 \times 1$, contrastando la señal cruda o de entrada (izquierda), la superposición de señales con la estimación intermedia (centro) y el resultado espectral procesado y depurado (derecha).
+
+\subsubsection{Evaluación Comparativa de Algoritmos de Suavizado}
+El suavizado local atenúa el ruido instrumental de alta frecuencia. En esta prueba, se aplica sobre el espectro crudo en escala de Absorbancia, evaluando los tres algoritmos disponibles:
+
+\begin{enumerate}
+    \item \textbf{Savitzky-Golay} (Ventana $W = 15$, Polinomio grado $d = 2$):
+    Conserva la altura y la anchura de los picos originales sin introducir distorsiones por ensanchamiento de banda, gracias a su base de regresión polinómica local.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.95\textwidth]{comparison_smooth_savitzky_golay.png}
+        \caption{Recreación de suavizado mediante filtro Savitzky-Golay ($W=15, d=2$). Izquierda: Absorbancia cruda. Centro: Superposición de señal cruda y suavizada. Derecha: Espectro de absorbancia resultante.}
+        \label{fig:comp_smooth_sg}
+    \end{figure}
+
+    \newpage
+    \item \textbf{Promedio Móvil} (Ventana $W = 15$):
+    Atenúa el ruido de forma uniforme promediando localmente los puntos de la ventana, lo que genera una ligera pérdida de definición en las cúspides de picos muy agudos.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.95\textwidth]{comparison_smooth_moving_average.png}
+        \caption{Recreación de suavizado por Promedio Móvil ($W=15$). Izquierda: Absorbancia cruda. Centro: Superposición. Derecha: Espectro resultante con ligera atenuación de extremos.}
+        \label{fig:comp_smooth_ma}
+    \end{figure}
+
+    \item \textbf{Filtro de Percentil} (Ventana $W = 15$, Percentil $P = 75$):
+    Introduce un desplazamiento no lineal al seleccionar el percentil superior de la ventana local, útil para aislar y remover ruido asimétrico o de tipo impulso.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.95\textwidth]{comparison_smooth_percentile.png}
+        \caption{Recreación de suavizado por Filtro de Percentil ($W=15, P=75$). Izquierda: Absorbancia cruda. Centro: Superposición con desplazamiento no lineal. Derecha: Espectro resultante.}
+        \label{fig:comp_smooth_perc}
+    \end{figure}
+\end{enumerate}
+
+\newpage
+\subsubsection{Evaluación Comparativa de Algoritmos de Corrección de Línea Base}
+La fluorescencia de fondo y la dispersión de luz provocan una deriva de la línea base en los espectros experimentales. A partir del espectro suavizado por el filtro Savitzky-Golay, se aplicaron los tres algoritmos de mínimos cuadrados penalizados asimétricos para remover el fondo (utilizando un parámetro común de penalización de rugosidad $\lambda = 10^5$):
+
+\begin{enumerate}
+    \item \textbf{Mínimos Cuadrados Asimétricos (AsLS)} ($p = 0.001$, $\lambda = 10^5$):
+    Ajusta una envolvente inferior suave aplicando pesos fijos asimétricos ($p$ para puntos por encima del ajuste, y $1-p$ para puntos por debajo).
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.95\textwidth]{comparison_baseline_asls.png}
+        \caption{Recreación de corrección por AsLS ($\lambda=10^5, p=0.001$). Izquierda: Señal de absorbancia de entrada. Centro: Ajuste de la línea base (rojo) sobre la señal. Derecha: Señal neta resultante libre de deriva.}
+        \label{fig:comp_base_asls}
+    \end{figure}
+
+    \item \textbf{Mínimos Cuadrados Penalizados Adaptativos (airPLS)} ($\lambda = 10^5$):
+    Elimina la necesidad del parámetro manual $p$ actualizando los pesos de forma iterativa y adaptativa mediante funciones exponenciales basadas en los residuos negativos.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.95\textwidth]{comparison_baseline_airpls.png}
+        \caption{Recreación de corrección por airPLS ($\lambda=10^5$). Izquierda: Señal de entrada. Centro: Línea base estimada adaptativamente (rojo). Derecha: Señal limpia resultante.}
+        \label{fig:comp_base_airpls}
+    \end{figure}
+
+    \newpage
+    \item \textbf{Mínimos Cuadrados Penalizados Asimétricos Locales (arPLS)} ($\lambda = 10^5$):
+    Utiliza una función de distribución logística continua para la actualización de pesos basada en la media y desviación estándar de los residuos negativos, logrando un ajuste suave y muy insensible a la presencia de picos analíticos anchos.
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.95\textwidth]{comparison_baseline_arpls.png}
+        \caption{Recreación de corrección por arPLS ($\lambda=10^5$). Izquierda: Señal de entrada. Centro: Línea base logística (rojo). Derecha: Espectro limpio libre de fluorescencia.}
+        \label{fig:comp_base_arpls}
+    \end{figure}
+\end{enumerate}
+\vspace{0.5cm}
+Como se aprecia en la galería experimental recreada, los algoritmos de preprocesamiento resuelven satisfactoriamente tanto la atenuación del ruido electrónico de alta frecuencia como la remoción matemática de la fluorescencia instrumental. La suite de pruebas unitarias automatizadas valida la reproducibilidad exacta de estos gráficos en cada compilación del sistema, consolidando las bases físicas y matemáticas de la biblioteca.

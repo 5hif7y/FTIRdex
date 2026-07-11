@@ -1,0 +1,181 @@
+Smoothing,Baseline,N_Groups_Detected,Detected_Groups,N_Peaks_Detected,N_Noise_Peaks,Score_Std,Score_Penalized
+RAW,RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+RAW,detrend,5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+RAW,linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+RAW,polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+RAW,polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+RAW,polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+RAW,"asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",13,7,12,5
+RAW,"asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+RAW,"asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+RAW,airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+RAW,airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+RAW,airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+RAW,arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",10,5,10,5
+RAW,arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",11,6,10,4
+RAW,arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",11,5,12,7
+Moving_Average(3),RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Moving_Average(3),detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Moving_Average(3),linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Moving_Average(3),polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(3),polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(3),polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Moving_Average(3),"asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",13,7,12,5
+Moving_Average(3),"asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Moving_Average(3),"asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(3),airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(3),airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(3),airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(3),arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+Moving_Average(3),arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",11,6,10,4
+Moving_Average(3),arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Moving_Average(5),RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Moving_Average(5),detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Moving_Average(5),linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Moving_Average(5),polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(5),polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(5),polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Moving_Average(5),"asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",11,5,12,7
+Moving_Average(5),"asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Moving_Average(5),"asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(5),airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Moving_Average(5),airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(5),airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(5),arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Moving_Average(5),arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+Moving_Average(5),arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(7),RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",7,1,12,11
+Moving_Average(7),detrend,5,"C-H, C-O-C, C=C, C=O, CO2",7,2,10,8
+Moving_Average(7),linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",7,2,10,8
+Moving_Average(7),polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(7),polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(7),polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Moving_Average(7),"asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",11,5,12,7
+Moving_Average(7),"asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Moving_Average(7),"asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(7),airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(7),airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(7),airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Moving_Average(7),arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Moving_Average(7),arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+Moving_Average(7),arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)",RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Savitzky_Golay(7, 2)",detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(7, 2)",linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(7, 2)",polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)",polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)",polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)","asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",13,7,12,5
+"Savitzky_Golay(7, 2)","asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+"Savitzky_Golay(7, 2)","asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)",airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)",airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)",airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(7, 2)",arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(7, 2)",arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",11,6,10,4
+"Savitzky_Golay(7, 2)",arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+"Savitzky_Golay(11, 2)",RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Savitzky_Golay(11, 2)",detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(11, 2)",linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(11, 2)",polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(11, 2)",polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(11, 2)",polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Savitzky_Golay(11, 2)","asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",11,5,12,7
+"Savitzky_Golay(11, 2)","asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+"Savitzky_Golay(11, 2)","asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(11, 2)",airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(11, 2)",airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(11, 2)",airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(11, 2)",arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(11, 2)",arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+"Savitzky_Golay(11, 2)",arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(15, 3)",RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Savitzky_Golay(15, 3)",detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(15, 3)",linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",7,2,10,8
+"Savitzky_Golay(15, 3)",polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(15, 3)",polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(15, 3)",polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Savitzky_Golay(15, 3)","asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",12,5,13,8
+"Savitzky_Golay(15, 3)","asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+"Savitzky_Golay(15, 3)","asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(15, 3)",airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(15, 3)",airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(15, 3)",airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Savitzky_Golay(15, 3)",arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Savitzky_Golay(15, 3)",arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+"Savitzky_Golay(15, 3)",arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(3),RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Median_Filter(3),detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Median_Filter(3),linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Median_Filter(3),polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(3),polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(3),polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Median_Filter(3),"asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",14,7,13,6
+Median_Filter(3),"asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Median_Filter(3),"asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(3),airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(3),airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(3),airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(3),arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Median_Filter(3),arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",10,5,10,5
+Median_Filter(3),arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Median_Filter(5),RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",7,1,12,11
+Median_Filter(5),detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Median_Filter(5),linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Median_Filter(5),polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(5),polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(5),polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Median_Filter(5),"asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",13,6,13,7
+Median_Filter(5),"asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Median_Filter(5),"asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(5),airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(5),airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(5),airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(5),arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+Median_Filter(5),arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",10,5,10,5
+Median_Filter(5),arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Median_Filter(7),RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",7,1,12,11
+Median_Filter(7),detrend,5,"C-H, C-O-C, C=C, C=O, CO2",7,2,10,8
+Median_Filter(7),linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",7,2,10,8
+Median_Filter(7),polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(7),polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(7),polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Median_Filter(7),"asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",12,5,13,8
+Median_Filter(7),"asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+Median_Filter(7),"asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(7),airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+Median_Filter(7),airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Median_Filter(7),airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+Median_Filter(7),arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+Median_Filter(7),arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+Median_Filter(7),arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 25)",RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",7,1,12,11
+"Percentile_Filter(5, 25)",detrend,5,"C-H, C-O-C, C=C, C=O, CO2",7,2,10,8
+"Percentile_Filter(5, 25)",linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Percentile_Filter(5, 25)",polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 25)",polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 25)",polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Percentile_Filter(5, 25)","asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",12,5,13,8
+"Percentile_Filter(5, 25)","asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+"Percentile_Filter(5, 25)","asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 25)",airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 25)",airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 25)",airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 25)",arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Percentile_Filter(5, 25)",arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+"Percentile_Filter(5, 25)",arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 75)",RAW,6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Percentile_Filter(5, 75)",detrend,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Percentile_Filter(5, 75)",linear_baseline,5,"C-H, C-O-C, C=C, C=O, CO2",8,3,10,7
+"Percentile_Filter(5, 75)",polynomial_baseline(deg=2),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 75)",polynomial_baseline(deg=3),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 75)",polynomial_baseline(deg=4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",8,2,12,10
+"Percentile_Filter(5, 75)","asls(lam=1e4, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",12,5,13,8
+"Percentile_Filter(5, 75)","asls(lam=1e5, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",10,4,12,8
+"Percentile_Filter(5, 75)","asls(lam=1e6, p=0.001)",6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 75)",airpls(lam=1e4),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 75)",airpls(lam=1e5),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 75)",airpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9
+"Percentile_Filter(5, 75)",arpls(lam=1e4),5,"C-H, C-O-C, C=C, C=O, CO2",9,4,10,6
+"Percentile_Filter(5, 75)",arpls(lam=1e5),5,"C-H, C-O-C, C=C, C=O, CO2",10,5,10,5
+"Percentile_Filter(5, 75)",arpls(lam=1e6),6,"C-H, C-O-C, C=C, C=O, CO2, O-H",9,3,12,9

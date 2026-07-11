@@ -1,0 +1,84 @@
+\section{Apéndice Arquitectónico: Estructura de Clases y Librería}
+% ==========================================
+Para facilitar la mantenibilidad, escalabilidad y legibilidad de la biblioteca \texttt{ftir\_library} v0.0.3, se ha diseñado una arquitectura orientada a objetos desacoplada. Este apéndice describe la estructura de clases del sistema mediante un diagrama de clases UML (Unified Modeling Language) y detalla las responsabilidades de cada componente clave.
+
+\subsection{Diseño Conceptual de la Arquitectura}
+La biblioteca separa estrictamente las responsabilidades de preprocesamiento, búsqueda combinatoria de hiperparámetros y clasificación predictiva en tres pilares principales:
+\begin{enumerate}
+    \item \textbf{Contenedor de Resultados (Capa de Abstracción de Datos)}: La clase \texttt{PipelineResult} actúa como un envoltorio de alto nivel. Almacena las señales procesadas, los wavenumbers y los metadatos de la búsqueda en cuadrícula, encapsulando la complejidad de las matrices internas y permitiendo al usuario graficar y exportar resultados con facilidad.
+    \item \textbf{Capa de Clasificación (Machine Learning Layer)}: Los algoritmos de clasificación en medio celular se implementan mediante clases que siguen una interfaz de tipo \texttt{scikit-learn} (\textit{fit-predict-pattern}). Esto permite el polimorfismo entre clasificadores lineales basados en distancias geométricas (\texttt{NearestCentroidClassifier}) y clasificadores no lineales regularizados de alto desempeño (\texttt{KernelRidgeClassifier}).
+\end{enumerate}
+
+\subsection{Diagrama de Clases UML}
+El siguiente diagrama detalla los atributos y métodos públicos y privados de cada clase, así como las relaciones de herencia y dependencia funcional en la biblioteca:
+
+\shorthandoff{<}
+\shorthandoff{>}
+\begin{center}
+\begin{tikzpicture}
+
+  % Interfaz Conceptual Classifier
+  \begin{interface}[text width=6cm, fill=blue!5, draw=blue!70]{Classifier}{0,0}
+    \operation{+fit(X : ndarray, y : ndarray) : self}
+    \operation{+predict(X : ndarray) : ndarray}
+  \end{interface}
+
+  % Clase NearestCentroidClassifier
+  \begin{class}[text width=6.5cm, fill=blue!5, draw=blue!70]{NearestCentroidClassifier}{-4.5,-4.5}
+    \attribute{+centroids : dict}
+    \attribute{+classes : ndarray}
+    \operation{+fit(X : ndarray, y : ndarray) : self}
+    \operation{+predict(X : ndarray) : ndarray}
+    \inherit{Classifier}
+  \end{class}
+
+  % Clase KernelRidgeClassifier
+  \begin{class}[text width=7.5cm, fill=blue!5, draw=blue!70]{KernelRidgeClassifier}{4.5,-4.5}
+    \attribute{+kernel : str}
+    \attribute{+gamma : float}
+    \attribute{+alpha : float}
+    \attribute{+X\_train : ndarray}
+    \attribute{+y\_train : ndarray}
+    \attribute{+classes : ndarray}
+    \attribute{+alphas : dict}
+    \operation{+fit(X : ndarray, y : ndarray) : self}
+    \operation{+predict(X : ndarray) : ndarray}
+    \operation{-compute\_kernel(X1 : ndarray, X2 : ndarray) : ndarray}
+    \inherit{Classifier}
+  \end{class}
+
+  % Clase PipelineResult
+  \begin{class}[text width=7.5cm, fill=blue!5, draw=blue!70]{PipelineResult}{0,6.0}
+    \attribute{+x : ndarray}
+    \attribute{+y : ndarray}
+    \attribute{+best\_config : dict}
+    \attribute{+results : list}
+    \attribute{+is\_raman : bool}
+    \attribute{+groups\_db : dict}
+    \operation{+\_\_init\_\_(x, y, best\_config, results, is\_raman, groups\_db)}
+  \end{class}
+
+  % Relación de dependencia de PipelineResult a Classifier removida por desacoplamiento lógico
+
+
+\end{tikzpicture}
+\end{center}
+\shorthandon{<}
+\shorthandon{>}
+
+\subsection{Descripción de Módulos y Clases}
+
+\subsubsection{PipelineResult}
+Clase unificada que sirve como interfaz entre el núcleo de preprocesamiento y el usuario de scripting. 
+\begin{itemize}
+    \item \textbf{x e y}: Representan los vectores o matrices de wavenumbers e intensidades espectrales preprocesados bajo la mejor configuración encontrada.
+    \item \textbf{best\_config}: Diccionario conteniendo los hiperparámetros óptimos seleccionados por la búsqueda combinatoria.
+    \item \textbf{results}: Historial completo del score de cada combinación en la cuadrícula para permitir análisis comparativos externos.
+    \item \textbf{groups\_db}: Diccionario que almacena la base de datos de compuestos y bandas espectrales a detectar, propagada automáticamente a los métodos de visualización.
+\end{itemize}
+
+\subsubsection{NearestCentroidClassifier}
+Clasificador lineal simple de bajo coste computacional que asigna a cada espectro de prueba la etiqueta del centroide más cercano en espacio Euclidiano. Es ideal para propósitos de benchmarking y control de calidad.
+
+\subsubsection{KernelRidgeClassifier}
+Clasificador no lineal de alta precisión diagnóstica basado en mínimos cuadrados regularizados (Ridge Regression) en espacio dual con soporte para kernel Gaussiano (RBF). Permite modelar fronteras de decisión complejas y curvas no lineales de fluorescencia en espectroscopía Raman SERS. Su implementación evita el uso de dependencias pesadas utilizando álgebra lineal determinista de NumPy.

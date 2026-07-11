@@ -1,0 +1,179 @@
+\section{Manual de Desarrollo e Interfaz de Alto Nivel (API Python)}
+% ==========================================
+Para facilitar el uso de la biblioteca para los usuarios destinados, se implementó una interfaz de alto nivel que oculta la manipulación manual de decenas de parámetros. Esta API simplificada exporta constantes globales y funciones unificadas de auto-detección y parametrización automática:
+
+\subsection{Firmas de la API}
+\begin{itemize}
+    \item \texttt{x, y = load\_data(filepath, format\_type=None)}: Carga los datos espectroscópicos. Permite especificar manualmente el formato de la muestra mediante las constantes importadas \texttt{FTIR} o \texttt{SERS}, o por texto (\texttt{"FTIR"}, \texttt{"SERS"}). Si se omite, auto-detecta según la extensión del archivo (.csv $\rightarrow$ SERS, .txt $\rightarrow$ FTIR).
+    \item \texttt{generate\_report(x, y, output\_csv=None, space=None, groups\_db=None)}: Genera y guarda un reporte de bandas moleculares y picos en formato CSV. Admite la especificación opcional de una base de datos de compuestos personalizada mediante \texttt{groups\_db}.
+    \item \texttt{analysis = run\_analysis(x, y, space=None, groups\_db=None)}: Corre el barrido combinatorio completo de 180 combinaciones y devuelve un contenedor de tipo \texttt{PipelineResult}. Admite la especificación opcional de una base de datos de compuestos personalizada mediante \texttt{groups\_db}.
+    \item \texttt{n = get\_approvednumber(analysis)}: Determina dinámicamente cuántas combinaciones del grid search son consideradas óptimas o aprobadas (aquellas que logran la máxima detección de bandas analíticas de interés sin línea base RAW).
+    \item \texttt{plot\_best(analysis, output\_image, mode="box", space="absorbance")}: Grafica el espectro preprocesado óptimo marcando las bandas. Permite configurar el marcado en modo líneas (\texttt{"lines"}) o cajas (\texttt{"boxes"} o \texttt{"box"}). Utiliza la base de datos de compuestos (\texttt{groups\_db}) almacenada en \texttt{analysis} si está presente.
+    \item \texttt{plot\_gallery(analysis, output\_prefix, max\_plots=9, mode="box", space="absorbance")}: Genera subplots horizontales $3 \times 1$ de las mejores $max\_plots$ configuraciones bajo el modo visual indicado. Utiliza la base de datos de compuestos (\texttt{groups\_db}) almacenada en \texttt{analysis} si está presente.
+\end{itemize}
+
+\subsection{Código de Ejemplo Integrado}
+El siguiente listado de código ejemplifica el flujo de trabajo final simplificado utilizando la biblioteca:
+
+\begin{lstlisting}[language=Python, caption=Flujo de analisis utilizando constantes y numero adaptativo de galerias]
+from ftir_library import (
+    load_data, generate_report, run_analysis, 
+    plot_best, plot_gallery, get_approvednumber, 
+    FTIR, SERS
+)
+
+# 1. CASO DE APLICACION I: ANALISIS DE MUESTRA FTIR
+print("Analizando espectro FTIR de Grafeno...")
+x_f, y_f = load_data("GO coque s lav ox.txt", FTIR)
+
+# Base de datos opcional y personalizada de compuestos y bandas
+custom_db = {
+    "Grafeno Carbonilo (C=O)": (1680, 1750),
+    "Grafeno Aromatico (C=C)": (1550, 1630),
+    "Grafeno Epoxido (C-O-C)": (850, 1000)
+}
+
+generate_report(x_f, y_f, "friendly_report_FTIR.csv", groups_db=custom_db)
+analysis_f = run_analysis(x_f, y_f, groups_db=custom_db)
+print(f"Mejor configuracion FTIR: {analysis_f.best_config}")
+
+# Obtener numero exacto de configuraciones exitosas
+n_f = get_approvednumber(analysis_f)
+print(f"Configuraciones FTIR aprobadas: {n_f}")
+
+# Graficar mejor ajuste con lineas e imprimir galeria con cajas
+plot_best(analysis_f, "images/friendly_best_FTIR.png", "lines")
+plot_gallery(analysis_f, "images/friendly_gallery_FTIR", n_f, "boxes")
+
+
+# 2. CASO DE APLICACION II: DIAGNOSTICO ONCOLOGICO RAMAN SERS
+print("\nAnalizando espectro Raman SERS de Melanoma...")
+x_r, y_r = load_data("Cells Raman Spectra/A/(COOH)2.csv", "SERS")
+generate_report(x_r, y_r, "friendly_report_Raman.csv")
+analysis_r = run_analysis(x_r, y_r)
+print(f"Mejor configuracion Raman: {analysis_r.best_config}")
+
+n_r = get_approvednumber(analysis_r)
+print(f"Configuraciones Raman aprobadas: {n_r}")
+
+# Graficar mejor ajuste con cajas e imprimir galeria con lineas
+plot_best(analysis_r, "images/friendly_best_Raman.png", "boxes")
+plot_gallery(analysis_r, "images/friendly_gallery_Raman", n_r, "lines")
+\end{lstlisting}
+
+\subsection{Visualización de Espectros en Transmitancia y Absorbancia}
+La API simplificada permite graficar el espectro preprocesado óptimo tanto en el espacio de Transmitancia como en el de Absorbancia, controlándolo mediante el parámetro opcional \texttt{space}. 
+
+A continuación se presentan los ejemplos de uso y los gráficos generados para cada espacio:
+
+\vspace{0.4cm}
+
+% --- MUESTRA EN TRANSMITANCIA ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Graficar en Transmitancia
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("GO coque s lav ox.txt", FTIR)
+res = run_analysis(x, y)
+plot_best(
+    res, 
+    "friendly_best_FTIR_trans.png", 
+    mode="box", 
+    space="transmittance"
+)
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=0.9\textwidth]{friendly_best_FTIR_trans.png}
+        \captionof{figure}{Muestra FTIR en Transmitancia}
+    \end{minipage}
+\end{minipage}
+
+\vspace{0.6cm}
+
+% --- MUESTRA EN ABSORBANCIA ---
+\noindent
+\begin{minipage}{\textwidth}
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \begin{lstlisting}[language=Python, numbers=none, frame=single, basicstyle=\ttfamily\scriptsize]
+# Graficar en Absorbancia
+from ftir_library import (
+    load_data, run_analysis,
+    plot_best, FTIR
+)
+x, y = load_data("GO coque s lav ox.txt", FTIR)
+res = run_analysis(x, y)
+plot_best(
+    res, 
+    "friendly_best_FTIR_abs.png", 
+    mode="box", 
+    space="absorbance"
+)
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \vspace{0pt}
+        \centering
+        \includegraphics[width=0.9\textwidth]{friendly_best_FTIR_abs.png}
+        \captionof{figure}{Muestra FTIR en Absorbancia}
+    \end{minipage}
+\end{minipage}
+
+\vspace{0.6cm}
+
+\subsection{Soporte Local de Parámetros en Español y Buenas Prácticas}
+Para facilitar la adopción y accesibilidad del software por parte de investigadores y técnicos locales en laboratorios clínicos y de nanotecnología, la versión \texttt{0.0.3} de la biblioteca introduce soporte para varios parámetros en español de uso frecuente:
+\begin{itemize}
+    \item \texttt{space}: Se admite \mbox{\texttt{"transmitancia"}} y \mbox{\texttt{"absorbancia"}} como equivalentes de \mbox{\texttt{"transmittance"}} y \mbox{\texttt{"absorbance"}}.
+    \item \texttt{mode}: Se admite \mbox{\texttt{"lineas"}} y \mbox{\texttt{"cajas"}} como equivalentes de \mbox{\texttt{"lines"}} y \mbox{\texttt{"box"}}.
+\end{itemize}
+
+Sin embargo, dado que el inglés es el estándar predominante a nivel global en programación, instrumentación analítica y documentación científica, la biblioteca emite un mensaje de advertencia (\texttt{UserWarning}) para instar al usuario a familiarizarse gradualmente con los parámetros en inglés. El mensaje es el siguiente:
+
+\begin{center}
+\textit{Advertencia: Esta biblioteca admite comandos y parámetros en español para facilitar su adopción y accesibilidad. No obstante, recomendamos familiarizarse gradualmente con la terminología en inglés, ya que constituye el estándar predominante en documentación científica, programación e instrumentación analítica.}
+\end{center}
+
+El listado de código \ref{lst:spanish_params} muestra cómo se invoca de manera local y cómo se dispara el warning indicando la línea del script origen:
+
+\begin{lstlisting}[language=Python, label=lst:spanish_params, caption=Uso de parametros en espanol y advertencia resultante]
+# Script de prueba (test1.py)
+from ftir_library import load_data, run_analysis, plot_best, FTIR
+x, y = load_data("GO coque s lav ox.txt", FTIR)
+
+# La llamada con "transmitancia" procesa los datos y emite la advertencia
+res = run_analysis(x, y, space="transmitancia")
+
+# La llamada con "lineas" y "transmitancia" tambien emite advertencias
+plot_best(res, "best_GO.png", mode="lineas", space="transmitancia")
+\end{lstlisting}
+
+\subsection{Configuración de Base de Datos de Compuestos Personalizada (groups\_db)}
+% ==========================================
+La biblioteca \texttt{ftir\_library} permite al usuario definir bases de datos personalizadas de compuestos y sus respectivos rangos de números de onda (wavenumbers) para el análisis automatizado y etiquetado de bandas. Esto resulta de gran utilidad cuando se trabaja con compuestos distintos al óxido de grafeno estándar o biomarcadores celulares predefinidos.
+
+La base de datos personalizada se estructura como un diccionario en Python, donde las claves son cadenas que representan el nombre de la banda o grupo funcional, y los valores son tuplas de dos elementos conteniendo los límites inferior y superior del rango de números de onda (en $\text{cm}^{-1}$):
+
+\begin{lstlisting}[language=Python, caption=Definición de base de datos personalizada]
+custom_db = {
+    "Grupo Hidroxilo (O-H)": (3200, 3600),
+    "Enlace Carbonilo (C=O)": (1680, 1750),
+    "Enlace Aromatico (C=C)": (1500, 1650),
+    "Estiramiento C-O-C": (950, 1200)
+}
+\end{lstlisting}
+
+Esta base de datos se pasa como argumento opcional \texttt{groups\_db} a las funciones \texttt{run\_analysis} o \texttt{generate\_report}. El objeto contenedor de resultados \texttt{PipelineResult} resultante de \texttt{run\_analysis} almacena automáticamente esta estructura en su atributo \texttt{groups\_db}.
+
+Al invocar los métodos de graficado \texttt{plot\_best} y \texttt{plot\_gallery}, la biblioteca detecta la presencia de esta base de datos dentro del objeto de análisis y dibuja los marcados de bandas (tanto en modo \texttt{"lines"} como \texttt{"box"} / \texttt{"boxes"}) utilizando los nombres y rangos provistos por el usuario. Esto elimina la necesidad de modificar el código interno de la biblioteca para dar soporte a nuevos compuestos químicos.

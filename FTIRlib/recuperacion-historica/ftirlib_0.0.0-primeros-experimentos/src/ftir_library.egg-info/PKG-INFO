@@ -1,0 +1,51 @@
+Metadata-Version: 2.4
+Name: ftir_library
+Version: 0.1.0
+Summary: Biblioteca avanzada para preprocesamiento y analisis de espectros FTIR
+Author: Matias Roberto Aleman
+License: Uso interno confidencial
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Dynamic: license-file
+
+# FTIR Analysis Library
+
+Biblioteca avanzada para preprocesamiento, corrección de línea base y detección automática de grupos funcionales en espectros FTIR de Óxido de Grafeno (GO) y Óxido de Grafeno Reducido (rGO).
+
+## Instalación
+
+Para instalar la biblioteca de forma local en modo editable (permitiendo modificar el código y ver los cambios al instante desde cualquier script en el sistema):
+
+```bash
+# Desde la raiz del repositorio
+pip install -e .
+```
+
+## Uso Rápido
+
+```python
+from ftir_library import load_ftir_data, transmittance_to_absorbance, correct_baseline_absorbance
+
+# Cargar datos
+x, y_trans = load_ftir_data("GO coque s lav red.txt")
+
+# Convertir a absorbancia
+y_abs = transmittance_to_absorbance(y_trans)
+
+# Corregir linea base usando arPLS
+z, y_corr = correct_baseline_absorbance(x, y_abs, method="arpls", lam=1e5)
+```
+
+## Estructura del Repositorio
+
+- `src/ftir_library/`: Código fuente de la biblioteca Python.
+- `docs/`: Documentación teórica, reportes en markdown e informe formal en LaTeX (`informe_desarrollo.tex`).
+- `examples/`: Datos FTIR experimentales y scripts ejecutables (`run_pipeline_absorbance.py`, `plot_superposition_absorbance.py`, `generate_reports.py`).
+
+## Licencia
+
+Uso interno estrictamente confidencial. Copyright (C) 2026 Matías Roberto Alemán.

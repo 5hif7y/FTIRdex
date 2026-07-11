@@ -1,0 +1,22 @@
+\section{Introducción General}
+% ==========================================
+La espectroscopía vibracional constituye una de las metodologías analíticas más potentes para la caracterización no destructiva, rápida y de alta especificidad de la materia condensada en física, química y biomedicina. Al registrar los modos de vibración fundamentales de los enlaces químicos en respuesta a la interacción con la radiación electromagnética, estas técnicas proporcionan una "huella dactilar" molecular única e inconfundible de las muestras analizadas.
+
+Este informe técnico documenta el diseño teórico, los algoritmos matemáticos y los resultados experimentales de la versión \texttt{0.0.3} de la biblioteca unificada \texttt{ftir\_library}. Esta biblioteca integra bajo un mismo núcleo computacional robusto desarrollado en Python puro (NumPy y SciPy) el procesamiento y análisis automatizado de dos de las técnicas espectroscópicas vibracionales más relevantes en la actualidad: la espectroscopía infrarroja por transformada de Fourier (FTIR) y la espectroscopía Raman amplificada por superficies (SERS).
+
+\subsection{Sinergia y Complementariedad Física de FTIR y Raman}
+Aunque ambas técnicas analizan transiciones de energía vibracional en la materia, obedecen a reglas de selección cuántica diferentes y complementarias:
+\begin{itemize}
+    \item \textbf{Espectroscopía FTIR}: Es una técnica de absorción que requiere que el modo de vibración molecular induzca un cambio neto en el momento dipolar eléctrico permanente de la molécula. Esto la hace sumamente sensible a grupos polares (como los enlaces hidroxilo O-H, carbonilo C=O y epóxido C-O-C en el óxido de grafeno).
+    \item \textbf{Espectroscopía Raman SERS}: Es una técnica de dispersión inelástica donde la transición vibracional depende de cambios en la polarizabilidad de la nube electrónica molecular. SERS utiliza nanoestructuras metálicas para amplificar la señal por factores de hasta $10^8$. Esto permite medir suspensiones celulares húmedas de forma directa dado que el agua (altamente polar pero poco polarizable) es prácticamente transparente bajo luz dispersada Raman, superando la limitación crítica de absorción que exhibe el agua en el infrarrojo.
+\end{itemize}
+
+\subsection{Estructura del Informe y Casos de Estudio}
+El documento describe detalladamente la validación matemática y la flexibilidad operacional de la biblioteca a través de tres casos de aplicación de complejidad creciente:
+\begin{itemize}
+    \item \textbf{Caso de Aplicación I}: Automatización de análisis químico FTIR para la caracterización de muestras de óxido de grafeno (GO y rGO), centrado en la conversión a Absorbancia y algoritmos de remoción de línea base (AsLS, airPLS, arPLS) para rastrear la desoxigenación.
+    \item \textbf{Caso de Aplicación II}: Automatización de análisis biomédico SERS de muestras celulares de melanoma, ilustrando la clasificación diagnóstica multiclase con Kernel Ridge no lineal de alta especificidad y precisión ($>99.5\%$) y filtrado de rayos cósmicos.
+    \item \textbf{Caso de Aplicación III}: Automatización de muestreo FTIR contra bases de datos científicas externas. Este caso de estudio valida la modularidad y capacidad de reutilización de la biblioteca mediante la importación y procesamiento de datasets independientes publicados en la literatura científica para diversos compuestos.
+\end{itemize}
+
+% ==========================================

@@ -1,0 +1,53 @@
+# Build folders
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+cmake-build-*/
+.vs/
+out/
+
+
+# Compiled binaries
+*.lib
+*.exe
+*.a
+*.so
+*.dylib
+
+# Object files and compilation residues
+*.obj
+*.pdb
+*.ilk
+*.suo
+*.user
+*.ncb
+*.sdf
+*.opensdf
+*.db
+*.o
+
+# Latex to PDF compilation residues
+*.aux
+*.log 
+*.out
+*.toc
+
+# Python outputs and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary runtime FTIR generated images/CSVs
+transmittance_*.png
+absorbance_*.png
+superposition_*.png
+reporte_picos_valleys_*.csv
+super_transmittance.png
+super_absorbance.png
+super_superposition.png
+temp_groups.json
+

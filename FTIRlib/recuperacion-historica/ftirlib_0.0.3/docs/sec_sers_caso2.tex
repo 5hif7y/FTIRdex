@@ -1,0 +1,171 @@
+\section{Caso de Aplicación II: Automatización de análisis biomédico SERS de muestras de melanoma}
+% ==========================================
+
+\subsection{Fundamento de Raman SERS celular en medio acuoso}
+A diferencia del infrarrojo, en la espectroscopía Raman el agua exhibe una polarizabilidad muy baja, haciéndola prácticamente transparente y permitiendo el análisis directo de suspensiones celulares en sus medios líquidos de cultivo o amortiguadores fisiológicos. Para lograr la sensibilidad diagnóstica requerida en oncología diagnóstica, se utiliza SERS (Surface-Enhanced Raman Spectroscopy), donde nanoestructuras de oro (\textit{gold nanourchins}) acopladas químicamente a las muestras amplifican los campos electromagnéticos locales mediante plasmones superficiales localizados, incrementando la sección eficaz de la señal Raman por factores de $10^5$ a $10^8$ \cite{erzina2020}.
+
+\subsection{Algoritmo Determinista de Rayos Cósmicos (MAD Z-Score)}
+Las colisiones aleatorias de radiación ionizante ambiental sobre el sensor CCD del detector generan picos intensos espurios de un solo píxel de ancho (rayos cósmicos). Su remoción activa se realiza mediante el algoritmo Z-Score modificado con la Desviación Absoluta respecto a la Mediana (MAD):
+\begin{enumerate}
+    \item Se calcula la tendencia local por mediana móvil: $y_{\text{med}} = \text{medfilt}(y, W_{\text{med}})$.
+    \item Residuos: $d = y - y_{\text{med}}$.
+    \item Z-Score modificado:
+    \begin{equation}
+        Z_i = \frac{0.6745 \cdot (d_i - \text{mediana}(d))}{\text{MAD}(d)}
+    \end{equation}
+    donde $\text{MAD}(d) = \text{mediana}(|d - \text{mediana}(d)|)$.
+    \item Los puntos con $Z_i > 6.0$ se identifican como artefactos de radiación y se interpolan de forma lineal usando los vecinos sanos más cercanos.
+\end{enumerate}
+
+\subsection{Normalización de Intensidad Espectral SERS}
+Para contrarrestar variaciones instrumentales de enfoque del láser y variaciones microscópicas de la densidad celular en el sustrato SERS, se aplica normalización vectorial L2:
+\begin{equation}
+    y_{\text{norm}} = \frac{y}{\|y\|_2} = \frac{y}{\sqrt{\sum_{i=1}^N y_i^2}}
+\end{equation}
+
+\subsection{Clasificación Predictiva mediante Kernel Ridge Classifier (Dual RLS)}
+El diagnóstico automático de células tumorales se modela en NumPy puro resolviendo de forma exacta y cerrada la regresión rígida dual generalizada con Kernel RBF (gaussiano):
+\begin{equation}
+    \alpha_c = (K + \lambda I)^{-1} Y_c, \quad K_{i,j} = \exp\left(-\gamma \|x_i - x_j\|_2^2\right)
+\end{equation}
+donde $\lambda=0.01$ es la regularización de Tikhonov, $\gamma=1.0$ controla el ancho de banda radial, y para cada clase $c \in C$, la etiqueta de entrenamiento $Y_c \in \{-1, 1\}^M$ representa la pertenencia binaria en el esquema One-vs-Rest (OvR).
+
+Para la inferencia de un nuevo espectro de prueba $x^* \in \mathbb{R}^D$, se calcula la función de decisión para cada clasificador binario:
+\begin{equation}
+    f_c(x^*) = \sum_{i=1}^{M} \alpha_{i,c} \exp\left(-\gamma \|x_i - x^*\|_2^2\right)
+\end{equation}
+y se asigna la etiqueta de la clase que maximiza esta puntuación dual:
+\begin{equation}
+    \hat{y} = \operatorname{arg\,max}_{c \in C} f_c(x^*)
+\end{equation}
+
+\subsection{Resultados Diagnósticos y Desempeño Clínico}
+El preprocesamiento óptimo determinado fue: Promedio Móvil (5) + baseline polinomial ($deg=2$). Sobre \textbf{1892 espectros Raman celulares} (Melanoma, DMEM --medio de cultivo Dulbecco's Modified Eagle Medium libre de células, utilizado como control analítico de fondo--, y control sano de fibroblastos normales) del dataset público de Trelin \cite{dataset_trelin}, la validación cruzada de 5 pliegues reportó:
+\begin{itemize}
+    \item \textbf{Precisión Multiclase}: 99.52 \%
+    \item \textbf{Precisión Binaria (Melanoma vs. Resto)}: 99.58 \%
+    \item \textbf{Sensibilidad (True Positive Rate)}: 99.21 \%
+    \item \textbf{Especificidad (True Negative Rate)}: 99.76 \%
+\end{itemize}
+El espacio de puntuaciones de componentes principales (PCA) de la figura \ref{fig:pca_raman} muestra la nítida separación de clases. La figura \ref{fig:avg_raman} ilustra los espectros promedio. Las figuras \ref{fig:raman_lines} y \ref{fig:raman_box} muestran la comparación del marcado de bandas del biomarcador de melanoma.
+
+\subsection{Galería de Barrido Combinatorio Raman (17 Configuraciones de alto score)}
+El barrido paramétrico en absorbancia identificó 17 configuraciones óptimas empatadas que maximizan la asignación de biomarcadores celulares: fosfatos de ácidos nucleicos ($1000-1150\text{ cm}^{-1}$), proteínas/lípidos ($1200-1400\text{ cm}^{-1}$) y amida I ($1550-1650\text{ cm}^{-1}$). La galería completa de las 17 configuraciones en formato de subplots $3 \times 1$ se presenta de forma secuencial en las figuras \ref{fig:galeria_raman_1} a la \ref{fig:galeria_raman_6}.
+
+\subsection{Figuras de Espectroscopía Raman SERS}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{average_spectra_raman.png}
+        \caption{Espectro Raman Promedio por clase celular.}
+        \label{fig:avg_raman}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{pca_scores_raman.png}
+        \caption{Espacio de Puntuaciones PCA del clasificador.}
+        \label{fig:pca_raman}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{raman_demo_lines.png}
+        \caption{Espectro Raman SERS celular en modo líneas.}
+        \label{fig:raman_lines}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{raman_demo_box.png}
+        \caption{Espectro Raman SERS celular en modo cajas.}
+        \label{fig:raman_box}
+    \end{minipage}
+\end{figure}
+
+\newpage
+\subsection{Galería de Barrido Paramétrico Raman (17 Configuraciones óptimas)}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{raman_gallery_box_part1.png}
+    \caption{Galería Raman (Parte 1).}
+    \label{fig:galeria_raman_1}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{raman_gallery_box_part2.png}
+    \caption{Galería Raman (Parte 2).}
+    \label{fig:galeria_raman_2}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{raman_gallery_box_part3.png}
+    \caption{Galería Raman (Parte 3).}
+    \label{fig:galeria_raman_3}
+\end{figure}
+
+\newpage
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{raman_gallery_box_part4.png}
+    \caption{Galería Raman (Parte 4).}
+    \label{fig:galeria_raman_4}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{raman_gallery_box_part5.png}
+    \caption{Galería Raman (Parte 5).}
+    \label{fig:galeria_raman_5}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{raman_gallery_box_part6.png}
+    \caption{Galería Raman (Parte 6, mostrando las últimas 2 combinaciones y 1 celda vacía).}
+    \label{fig:galeria_raman_6}
+\end{figure}
+
+\newpage
+
+\subsection{Comparativa Tecnológica y Criterio Clínico}
+% ==========================================
+La versión 0.0.3 presenta ventajas operacionales críticas frente a la red neuronal convolucional (CNN) profunda de Erzina et al. \cite{erzina2020}.
+
+\subsubsection{Tabla Comparativa de Flujos de Trabajo}
+La tabla \ref{tab:comparativa} resume los contrastes de diseño e implicaciones clínicas:
+
+\begin{table}[!ht]
+    \centering
+    \caption{Comparación entre el flujo de Erzina et al. (CNN) y la biblioteca v0.0.3.}
+    \label{tab:comparativa}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{lp{5cm}p{5cm}p{4.2cm}}
+        \toprule
+        Criterio Metodológico & Estudio de Referencia (CNN) \cite{erzina2020} & Biblioteca v0.0.3 (SERS) & Implicación Clínica / Oncológica \\
+        \midrule
+        \textbf{Hardware} & Requiere GPU dedicada (NVIDIA CUDA) y almacenamiento masivo para frameworks. & Ejecución instantánea en CPU estándar (computadora de escritorio o laptop de laboratorio). & \textbf{Alta viabilidad local}: No requiere servidores en la nube ni hardware de alto coste. \\
+        \textbf{Software} & TensorFlow, Keras y controladores propietarios propensos a incompatibilidades. & NumPy y SciPy puros, instalable mediante zip de forma limpia y liviana. & \textbf{Despliegue robusto}: Instalación sin riesgos de desconfiguración en el laboratorio. \\
+        \textbf{Entrada} & Exige la adquisición simultánea de un triplete de espectros por paciente. & Clasificación y preprocesamiento sobre espectros individuales. & \textbf{Flexibilidad analítica}: Si una medición se daña, no se descarta toda la muestra. \\
+        \textbf{Filtro CCD} & Sin tratamiento de rayos cósmicos (delegado a la tolerancia intrínseca de la red). & Filtro determinista adaptativo MAD Z-Score e interpolación lineal de vecinos. & \textbf{Seguridad clínica}: Eliminación activa de artefactos físicos de radiación ionizante. \\
+        \textbf{Explicabilidad} & Redes neuronales profundas que actúan como cajas negras no interpretables. & Clasificador Kernel Ridge dual con visualización y proyección en espacio PCA. & \textbf{Garantía médica}: El clínico puede contrastar y auditar la posición del espectro frente a controles. \\
+        \bottomrule
+    \end{tabular}%
+    }
+\end{table}
+
+\subsubsection{Beneficios Clave en Oncología Clínica}
+\begin{enumerate}
+    \item \textbf{Cero Latencia y Eficiencia Computacional}: El clasificador Kernel Ridge posee una solución matemática dual cerrada directa mediante álgebra lineal ($ (K + \lambda I)^{-1} Y $). El entrenamiento del dataset completo toma menos de un segundo en CPU ordinaria y la predicción tarda milisegundos.
+    \item \textbf{Mayor Resiliencia al Sobreajuste (Overfitting)}: La regularización de Tikhonov ($\lambda=0.01$) penaliza los coeficientes grandes, forzando una frontera de decisión suave que generaliza con alta precisión en datos nuevos y datasets pequeños de células raras.
+    \item \textbf{Explicabilidad y Confianza Clínica (Auditoría Médica)}: La combinación de proyección PCA y clasificación Kernel Ridge permite trazar el clúster espacial de la muestra y correlacionarlo con bandas moleculares conocidas (e.g., ácidos nucleicos a $\sim1080$ cm$^{-1}$), posibilitando al oncólogo validar de forma química el diagnóstico automático antes de tomar decisiones críticas.
+\end{enumerate}
+
+% ==========================================

@@ -1,0 +1,68 @@
+\section{Caso de Aplicación IV: Comparación de Calidad de Proveedores de Grafeno mediante PCA y Clasificación con Kernel Ridge en Espectros FTIR}
+% ==========================================
+
+\subsection{Contexto y Fundamento del Control de Calidad}
+En el ámbito industrial de los nanomateriales, la reproducibilidad lote a lote es un desafío crítico. Específicamente, en la síntesis de Óxido de Grafeno Reducido (rGO), el nivel de reducción química determina directamente la conductividad eléctrica y las propiedades mecánicas finales del material. El análisis directo de espectros FTIR mediante métodos convencionales puede verse dificultado por el ruido instrumental y la deriva de la línea base. 
+
+Este caso de aplicación aborda la automatización del control de calidad y la clasificación de proveedores mediante técnicas estadísticas multivariantes: Análisis de Componentes Principales (PCA) mediante Descomposición en Valores Singulares (SVD) para reducción de dimensionalidad, y un clasificador Kernel Ridge con kernel RBF bajo un esquema Multiclase One-vs-Rest (OvR) para validar la separabilidad de los lotes.
+
+\subsection{Modelo de Simulación Físico-Química de Reducción}
+Para simular de manera realista la variabilidad en el control de calidad, la biblioteca genera espectros ficticios basados en un espectro real de óxido de grafeno ($y_{\text{base}}$) medido en el vector de números de onda $x$. Se introducen variaciones no colineares en la presencia de grupos funcionales de oxígeno para modelar de forma preciso la cinética química de reducción, donde los grupos hidroxilo (O-H), carbonilo (C=O) y alcoxilo (C-O) se reducen a distintas tasas físicas:
+
+\begin{equation}
+    y_{\text{sim}} = y_{\text{base}} \times s + \psi_{\text{quim}} + \text{drift}_{\text{lineabase}} + \epsilon_{\text{ruido}} + \delta_{\text{shift}}
+\end{equation}
+
+donde:
+\begin{itemize}
+    \item $s$ es un factor de escala aleatorio.
+    \item $\psi_{\text{quim}}$ es la firma química específica de la clase del proveedor, construida sobre perfiles gaussianos para O-H ($3400\text{ cm}^{-1}$), C=O ($1720\text{ cm}^{-1}$) y C-O ($1050\text{ cm}^{-1}$):
+    \begin{equation}
+        P_{3400} = e^{-\left(\frac{x - 3400}{250}\right)^2}, \quad P_{1720} = e^{-\left(\frac{x - 1720}{50}\right)^2}, \quad P_{1050} = e^{-\left(\frac{x - 1050}{60}\right)^2}
+    \end{equation}
+    \item $\text{drift}_{\text{lineabase}} = c_1 x_{\text{norm}} + c_2 x_{\text{norm}}^2$ representa la deriva de la línea base debido a dispersión Mie residual.
+    \item $\epsilon_{\text{ruido}} \sim \mathcal{N}(0, \sigma^2)$ es el ruido gaussiano instrumental.
+    \item $\delta_{\text{shift}}$ es un desplazamiento vertical aleatorio del espectro completo.
+\end{itemize}
+
+Los tres proveedores se modelan con las siguientes características físicas y químicas (que eliminan la colinealidad lineal y reflejan el grado de reducción de grafeno):
+\begin{enumerate}
+    \item \textbf{Proveedor A (Alta Calidad - rGO altamente reducido)}: Presenta un grado óptimo de reducción. Los picos de grupos funcionales de oxígeno son prácticamente nulos: $\psi_{\text{quim}} = 0.05 P_{3400} + 0.05 P_{1720} + 0.05 P_{1050}$. El ruido es muy bajo ($\sigma = 0.005$) y la deriva de línea base es insignificante ($c_1, c_2 \in [-0.02, 0.02]$).
+    \item \textbf{Proveedor B (Calidad Media - rGO parcialmente reducido)}: Muestra una reducción incompleta. Conserva grupos carbonilo y alcoxilo, pero tiene baja presencia de hidroxilos: $\psi_{\text{quim}} = 0.1 P_{3400} + 2.0 P_{1720} + 1.0 P_{1050}$. El nivel de ruido es moderado ($\sigma = 0.03$) y la deriva de línea base es intermedia ($c_1, c_2 \in [-0.15, 0.15]$).
+    \item \textbf{Proveedor C (Baja Calidad - GO sin reducir)}: Representa material de baja calidad técnica (prácticamente óxido de grafeno puro sin reducir). Tiene una alta abundancia de hidroxilos y grupos oxigenados: $\psi_{\text{quim}} = 4.0 P_{3400} + 0.5 P_{1720} + 3.0 P_{1050}$. El nivel de ruido es severo ($\sigma = 0.09$) y presenta una deriva extrema de línea base ($c_1, c_2 \in [-0.40, 0.40]$).
+\end{enumerate}
+
+\subsection{Análisis de Componentes Principales (PCA) mediante SVD}
+Para el PCA, primero se normalizan vectorialmente los espectros crudos $y_{\text{sim}}$ de forma que su norma $L_2$ sea la unidad. La matriz de datos espectrales resultantes $X$ ($N_{\text{muestras}} \times L$) se centra restando la media de cada variable, obteniéndose $X_c$.
+
+La descomposición de valores singulares (SVD) de $X_c$ es:
+\begin{equation}
+    X_c = U \Sigma V^T
+\end{equation}
+donde las filas de $V^T$ representan las direcciones de los componentes principales (vectores de carga o \textit{loadings}). Las puntuaciones espectrales (\textit{scores}) se calculan proyectando los datos centrados:
+\begin{equation}
+    T = X_c V
+\end{equation}
+La varianza asociada al componente principal $i$-ésimo se obtiene a partir del valor singular correspondiente $\lambda_i = \Sigma_{ii}$:
+\begin{equation}
+    \sigma^2_i = \frac{\lambda_i^2}{N_{\text{muestras}} - 1}
+\end{equation}
+El porcentaje de varianza explicada se define como $\text{EVR}_i = \lambda_i^2 / \sum_j \lambda_j^2$.
+
+\subsection{Resultados y Clasificación}
+Al aplicar PCA sobre el dataset simulado de 180 espectros (60 por proveedor), el primer componente principal (PC1) captura el \textbf{55.36\%} de la varianza total, y el segundo (PC2) el \textbf{40.01\%} (explicando en conjunto el \textbf{95.37\%} de la varianza total). Como se observa en la figura \ref{fig:pca_suppliers}, el espacio bidimensional PC1-PC2 revela una clara segregación en tres grupos bien definidos correspondientes a cada proveedor:
+\begin{itemize}
+    \item El \textbf{Proveedor A} (verde) se concentra en una región estrecha y densa, debido a su bajísima variabilidad y ruido.
+    \item El \textbf{Proveedor B} (naranja) se desplaza a lo largo del eje PC2 por la presencia selectiva de picos a $1720\text{ cm}^{-1}$.
+    \item El \textbf{Proveedor C} (rojo) muestra una gran dispersión espacial debido al elevado nivel de ruido aleatorio e interferencias de línea base de gran magnitud, pero claramente separado por su dominante banda O-H a $3400\text{ cm}^{-1}$.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{pca_scores_ftir_quality.png}
+    \caption{Espacio de puntuaciones de los componentes principales PC1 y PC2 para la clasificación de proveedores de grafeno (Caso IV).}
+    \label{fig:pca_suppliers}
+\end{figure}
+
+Para validar computacionalmente esta separación, se entrenó y evaluó un clasificador Kernel Ridge con kernel RBF ($\gamma=0.1, \alpha=0.1$) en un esquema One-vs-Rest (OvR). Utilizando una validación cruzada de 5 pliegues (5-fold Cross-Validation), el clasificador alcanzó una precisión del \textbf{100.00\%}. Esta robustez demuestra que, a pesar del severo ruido y de las fuertes derivas de línea base añadidas, el modelado químico no colineal preserva características de forma estables que la normalización vectorial resalta, permitiendo una identificación inequívoca del origen del lote.
+\newpage

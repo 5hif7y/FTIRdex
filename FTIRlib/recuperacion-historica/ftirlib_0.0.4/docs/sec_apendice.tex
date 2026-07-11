@@ -1,0 +1,488 @@
+\section{Apéndice Algorítmico: Detalles Matemáticos y Pseudocódigos}
+% ==========================================
+Para garantizar la máxima transparencia científica y clínica, este apéndice técnico detalla las ecuaciones matemáticas y los pseudocódigos estructurados en español para todos los algoritmos que componen el núcleo computacional de la biblioteca \texttt{ftir\_library} v0.0.3. Todos los pseudocódigos presentados adoptan de forma homogénea la indexación basada en cero (0-indexed) en coherencia con la implementación computacional de la biblioteca en Python.
+
+% ==========================================
+\subsection{Algoritmos de Suavizado y Filtros de Ruido}
+% ==========================================
+El suavizado se emplea para atenuar el ruido electrónico e instrumental de alta frecuencia en los espectros registrados.
+
+\subsubsection{Promedio Móvil (Moving Average)}
+Este filtro lineal reemplaza cada valor con la media aritmética calculada sobre una ventana local y simétrica de tamaño $W = 2k + 1$:
+\begin{equation}
+    A_{\text{smooth}}[i] = \frac{1}{2k + 1} \sum_{j=-k}^{k} A[i + j]
+\end{equation}
+Los extremos del espectro se resuelven mediante un acolchado (padding) que repite los valores de borde para evitar artefactos numéricos de truncamiento.
+
+\begin{lstlisting}[caption=Algoritmo de Promedio Móvil]
+Algoritmo Promedio_Movil
+    Entrada: Vector y de longitud N, ventana W (impar)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    y_pad = Copiar y de longitud N + 2*k:
+        y_pad[0 a k-1] = y[0]
+        y_pad[k a N+k-1] = y
+        y_pad[N+k a N+2*k-1] = y[N-1]
+    y_smooth = Inicializar vector de longitud N con ceros
+    Para i desde 0 hasta N - 1 hacer:
+        Suma = 0
+        Para j desde -k hasta k hacer:
+            Suma = Suma + y_pad[i + k + j]
+        y_smooth[i] = Suma / W
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Filtro de Savitzky-Golay}
+Realiza una regresión local por mínimos cuadrados de un polinomio de grado $d$ sobre una ventana móvil simétrica de tamaño $W = 2k + 1$ \cite{savitzky1964}:
+\begin{equation}
+    p_i(z) = \sum_{m=0}^{d} a_m z^m, \quad z \in [-k, k]
+\end{equation}
+El valor suavizado corresponde al término independiente ajustado: $A_{\text{smooth}}[i] = p_i(0) = a_0$. Equivale matemáticamente a una convolución lineal discreta utilizando coeficientes $c_j$ precalculados mediante la pseudoinversa de la matriz local de Vandermonde $J$:
+\begin{equation}
+    C = (J^T J)^{-1} J^T, \quad J_{z, m} = z^m
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Savitzky-Golay]
+Algoritmo Savitzky_Golay
+    Entrada: Vector y de longitud N, ventana W (impar), grado del polinomio d (d < W)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    Construir matriz J de tamano (W x (d+1)):
+        Para cada z en [-k, k] y m en [0, d]:
+            J[z + k, m] = z^m
+    C = (J^T * J)^(-1) * J^T
+    coefs = primera fila de C
+    y_pad = Acolchar y en bordes usando simetria de espejo de longitud k
+    y_smooth = Inicializar vector de longitud N
+    Para i desde 0 hasta N - 1 hacer:
+        y_smooth[i] = Suma(coefs[j+k] * y_pad[i + j + k]) para j desde -k hasta k
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Filtro de Mediana (Median Filter)}
+Filtro no lineal que reemplaza cada punto por la mediana de la ventana móvil. Es sumamente efectivo para eliminar picos de ruido aislados de gran amplitud sin difuminar los bordes abruptos de las señales analíticas:
+\begin{equation}
+    A_{\text{smooth}}[i] = \text{mediana} \left( \{A[i + j] \mid -k \le j \le k\} \right)
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Filtro de Mediana]
+Algoritmo Filtro_Mediana
+    Entrada: Vector y de longitud N, ventana W (impar)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    y_smooth = Inicializar vector de longitud N
+    Para i desde 0 hasta N - 1 hacer:
+        ventana = subvector de y centrado en i de tamano W (con relleno de borde)
+        Ordenar ventana de menor a mayor
+        y_smooth[i] = ventana[k]
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Filtro de Percentil (Percentile Filter)}
+Generaliza el filtro de mediana seleccionando el valor correspondiente a un percentil específico $P \in [0, 100]$ dentro de la ventana de vecindario local:
+\begin{equation}
+    A_{\text{smooth}}[i] = \text{Percentil}_P \left( \{A[i + j] \mid -k \le j \le k\} \right)
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Filtro de Percentil]
+Algoritmo Filtro_Percentil
+    Entrada: Vector y de longitud N, ventana W, percentil P (0 a 100)
+    Salida: Vector y_smooth
+
+    k = parte_entera(W / 2)
+    y_smooth = Inicializar vector de longitud N
+    Para i desde 0 hasta N - 1 hacer:
+        ventana = subvector de y centrado en i de tamano W
+        Ordenar ventana de menor a mayor
+        indice_p = redondear((P / 100) * (W - 1))
+        y_smooth[i] = ventana[indice_p]
+    Retornar y_smooth
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Filtrado Adaptativo de Rayos Cósmicos (MAD Z-Score)}
+Las trazas CCD en espectroscopía Raman sufren interferencias por rayos cósmicos. Su eliminación adaptativa utiliza un Z-Score modificado robusto basado en la Desviación Absoluta respecto a la Mediana (MAD) de los residuos respecto a una mediana móvil previa \cite{whitaker2018}:
+\begin{equation}
+    Z_i = \frac{0.6745 \cdot (d_i - \text{mediana}(d))}{\text{MAD}(d)}
+\end{equation}
+donde los residuos son $d_i = y_i - y_{\text{med}, i}$ y $\text{MAD}(d) = \text{mediana}(|d - \text{mediana}(d)|)$.
+
+\begin{lstlisting}[caption=Algoritmo de Filtrado Adaptativo de Rayos Cosmicos]
+Algoritmo Filtrar_Rayos_Cosmicos
+    Entrada: Vector y de longitud N, ventana W, umbral theta
+    Salida: Vector y_clean
+
+    y_clean = Copiar y
+    y_med = aplicar_filtro_mediana_movil(y_clean, W)
+    d = y_clean - y_med
+    mad = mediana(abs(d - mediana(d)))
+    Si mad < 10^(-8) entonces mad = 10^(-8)
+    
+    z_scores = 0.6745 * (d - mediana(d)) / mad
+    spikes = buscar_indices(z_scores > theta)
+    
+    Para cada idx en spikes hacer:
+        left = idx - 1
+        Mientras left este en spikes y left >= 0 hacer: left = left - 1
+        right = idx + 1
+        Mientras right este en spikes y right < N hacer: right = right + 1
+            
+        Si left >= 0 y right < N entonces:
+            y_clean[idx] = y_clean[left] + (y_clean[right] - y_clean[left]) * (idx - left) / (right - left)
+        Sino si left >= 0 entonces:
+            y_clean[idx] = y_clean[left]
+        Sino si right < N entonces:
+            y_clean[idx] = y_clean[right]
+            
+    Retornar y_clean
+Fin Algoritmo
+\end{lstlisting}
+
+% ==========================================
+\subsection{Algoritmos de Corrección de Línea Base}
+% ==========================================
+La fluorescencia de fondo y las derivas instrumentales distorsionan el espectro. En el espacio de Absorbancia, la línea base estimada $z$ debe aproximarse a la envolvente inferior de los espectros.
+
+\subsubsection{Ajuste Polinomial Modificado Iterativo (IModPoly)}
+Ajusta de forma iterativa un polinomio global de grado $d$. Si el espectro original en un píxel supera el polinomio estimado más la desviación estándar de los residuos $\sigma$, el dato se reemplaza por el valor polinomial en esa iteración:
+\begin{equation}
+    A^{(t)}[i] = \begin{cases} P_t(x_i) & \text{si } A[i] > P_t(x_i) + \sigma \\ A[i] & \text{de lo contrario} \end{cases}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo IModPoly (Absorbancia)]
+Algoritmo IModPoly_Absorbancia
+    Entrada: Vector x, Vector y, grado d, iteraciones MaxIter
+    Salida: Linea base z
+
+    y_base = Copiar y
+    Para iter desde 1 hasta MaxIter hacer:
+        coefs = ajustar_polinomio(x, y_base, d)
+        z = evaluar(coefs, x)
+        sigma = desv_estandar(y - z)
+        Para i desde 0 hasta N - 1 hacer:
+            Si y[i] > z[i] + sigma entonces:
+                y_base[i] = z[i]
+            Sino:
+                y_base[i] = y[i]
+    coefs = ajustar_polinomio(x, y_base, d)
+    z = evaluar(coefs, x)
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Mínimos Cuadrados Asimétricos (AsLS)}
+El algoritmo AsLS minimiza una función de coste balanceando la suavidad (derivada de segundo orden) con la fidelidad a los datos \cite{eilers2003}:
+\begin{equation}
+    S = \sum_{i=1}^{N} w_i (y_i - z_i)^2 + \lambda \sum_{i=3}^{N} (\Delta^2 z_i)^2
+\end{equation}
+donde los pesos se actualizan asimétricamente para forzar la línea base a ubicarse en el fondo:
+\begin{equation}
+    w_i = \begin{cases} p & \text{si } y_i > z_i \\ 1 - p & \text{si } y_i \le z_i \end{cases}
+\end{equation}
+Se resuelve matricialmente como el sistema lineal disperso: $(W + \lambda D^T D) z = W y$.
+
+\begin{lstlisting}[caption=Algoritmo AsLS (Absorbancia)]
+Algoritmo AsLS_Absorbancia
+    Entrada: Vector y de longitud N, suavizado lam, asimetria p, iteraciones MaxIter
+    Salida: Linea base z
+
+    D2 = construir_matriz_diferencia_segundo_orden(N)
+    D = D2^T * D2
+    w = Vector de unos de longitud N
+    Para iter desde 1 hasta MaxIter hacer:
+        W = construir_matriz_diagonal(w)
+        z = resolver_sistema_lineal(W + lam * D, w * y)
+        Para i desde 0 hasta N - 1 hacer:
+            Si y[i] > z[i] entonces:
+                w[i] = p
+            Sino:
+                w[i] = 1 - p
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Mínimos Cuadrados Penalizados Adaptativos (airPLS)}
+Modifica AsLS estimando iterativamente los pesos sin necesidad del parámetro manual de asimetría $p$ \cite{zhang2010}:
+\begin{equation}
+    w_i = \begin{cases} 0 & \text{si } y_i \ge z_i \\ \exp\left( \frac{t \cdot (y_i - z_i)}{\text{std}(d^-)} \right) & \text{si } y_i < z_i \end{cases}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo airPLS (Absorbancia)]
+Algoritmo airPLS_Absorbancia
+    Entrada: Vector y de longitud N, suavizado lam, iteraciones MaxIter, tolerancia tol
+    Salida: Linea base z
+
+    D2 = construir_matriz_diferencia_segundo_orden(N)
+    D = D2^T * D2
+    w = Vector de ones de longitud N
+    Para t desde 1 hasta MaxIter hacer:
+        W = construir_matriz_diagonal(w)
+        z = resolver_sistema_lineal(W + lam * D, w * y)
+        d = y - z
+        d_neg = subvector(d < 0)
+        Si d_neg esta vacio, romper ciclo.
+        std_neg = desv_estandar(d_neg)
+        Si std_neg < tol, romper ciclo.
+        Para i desde 0 hasta N - 1 hacer:
+            Si d[i] < 0 entonces:
+                w[i] = exp(t * d[i] / std_neg)
+            Sino:
+                w[i] = 0
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Mínimos Cuadrados Penalizados Asimétricos Locales (arPLS)}
+Emplea una función logística continua asimétrica para actualizar los pesos basada en la media $\mu^-$ y desviación estándar $\sigma^-$ de los residuos negativos \cite{baek2015}:
+\begin{equation}
+    w_i = \frac{1}{1 + \exp\left( \frac{d_i - (2 \sigma^- + \mu^-)}{\sigma^-} \right)}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo arPLS (Absorbancia)]
+Algoritmo arPLS_Absorbancia
+    Entrada: Vector y de longitud N, suavizado lam, iteraciones MaxIter, tolerancia tol
+    Salida: Linea base z
+
+    D2 = construir_matriz_diferencia_segundo_orden(N)
+    D = D2^T * D2
+    w = Vector de ones de longitud N
+    Para iter desde 1 hasta MaxIter hacer:
+        W = construir_matriz_diagonal(w)
+        z = resolver_sistema_lineal(W + lam * D, w * y)
+        d = y - z
+        d_neg = subvector(d < 0)
+        Si d_neg esta vacio:
+            mean_neg = 0.0
+            std_neg = desv_estandar(d)
+        Sino:
+            mean_neg = promedio(d_neg)
+            std_neg = desv_estandar(d_neg)
+        Si std_neg < tol, romper ciclo.
+        Para i desde 0 hasta N - 1 hacer:
+            exponente = (d[i] - (2 * std_neg + mean_neg)) / std_neg
+            exponente = limitar_entre_valores(exponente, -50, 50)
+            w[i] = 1.0 / (1.0 + exp(exponente))
+    Retornar z
+Fin Algoritmo
+\end{lstlisting}
+
+% ==========================================
+\subsection{Algoritmos de Búsqueda y Optimización Paramétrica}
+% ==========================================
+
+\subsubsection{Búsqueda en Cuadrícula Combinatoria (Grid Search)}
+Para automatizar la selección del mejor pipeline de preprocesamiento, se barren de forma cruzada todas las combinaciones paramétricas. Se calcula un Score que recompensa la detección de biomarcadores conocidos ($N_g$) y penaliza los picos asociados al ruido instrumental ($N_{\text{ruido}}$):
+\begin{equation}
+    Score = N_v + N_g - w_n \cdot N_{\text{ruido}}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo Modular Combinatorio de Busqueda en Cuadricula]
+Algoritmo Busqueda_Cuadricula
+    Entrada: Vector x, Vector y, Prominencia P, Distancia D, Peso w_n
+    Salida: Mejor_Config, Historial_Resultados
+
+    Historial_Resultados = Lista vacia
+    Para cada smooth_cfg in SMOOTHING_CONFIGS hacer:
+        y_smooth = aplicar_suavizado(y, smooth_cfg)
+        Para cada base_cfg in BASELINE_CONFIGS hacer:
+            Intentar:
+                z, y_corr = aplicar_linea_base(x, y_smooth, base_cfg)
+                picos_x, picos_y = detectar_picos(x, y_corr, P, D)
+                grupos_mapeados, ruido = asignar_grupos(picos_x)
+                
+                score_std = calcular_score(picos_x, grupos_mapeados, ruido, 1.0)
+                score_pen = calcular_score(picos_x, grupos_mapeados, ruido, w_n)
+                
+                Registrar en Historial_Resultados:
+                    smooth_cfg.label, base_cfg.label,
+                    len(grupos_mapeados), len(picos_x), len(ruido), score_pen
+            Sino:
+                Ignorar configuracion fallida
+                
+    Filtrar Historial_Resultados excluyendo Baseline == "RAW"
+    Mejor_Config = elemento en Historial con maximo(score_pen)
+    Retornar Mejor_Config, Historial_Resultados
+Fin Algoritmo
+\end{lstlisting}
+
+% ==========================================
+\subsection{Algoritmos de Clasificación Predictiva y Machine Learning}
+% ==========================================
+
+\subsubsection{Clasificación con Kernel Ridge Classifier (Dual RLS)}
+Resuelve de forma cerrada el clasificador no lineal de mínimos cuadrados regularizados con kernel en el espacio dual de coeficientes $\alpha_c \in \mathbb{R}^M$ para cada clase $c \in C$ \cite{hoerl1970}:
+\begin{equation}
+    \alpha_c = (K + \lambda I)^{-1} Y_c, \quad K(x_i, x_j) = \exp\left(-\gamma \|x_i - x_j\|_2^2\right)
+\end{equation}
+Para la clasificación multiclase se emplea el esquema One-vs-Rest (OvR). La puntuación de decisión para un espectro de prueba $x^* \in \mathbb{R}^D$ en cada clase $c$ es:
+\begin{equation}
+    f_c(x^*) = \sum_{i=1}^M \alpha_{i,c} \exp\left(-\gamma \|x_i - x^*\|_2^2\right)
+\end{equation}
+y la predicción de clase $\hat{y}$ se obtiene seleccionando la clase con el máximo valor de decisión dual:
+\begin{equation}
+    \hat{y} = \operatorname{arg\,max}_{c \in C} f_c(x^*)
+\end{equation}
+
+\begin{lstlisting}[caption=Entrenamiento y Prediccion de Clasificador Kernel Ridge Multiclase]
+Algoritmo Kernel_Ridge_Multiclase_OvR
+    Entrada: Matriz X_train (M x D), Vector Y_train (M), lambda (regularizacion), gamma (ancho RBF), Clases
+    Salida: Modelos (coeficientes duales alpha para cada clase y matriz de entrenamiento)
+
+    K = calcular_matriz_kernel_rbf(X_train, X_train, gamma)
+    Modelos_Clase = diccionario_vacio()
+    
+    Para cada c en Clases hacer:
+        # Codificacion binaria One-vs-Rest (OvR)
+        Y_binario = Vector_de_ceros(M)
+        Para i desde 0 hasta M - 1 hacer:
+            Si Y_train[i] == c entonces:
+                Y_binario[i] = 1.0
+            Sino:
+                Y_binario[i] = -1.0
+                
+        # Resolucion en forma cerrada dual
+        alpha_c = resolver_sistema_lineal(K + lambda * Identidad(M), Y_binario)
+        Modelos_Clase[c] = alpha_c
+        
+    Retornar Modelos_Clase
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Clasificador de Centroide Más Cercano (Nearest Centroid Classifier)}
+El clasificador de Centroide Más Cercano es un modelo lineal basado en distancias geométricas. Durante el entrenamiento, calcula el vector de perfil medio (centroide) $\mu_c$ para cada clase $c \in C$ a partir de los espectros de entrenamiento $x_i$ pertenecientes a dicha clase:
+\begin{equation}
+    \mu_c = \frac{1}{N_c} \sum_{i: y_i = c} x_i
+\end{equation}
+donde $N_c$ es el número total de muestras asignadas a la clase $c$. Para un espectro de prueba $x^*$, la clase predicha $\hat{y}$ se determina asignándole la clase del centroide a menor distancia Euclidiana (norma $\mathcal{L}_2$):
+\begin{equation}
+    \hat{y} = \operatorname{arg\,min}_{c \in C} \|x^* - \mu_c\|_2
+\end{equation}
+
+\begin{lstlisting}[caption=Entrenamiento y Prediccion del Clasificador de Centroide Mas Cercano]
+Algoritmo Nearest_Centroid
+    Entrada: Matriz X_train (M x D), Vector Y_train (M), Matriz X_test (K x D), Clases
+    Salida: Predicciones y_pred (K)
+
+    # Entrenamiento: Calcular Centroides de Clase
+    Centroides = diccionario_vacio()
+    Para cada c en Clases hacer:
+        # Filtrar muestras pertenecientes a la clase c
+        X_c = subvector(Y_train == c) de X_train
+        Centroides[c] = promedio(X_c) por columna
+
+    # Prediccion: Asignar clase por distancia minima
+    y_pred = Vector_de_ceros(K)
+    Para i desde 0 hasta K - 1 hacer:
+        x_spec = X_test[i]
+        min_dist = 10^(10)
+        best_class = Clases[0]
+        Para cada c en Clases hacer:
+            dist = norma_l2(x_spec - Centroides[c])
+            Si dist < min_dist entonces:
+                min_dist = dist
+                best_class = c
+        y_pred[i] = best_class
+
+    Retornar y_pred
+Fin Algoritmo
+\end{lstlisting}
+
+\subsubsection{Análisis de Componentes Principales (PCA) mediante SVD}
+El Análisis de Componentes Principales (PCA) es una técnica no supervisada de reducción de dimensionalidad y proyección lineal. Dada una matriz de entrada $X$ de dimensiones $M \times D$, primero se calcula el vector promedio de canal $\mu \in \mathbb{R}^D$ para centrar los datos:
+\begin{equation}
+    \tilde{X} = X - \mathbf{1}\mu^T
+\end{equation}
+donde $\mathbf{1}$ es un vector de unos de longitud $M$. Posteriormente, se calcula la descomposición en valores singulares (SVD) de la matriz centrada $\tilde{X}$:
+\begin{equation}
+    \tilde{X} = U \Sigma V^T
+\end{equation}
+donde $U \in \mathbb{R}^{M \times M}$ y $V \in \mathbb{R}^{D \times D}$ son matrices ortogonales conteniendo los vectores singulares izquierdos y derechos (loadings), respectivamente. La matriz diagonal $\Sigma \in \mathbb{R}^{M \times D}$ contiene los valores singulares $\sigma_j$ ordenados de mayor a menor. Para proyectar los datos a un espacio de menor dimensión $k$, se seleccionan los primeros $k$ componentes (las primeras $k$ filas de $V^T$, denotadas como $V_k \in \mathbb{R}^{k \times D}$):
+\begin{equation}
+    T_k = \tilde{X} V_k^T
+\end{equation}
+La varianza explicada por cada una de las componentes principales $j \in [1, k]$ se obtiene como:
+\begin{equation}
+    \lambda_j = \frac{\sigma_j^2}{M - 1}
+\end{equation}
+Y la proporción de varianza explicada ratio (Explained Variance Ratio) para el componente $j$ se define como:
+\begin{equation}
+    \text{Ratio}_j = \frac{\lambda_j}{\sum_{i=1}^{D} \lambda_i}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Analisis de Componentes Principales mediante SVD]
+Algoritmo PCA_SVD
+    Entrada: Matriz X (M x D), Numero de componentes k
+    Salida: Matriz proyectada T (M x k), Matriz de carga Vt_k (k x D), Ratio_Varianza (k)
+
+    # Paso 1: Centrar los datos
+    mu = promedio(X) por columna
+    X_centered = X - mu
+
+    # Paso 2: Descomposicion en Valores Singulares (SVD)
+    U, S, Vt = SVD(X_centered)
+    Vt_k = subvector(Vt) de fila 0 a k-1
+
+    # Paso 3: Proyeccion en subespacio latente
+    T = X_centered * Vt_k^T
+
+    # Paso 4: Varianza explicada y ratio
+    Varianzas = Vector_de_ceros(k)
+    M_muestras = longitud(X)
+    Para j desde 0 hasta k - 1 hacer:
+        Varianzas[j] = S[j]^2 / (M_muestras - 1)
+
+    Varianza_Total = 0
+    Para i desde 0 hasta longitud(S) - 1 hacer:
+        Varianza_Total = Varianza_Total + S[i]^2 / (M_muestras - 1)
+
+    Ratio_Varianza = Varianzas / Varianza_Total
+    Retornar T, Vt_k, Ratio_Varianza
+Fin Algoritmo
+\end{lstlisting}
+
+% ==========================================
+\subsection{Algoritmos de Detección Extrema y Generación de Reportes}
+% ==========================================
+
+\subsubsection{Detección Simultánea de Picos y Valles (Generación de Reportes)}
+Calcula los extremos de intensidad espectral local utilizando la restricción de prominencia y distancia mínima. Un pico a wavenumber $x_c$ se define si:
+\begin{equation}
+    y_c > y_{c \pm j} \quad \forall j \in [1, D], \quad \text{y} \quad \text{prominencia}(y_c) \ge P_{\text{picos}}
+\end{equation}
+Y un valle en $x_v$ satisface:
+\begin{equation}
+    y_v < y_{v \pm j} \quad \forall j \in [1, D], \quad \text{y} \quad \text{prominencia}(-y_v) \ge P_{\text{valles}}
+\end{equation}
+
+\begin{lstlisting}[caption=Algoritmo de Deteccion de Extremos y Generacion de Reportes]
+Algoritmo Generar_Reporte_Numerico
+    Entrada: Vector x, Vector y_corr, Nombre_Muestra, Ruta_CSV, P_picos, P_valles, D
+    Salida: Reporte en archivo CSV
+
+    picos_idx = buscar_maximos_locales(y_corr, prominencia=P_picos, distancia=D)
+    valles_idx = buscar_maximos_locales(-y_corr, prominencia=P_valles, distancia=D)
+    
+    reporte = Lista vacia
+    grupos_mapeados, _ = asignar_grupos(x[picos_idx])
+    
+    Para cada idx en picos_idx hacer:
+        w = x[idx]
+        val = y_corr[idx]
+        g = buscar_grupo_asociado(w, grupos_mapeados)
+        reporte.agregar(Tipo="Peak", Wavenumber=w, Absorbance=val, Group=g)
+        
+    Para cada idx en valles_idx hacer:
+        w = x[idx]
+        val = y_corr[idx]
+        reporte.agregar(Tipo="Valley", Wavenumber=w, Absorbance=val, Group="N/A")
+        
+    Ordenar reporte por Wavenumber descendente
+    Escribir_CSV(Ruta_CSV, reporte)
+Fin Algoritmo
+\end{lstlisting}

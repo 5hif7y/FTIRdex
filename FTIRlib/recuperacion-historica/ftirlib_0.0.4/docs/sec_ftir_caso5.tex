@@ -1,0 +1,75 @@
+\section{Caso de Aplicación V: Automatización de muestreo de espectros infrarrojos clásicos de la base de datos NIST Chemistry WebBook}
+% ==========================================
+
+\subsection{El Estándar JCAMP-DX y Metodología de Lectura}
+El estándar JCAMP-DX (Joint Committee on Atomic and Molecular Physical Data) es el formato de archivo plano más utilizado internacionalmente para el intercambio de datos espectroscópicos. Sin embargo, su lectura presenta importantes desafíos de ingeniería de software debido a sus diversos esquemas de compresión de datos y formatos de codificación, tales como registros fijos de pares coordenados $XY$, codificaciones de diferencia en cascada (\textit{ASDF} o \textit{A-to-I difference}) y repetición de duplicados (\textit{DUP}).
+
+Para evitar la dependencia de librerías externas no verificadas o restrictivas, la biblioteca versión 0.0.4 introduce un lector nativo puro en Python \texttt{load\_jcamp\_dx}. Este parser:
+\begin{enumerate}
+    \item Escanea de forma secuencial las etiquetas de metadatos (\textit{LDRs} o \textit{Labeled Data Records}) para extraer el título de la muestra, la escala instrumental y los factores de corrección físico-químicos:
+    \begin{equation}
+        X_{\text{real}} = X_{\text{registro}} \times \text{XFACTOR}, \quad Y_{\text{real}} = Y_{\text{registro}} \times \text{YFACTOR}
+    \end{equation}
+    \item Resuelve dinámicamente los bloques compactos descodificando los caracteres pseudo-numéricos especiales que codifican signos y diferencias consecutivas de intensidad (p. ej., caracteres del set ASCII para diferencias del primer orden).
+    \item Mapea y ordena automáticamente el espectro interpolando de manera transparente en la función general \texttt{load\_data} al detectar la extensión del archivo (\path{.jdx} o \path{.dx}).
+\end{enumerate}
+
+Para validar esta implementación, el usuario dispuso en el directorio \path{muestras jdx} un conjunto representativo de 12 compuestos orgánicos clásicos de la base de datos oficial del \textbf{NIST Chemistry WebBook} (como ácido acético, acetona, amoníaco, benceno, dióxido de carbono, cloroformo, ciclohexano, ciclopentano, etanol, metanol, tolueno y agua).
+
+\subsection{Resultados del Muestreo y Búsqueda en Cuadrícula en Etanol}
+Como caso demostrativo de muestreo automatizado, se procesó el espectro del \textbf{Etanol} (\path{ethanol-64-17-5-IR.jdx}), el cual cuenta con 3897 puntos espectrales distribuidos en el rango medio del infrarrojo desde $392.05\text{ cm}^{-1}$ hasta $3783.81\text{ cm}^{-1}$.
+
+El sistema generó en primer lugar un reporte analítico de picos y valles (\path{friendly_report_Ethanol.csv}), detectando 35 picos característicos tras su conversión a Absorbancia. Entre ellos, el sistema identificó con precisión las siguientes bandas moleculares fundamentales del etanol:
+\begin{itemize}
+    \item La banda ancha de tensión O-H asociada a asociación intermolecular por puentes de hidrógeno, centrada a $\sim 3350\text{ cm}^{-1}$.
+    \item Las bandas de tensión simétrica y asimétrica de los enlaces C-H del grupo alquilo ($\text{CH}_3$ y $\text{CH}_2$) en el rango $2850-2980\text{ cm}^{-1}$.
+    \item La banda intensa de tensión C-O del alcohol primario a $\sim 1050\text{ cm}^{-1}$.
+\end{itemize}
+
+Posteriormente, se ejecutó la búsqueda en cuadrícula combinatoria evaluando 180 variantes de preprocesamiento. La configuración óptima identificada según el Score espectral fue:
+\begin{itemize}
+    \item \textbf{Suavizado}: RAW (se determinó óptimo no aplicar suavizado para no deformar las bandas estrechas de C-H).
+    \item \textbf{Corrección de Línea Base}: Mínimos Cuadrados Penalizados Asimétricos de arPLS con $\lambda=10^4$.
+\end{itemize}
+
+Los resultados del marcado automático de grupos funcionales se graficaron utilizando la mejor configuración en los modos de visualización por líneas (figura \ref{fig:eth_best_lines}) y por cajas delimitadoras de bandas (figura \ref{fig:eth_best_box}).
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ethanol_best_lines.png}
+        \caption{Efecto óptimo con búsqueda en cuadrícula (modo líneas) en etanol.}
+        \label{fig:eth_best_lines}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ethanol_best_box.png}
+        \caption{Efecto óptimo con búsqueda en cuadrícula (modo cajas) en etanol.}
+        \label{fig:eth_best_box}
+    \end{minipage}
+\end{figure}
+
+\subsection{Demostración de la API Simplificada con Constantes RAW/NONE}
+Para simplificar la interfaz gráfica del usuario de scripting y habilitar un modo de depuración de espectros crudos sin procesamiento colateral, la biblioteca v0.0.4 incorpora la función \texttt{plot\_config} que interactúa con los alias globales \texttt{RAW} y \texttt{NONE}.
+
+Al configurar \texttt{smooth\_algorithm=RAW} y \texttt{baseline\_algorithm=RAW}, el sistema desactiva por completo el pipeline matemático y la detección de picos. Como se observa en la figura \ref{fig:eth_raw}, esto genera una gráfica del espectro puramente analítico y original de transmitancia del NIST. Por el contrario, la figura \ref{fig:eth_manual} muestra el resultado aplicando manualmente una configuración de Savitzky-Golay (ventana de 11 puntos, orden 2) y línea base arPLS con $\lambda=10^5$, demostrando la alta versatilidad que la biblioteca ofrece al usuario mediante una única línea de código simple.
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ethanol_raw.png}
+        \caption{Espectro original crudo (transmitancia) del NIST graficado mediante RAW.}
+        \label{fig:eth_raw}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{ethanol_manual.png}
+        \caption{Espectro preprocesado manualmente en modo cajas vía plot\_config.}
+        \label{fig:eth_manual}
+    \end{minipage}
+\end{figure}
+\newpage
