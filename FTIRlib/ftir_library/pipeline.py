@@ -377,7 +377,7 @@ def plot_config(x, y, smooth_algorithm, baseline_algorithm, *args, **kwargs):
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Inter", "Liberation Sans"]
     
-    fig, ax = plt.subplots(figsize=(10, 7), dpi=300)
+    fig, ax = plt.subplots(figsize=(10, 7), dpi=120)
     ax.plot(x, y_corrected, color='black', linewidth=1.0)
     
     ax.set_xlabel("Número de onda (cm$^{-1}$)", fontsize=13)
@@ -511,7 +511,7 @@ def plot_config(x, y, smooth_algorithm, baseline_algorithm, *args, **kwargs):
                     )
                     
     plt.tight_layout()
-    plt.savefig(output_image, bbox_inches='tight', dpi=300)
+    plt.savefig(output_image, bbox_inches='tight', dpi=120)
     plt.close()
     print(f"Plot saved to '{output_image}'.")
 
@@ -546,7 +546,7 @@ def plot_best_configuration(x, y, best_cfg, output_image, space='absorbance', pr
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Inter", "Liberation Sans"]
     
-    fig, ax = plt.subplots(figsize=(10, 7), dpi=300)
+    fig, ax = plt.subplots(figsize=(10, 7), dpi=120)
     ax.plot(x, y_corrected, color='black', linewidth=1.0)
     
     ax.set_xlabel("Número de onda (cm$^{-1}$)", fontsize=13)
@@ -665,7 +665,7 @@ def plot_best_configuration(x, y, best_cfg, output_image, space='absorbance', pr
                 )
             
     plt.tight_layout()
-    plt.savefig(output_image, bbox_inches='tight', dpi=300)
+    plt.savefig(output_image, bbox_inches='tight', dpi=120)
     plt.close()
     print(f"Plot saved to '{output_image}'.")
 
@@ -708,7 +708,7 @@ def plot_gallery_3x1(x, y, results, output_prefix, space='absorbance', prominenc
         chunk_cfgs = gallery_configs[start:end]
         
         # We always create a 1 row, 3 columns figure. If End-Start < 3, some columns will be empty.
-        fig, axes = plt.subplots(1, 3, figsize=(12.5, 3.6), dpi=300)
+        fig, axes = plt.subplots(1, 3, figsize=(12.5, 3.6), dpi=120)
         axes_flat = axes.flatten()
         
         for i in range(3):
@@ -847,7 +847,7 @@ def plot_gallery_3x1(x, y, results, output_prefix, space='absorbance', prominenc
                     
         plt.tight_layout()
         img_name = f"{output_prefix}_part{chunk_idx + 1}.png"
-        plt.savefig(img_name, bbox_inches='tight', dpi=300)
+        plt.savefig(img_name, bbox_inches='tight', dpi=120)
         plt.close()
         print(f"Gallery slice saved to '{img_name}'.")
 
@@ -860,7 +860,7 @@ def plot_superposition(x1, y1_corr, label1, x2, y2_corr, label2, output_image, s
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Inter", "Liberation Sans"]
     
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=120)
     
     ax.plot(x1, y1_corr, color='blue', linewidth=1.2, label=label1)
     ax.plot(x2, y2_corr, color='black', linewidth=1.2, label=label2)
@@ -886,7 +886,7 @@ def plot_superposition(x1, y1_corr, label1, x2, y2_corr, label2, output_image, s
               frameon=True, edgecolor='black', fontsize=11, framealpha=0.9)
               
     plt.tight_layout()
-    plt.savefig(output_image, bbox_inches='tight', dpi=300)
+    plt.savefig(output_image, bbox_inches='tight', dpi=120)
     plt.close()
     print(f"Superposition plot saved to '{output_image}'.")
 
@@ -1041,7 +1041,7 @@ def plot_raman_pca(X, y, class_map, output_image):
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Inter", "Liberation Sans"]
     
-    fig, ax = plt.subplots(figsize=(8, 6), dpi=300)
+    fig, ax = plt.subplots(figsize=(8, 6), dpi=120)
     colors = {0: 'red', 1: 'green', 2: 'blue'}
     
     for c in np.unique(y):
@@ -1060,7 +1060,7 @@ def plot_raman_pca(X, y, class_map, output_image):
     ax.grid(True, linestyle='--', alpha=0.5)
     
     plt.tight_layout()
-    plt.savefig(output_image, bbox_inches='tight', dpi=300)
+    plt.savefig(output_image, bbox_inches='tight', dpi=120)
     plt.close()
     print(f"PCA score plot saved to '{output_image}'.")
 
