@@ -1,10 +1,12 @@
 # FTIR Analysis Library
 
-Biblioteca avanzada para preprocesamiento, corrección de línea base y detección automática de grupos funcionales en espectros FTIR de Óxido de Grafeno (GO) y Óxido de Grafeno Reducido (rGO).
+Biblioteca avanzada para preprocesamiento, corrección de línea base y detección automática de grupos funcionales en espectros FTIR.
 
 ## Instalación y Actualización
 
 La biblioteca se distribuye en formato ZIP (`ftirlib.zip`) conteniendo el paquete de código fuente, los scripts de ejemplo y los reportes de desarrollo.
+
+En la brevedad se implementara un script para regenerar el paquete.
 
 ### Instalación Inicial
 Para instalar la biblioteca y todas sus dependencias automáticamente, ejecute en la terminal desde el directorio donde se ubica el archivo `.zip`:
@@ -43,7 +45,8 @@ z, y_corr = correct_baseline_absorbance(x, y_abs, method="arpls", lam=1e5)
 
 ## Historial de versiones
 
-* [13/06/2026] – v0.0.3 (actual): prototipo de librería adaptado al uso profesional (Informe_Tecnico_FTIR_alpha-0.0.3.pdf / ftirlib_0.0.3.zip)
+* [20/06/2026] – v0.0.4: prototipo de librería adaptado al uso profesional (Informe_Tecnico_FTIR_alpha-0.0.4.pdf / Manual_extendido-0.0.4.pdf / ftirlib_0.0.4.zip)
+* [13/06/2026] – v0.0.3: prototipo de librería adaptado al uso profesional (Informe_Tecnico_FTIR_alpha-0.0.3.pdf / ftirlib_0.0.3.zip)
 * [09/06/2026] – v0.0.2: prototipo de librería (Informe_Tecnico_FTIR_alpha-0.0.2.pdf / ftirlib_0.0.2.zip)
 * [08/06/2026] – v0.0.1: versión experimental inicial (Informe_Tecnico_Informal.pdf / entregar-FTIR-alpha-0.0.1.zip)
 
