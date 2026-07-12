@@ -53,7 +53,8 @@ jobs:
       - name: Create Source Tarball
         shell: bash
         run: |
-          tar --exclude='./build' --exclude='./.git' --exclude='./.github' -czf FTIRdex-source.tar.gz .
+          tar --exclude='./build' --exclude='./.git' --exclude='./.github' --exclude='./FTIRlib/recuperacion-historica' -czf ../FTIRdex-source.tar.gz .
+          mv ../FTIRdex-source.tar.gz .
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
