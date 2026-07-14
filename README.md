@@ -1,6 +1,6 @@
 # FTIRdex
 
-**FTIRdex** es una aplicación de escritorio nativa, rápida y ligera diseñada para el **análisis de espectros de espectroscopía FTIR** (Infrarrojo por Transformada de Fourier). 
+**FTIRdex** es una aplicación de escritorio nativa y liviana diseñada para el **análisis de espectros de espectroscopía FTIR** (Infrarrojo por Transformada de Fourier). 
 
 La aplicación combina una interfaz de usuario nativa de alto rendimiento desarrollada en C con un potente motor de procesamiento numérico y graficación basado en Python.
 
