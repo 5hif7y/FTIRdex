@@ -1,6 +1,6 @@
 # FTIRdex
 
-**FTIRdex** es una aplicación de escritorio nativa y liviana diseñada para el **análisis de espectros de espectroscopía FTIR** (Infrarrojo por Transformada de Fourier). 
+**FTIRdex** es una aplicación de escritorio nativa y liviana diseñada para el **análisis espectroscópico FTIR** (Infrarrojo por Transformada de Fourier). 
 
 La aplicación combina una interfaz de usuario nativa de alto rendimiento desarrollada en C con un potente motor de procesamiento numérico y graficación basado en Python.
 
@@ -24,7 +24,9 @@ El repositorio está organizado de forma limpia y simplificada:
 ```sh
 FTIRdex/
 ├── FTIRdex/                   # Código fuente en C (interfaz y lógica de procesos)
-│   ├── main.c                 # Punto de entrada y renderizado UI
+│   ├── app_state.h/.c         # Gestión de datos y lógica de ejecución
+│   ├── gui_render.h/.c        # Renderizado y dibujo UI
+│   ├── main.c                 # Punto de entrada y bucle de eventos
 │   ├── iprocesses.h           # API de ejecución de subprocesos asíncronos
 │   ├── process_ftir.py        # Backend de análisis numérico y matplotlib
 │   ├── make_ico.py            # Script regenerador del icono local (.png a .ico)
