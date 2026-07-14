@@ -53,7 +53,7 @@ jobs:
       - name: Create Source Tarball
         shell: bash
         run: |
-          tar --exclude='./build' --exclude='./.git' --exclude='./.github' --exclude='./FTIRlib/recuperacion-historica' -czf ../FTIRdex-source.tar.gz .
+          tar --exclude='./build' --exclude='./.git' --exclude='./.github' --exclude='./FTIRlib/recuperacion-historica' --exclude='./FTIRdex-0.0.5-Installer-x64.exe' -czf ../FTIRdex-source.tar.gz .
           mv ../FTIRdex-source.tar.gz .
 
       - name: Upload Artifacts
@@ -67,7 +67,7 @@ jobs:
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             FTIRdex-portable.zip
