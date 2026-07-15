@@ -2,6 +2,7 @@
 #define APP_STATE_H
 
 #include "gw.h"
+#include "zipvfs.h"
 
 // System and limit constants
 #define MAX_CSV_ROWS 512
@@ -99,6 +100,14 @@ extern int zoom_mode;
 extern GW_Image* zoom_img;
 extern float zoom_scale;
 
+extern int menu_active_subview;
+
+// Project VFS ZIP path
+extern char project_zip_path[512];
+extern zipvfs_t* project_vfs;
+extern char project_vfs_mount_dir[512];
+extern int theme_light;
+
 // Header layout coordinates
 extern int x_smooth;
 extern int x_baseline;
@@ -118,5 +127,12 @@ void save_groups_json(const char* filepath);
 void parse_csv_report(const char* filepath, int s_idx);
 void regenerate_superposition(void);
 int run_python_pump_events(const char* argv[]);
+
+// VFS ZIP functions
+void init_default_project_zip(void);
+void load_project_zip(const char* filepath);
+void create_new_project_zip(const char* filepath);
+void add_sample_to_project(const char* filepath, const char* filename);
+void extract_and_load_processed_files(void);
 
 #endif // APP_STATE_H
