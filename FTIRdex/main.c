@@ -10,6 +10,49 @@
   #include <windows.h>
 #endif
 
+void update_dynamic_fonts(int window_width) {
+    if (ui_font) {
+        GW_FreeFont(ui_font);
+        ui_font = NULL;
+    }
+    if (title_font) {
+        GW_FreeFont(title_font);
+        title_font = NULL;
+    }
+    
+    // Scale factor: base width is 1280
+    float scale = (float)window_width / 1280.0f;
+    if (scale < 0.8f) scale = 0.8f; // Clamp minimum size to prevent illegibility
+    if (scale > 1.8f) scale = 1.8f; // Clamp maximum size to prevent overflowing panels
+    
+    float ui_size = 11.0f * scale;
+    float title_size = 12.5f * scale;
+    
+    ui_font = GW_LoadFont("JetBrainsMono-Regular.ttf", ui_size);
+    if (!ui_font) {
+        ui_font = GW_LoadFont("Segoe UI", ui_size * 1.09f);
+    }
+    if (!ui_font) {
+        ui_font = GW_LoadFont("Consolas", ui_size * 1.09f);
+    }
+    
+    title_font = GW_LoadFont("JetBrainsMono-Regular.ttf", title_size);
+    if (!title_font) {
+        title_font = GW_LoadFont("Segoe UI Semibold", title_size * 1.08f);
+    }
+    if (!title_font) {
+        title_font = GW_LoadFont("Segoe UI", title_size * 1.08f);
+    }
+    if (!title_font) {
+        title_font = GW_LoadFont("Consolas", title_size * 1.08f);
+    }
+    
+    // Recalculate font height
+    int temp_w = 0;
+    wchar_t wtemp[4] = L"Ap";
+    GW_MeasureText(ui_font, wtemp, &temp_w, &font_height);
+}
+
 int main(int argc, char* argv[]) {
     // 1. Initialize Default Functional Groups Database
     groups[ngroups++] = (FuncGroup){"O-H", 3000, 3600, 1};
@@ -20,30 +63,18 @@ int main(int argc, char* argv[]) {
     groups[ngroups++] = (FuncGroup){"C-O", 1000, 1300, 1};
     groups[ngroups++] = (FuncGroup){"C-O-C", 800, 1000, 1};
 
+    // 1.5 Initialize Default VFS ZIP path
+    init_default_project_zip();
+
     // 2. Initialize GUI Window
-    app_win = GW_CreateWindow("FTIRdex - Análisis de espectros", ww, wh);
+    app_win = GW_CreateWindow("FTIRdex - Análisis de espectros FTIR", ww, wh);
     if (!app_win) {
         fprintf(stderr, "FTIRdex: Failed to create LibGW window\n");
         return 1;
     }
 
-    // 3. Load UI Fonts
-    ui_font = GW_LoadFont("Segoe UI", 12.0f);
-    if (!ui_font) {
-        ui_font = GW_LoadFont("Consolas", 12.0f);
-    }
-    title_font = GW_LoadFont("Segoe UI Semibold", 13.5f);
-    if (!title_font) {
-        title_font = GW_LoadFont("Segoe UI", 13.5f);
-    }
-    if (!title_font) {
-        title_font = GW_LoadFont("Consolas", 13.5f);
-    }
-
-    // Set font height measurement
-    int temp_w = 0;
-    wchar_t wtemp[4] = L"Ap";
-    GW_MeasureText(ui_font, wtemp, &temp_w, &font_height);
+    // 3. Load UI Fonts dynamically
+    update_dynamic_fonts(ww);
 
     // 4. Set Application Custom Icon (Win32 Specific)
 #ifdef _WIN32
@@ -77,6 +108,7 @@ int main(int argc, char* argv[]) {
         if (ev.type == GW_EVENT_WINDOW_RESIZE) {
             ww = ev.resize.width;
             wh = ev.resize.height;
+            update_dynamic_fonts(ww);
             draw_interface(app_win);
         }
 
@@ -100,10 +132,89 @@ int main(int argc, char* argv[]) {
             int mx = ev.mouse_button.x;
             int my = ev.mouse_button.y;
             int btn = ev.mouse_button.button;
+            int groups_bottom_y = (int)(wh * 0.42f);
+            if (groups_bottom_y < 250) groups_bottom_y = 250;
+            if (groups_bottom_y > wh - 250) groups_bottom_y = wh - 250;
 
             // Mode A: Interactive clicks while zoom_mode is active
             if (zoom_mode) {
                 if (btn == 1) { // Left click: Click interactive slots or exit zoom mode
+                    if (zoom_mode == 4) {
+                        int item_h = (int)(40 * zoom_scale);
+                        int item_w = (int)(250 * zoom_scale);
+                        int item_spacing = (int)(50 * zoom_scale);
+                        int sx = (ww / 2) - item_w - (int)(20 * zoom_scale);
+                        if (menu_active_subview == 0) {
+                            sx = (ww - item_w) / 2;
+                        }
+                        int sy = 150;
+                        int clicked_menu_item = -1;
+                        for (int i = 0; i < 6; i++) {
+                            if (mx >= sx && mx <= sx + item_w && my >= sy && my <= sy + item_h) {
+                                clicked_menu_item = i;
+                                break;
+                            }
+                            sy += item_spacing;
+                        }
+                        
+                        if (clicked_menu_item == 0) { // Nuevo Proyecto
+                            char* path = GW_ShowSaveFileDialog(app_win, "Nuevo Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                            if (path) {
+                                char final_path[512];
+                                strncpy(final_path, path, sizeof(final_path) - 1);
+                                final_path[sizeof(final_path) - 1] = '\0';
+                                int len = strlen(final_path);
+                                if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
+                                    strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                                }
+                                create_new_project_zip(final_path);
+                                free(path);
+                                zoom_mode = 0;
+                                menu_active_subview = 0;
+                            }
+                            draw_interface(app_win);
+                        } else if (clicked_menu_item == 1) { // Abrir Proyecto
+                            char* path = GW_ShowOpenFileDialog(app_win, "Abrir Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                            if (path) {
+                                load_project_zip(path);
+                                free(path);
+                                zoom_mode = 0;
+                                menu_active_subview = 0;
+                            }
+                            draw_interface(app_win);
+                        } else if (clicked_menu_item == 2) { // Guardar Proyecto
+                            char* path = GW_ShowSaveFileDialog(app_win, "Guardar Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                            if (path) {
+                                char final_path[512];
+                                strncpy(final_path, path, sizeof(final_path) - 1);
+                                final_path[sizeof(final_path) - 1] = '\0';
+                                int len = strlen(final_path);
+                                if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
+                                    strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                                }
+                                create_new_project_zip(final_path);
+                                free(path);
+                                zoom_mode = 0;
+                                menu_active_subview = 0;
+                                GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como ZIP.", NULL, 0);
+                            }
+                            draw_interface(app_win);
+                        } else if (clicked_menu_item == 3) { // Colores de interfaz
+                            menu_active_subview = 2;
+                            draw_interface(app_win);
+                        } else if (clicked_menu_item == 4) { // Sobre este software
+                            menu_active_subview = 1;
+                            draw_interface(app_win);
+                        } else if (clicked_menu_item == 5) { // Salir
+                            break;
+                        } else {
+                            // Clicked outside menu items
+                            zoom_mode = 0;
+                            menu_active_subview = 0;
+                            draw_interface(app_win);
+                        }
+                        continue;
+                    }
                     if (zoom_mode == 2) {
                         GW_Font* zf = GW_LoadFont("Segoe UI", 12.0f * zoom_scale);
                         if (!zf) zf = GW_LoadFont("Consolas", 12.0f * zoom_scale);
@@ -174,7 +285,7 @@ int main(int argc, char* argv[]) {
                     draw_interface(app_win);
                 } else if (btn == 3) { // Right click: Save files from zoom views
                     if (zoom_mode == 3 && nsamples > 0 && samples[current_sample_idx].ncsv_rows > 0) {
-                        char* path = GW_ShowSaveFileDialog(app_win, "Guardar reporte como CSV", "Archivos CSV (*.csv)\0*.csv\0");
+                        char* path = GW_ShowSaveFileDialog(app_win, "Guardar reporte como CSV", "Archivos CSV (*.csv)|*.csv");
                         if (path) {
                             char final_path[512];
                             strncpy(final_path, path, sizeof(final_path) - 1);
@@ -192,7 +303,7 @@ int main(int argc, char* argv[]) {
                             GW_ShowMessageBox(app_win, "Reporte Guardado", L"El reporte de picos y valles se ha exportado correctamente.", NULL, 0);
                         }
                     } else if (zoom_mode == 1 && zoom_img) {
-                        char* path = GW_ShowSaveFileDialog(app_win, "Guardar imagen como PNG", "Archivos PNG (*.png)\0*.png\0");
+                        char* path = GW_ShowSaveFileDialog(app_win, "Guardar imagen como PNG", "Archivos PNG (*.png)|*.png");
                         if (path) {
                             char final_path[512];
                             strncpy(final_path, path, sizeof(final_path) - 1);
@@ -275,7 +386,7 @@ int main(int argc, char* argv[]) {
                         }
                         
                         if (src_file && src_file[0] != '\0') {
-                            char* path = GW_ShowSaveFileDialog(app_win, "Guardar imagen como PNG", "Archivos PNG (*.png)\0*.png\0");
+                            char* path = GW_ShowSaveFileDialog(app_win, "Guardar imagen como PNG", "Archivos PNG (*.png)|*.png");
                             if (path) {
                                 char final_path[512];
                                 strncpy(final_path, path, sizeof(final_path) - 1);
@@ -298,7 +409,7 @@ int main(int argc, char* argv[]) {
             // Mode C: Right-click CSV saving option inside CSV frame bounds
             if (btn == 3 && nsamples > 0 && samples[current_sample_idx].ncsv_rows > 0) {
                 if (mx >= 15 && mx < splitter_x - 15 && my >= 345 && my < wh - 20) {
-                    char* path = GW_ShowSaveFileDialog(app_win, "Guardar reporte como CSV", "Archivos CSV (*.csv)\0*.csv\0");
+                    char* path = GW_ShowSaveFileDialog(app_win, "Guardar reporte como CSV", "Archivos CSV (*.csv)|*.csv");
                     if (path) {
                         char final_path[512];
                         strncpy(final_path, path, sizeof(final_path) - 1);
@@ -398,7 +509,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 // Zoom CSV table header trigger
-                if (mx >= 15 && mx < splitter_x - 260 && my >= 340 && my < 370) {
+                if (mx >= 15 && mx < splitter_x - 260 && my >= groups_bottom_y + 10 && my < groups_bottom_y + 40) {
                     zoom_mode = 3;
                     zoom_scale = 1.0f;
                     draw_interface(app_win);
@@ -410,35 +521,36 @@ int main(int argc, char* argv[]) {
                     is_dragging_splitter = 1;
                 }
 
+                // Header Action: Open Menu vertical ellipsis
+                if (mx >= 12 && mx <= 38 && my >= 8 && my <= 34) {
+                    zoom_mode = 4;
+                    zoom_scale = 1.0f;
+                    menu_active_subview = 0;
+                    draw_interface(app_win);
+                    continue;
+                }
+
+                // Header Action: Theme toggle
+                if (mx >= 44 && mx <= 70 && my >= 8 && my <= 34) {
+                    theme_light = !theme_light;
+                    draw_interface(app_win);
+                    continue;
+                }
+
                 // Header Action: Open FTIR .txt File Dialog
                 if (mx >= x_open && mx <= x_open + 140 && my >= 8 && my <= 34) {
                     if (nsamples >= MAX_SAMPLES) {
                         GW_ShowMessageBox(app_win, "Limite alcanzado", L"No se pueden cargar mas de 8 muestras simultaneamente.", NULL, 0);
                         continue;
                     }
-                    char* file = GW_ShowOpenFileDialog(app_win, "Abrir muestra FTIR (.txt)", "Archivos FTIR (*.txt)\0*.txt\0");
+                    char* file = GW_ShowOpenFileDialog(app_win, "Abrir muestra FTIR (.txt)", "Archivos FTIR (*.txt)|*.txt");
                     if (file) {
                         const char* filename = strrchr(file, '\\');
                         if (!filename) filename = strrchr(file, '/');
                         if (!filename) filename = file;
                         else filename++;
 
-                        Sample* s = &samples[nsamples];
-                        strncpy(s->filepath, file, sizeof(s->filepath) - 1);
-                        s->filepath[sizeof(s->filepath) - 1] = '\0';
-                        strncpy(s->filename, filename, sizeof(s->filename) - 1);
-                        s->filename[sizeof(s->filename) - 1] = '\0';
-                        
-                        s->img_trans = NULL;
-                        s->img_super = NULL;
-                        s->img_abs = NULL;
-                        s->images_loaded = 0;
-                        s->ncsv_rows = 0;
-                        s->csv_scroll_offset = 0;
-                        s->super_selected = 1;
-                        
-                        current_sample_idx = nsamples;
-                        nsamples++;
+                        add_sample_to_project(file, filename);
                         free(file);
                         draw_interface(app_win);
                     }
@@ -501,6 +613,10 @@ int main(int argc, char* argv[]) {
                     argv[argc++] = mode_opts[sel_mode];
                     argv[argc++] = "--groups";
                     argv[argc++] = "temp_groups.json";
+                    argv[argc++] = "--out-dir";
+                    char out_dir_arg[512];
+                    snprintf(out_dir_arg, sizeof(out_dir_arg), "%s/processed_plots", project_vfs_mount_dir);
+                    argv[argc++] = out_dir_arg;
                     argv[argc++] = NULL;
 
                     is_processing = 1;
@@ -508,57 +624,42 @@ int main(int argc, char* argv[]) {
                     is_processing = 0;
                     
                     if (result == 0) {
-                        for (int s_idx = 0; s_idx < nsamples; s_idx++) {
-                            if (samples[s_idx].img_trans) { GW_FreeImage(samples[s_idx].img_trans); samples[s_idx].img_trans = NULL; }
-                            if (samples[s_idx].img_super) { GW_FreeImage(samples[s_idx].img_super); samples[s_idx].img_super = NULL; }
-                            if (samples[s_idx].img_abs)   { GW_FreeImage(samples[s_idx].img_abs);   samples[s_idx].img_abs = NULL; }
-
-                            char t_img[256], s_img[256], a_img[256], r_csv[256];
-                            snprintf(t_img, sizeof(t_img), "transmittance_%d.png", s_idx);
-                            snprintf(s_img, sizeof(s_img), "superposition_%d.png", s_idx);
-                            snprintf(a_img, sizeof(a_img), "absorbance_%d.png", s_idx);
-                            snprintf(r_csv, sizeof(r_csv), "reporte_picos_valleys_%d.csv", s_idx);
-
-                            samples[s_idx].img_trans = GW_LoadImage(t_img);
-                            samples[s_idx].img_super = GW_LoadImage(s_img);
-                            samples[s_idx].img_abs   = GW_LoadImage(a_img);
-                            samples[s_idx].images_loaded = 1;
-
-                            parse_csv_report(r_csv, s_idx);
-                        }
-
-                        if (super_count > 0) {
-                            if (super_img_trans) { GW_FreeImage(super_img_trans); super_img_trans = NULL; }
-                            if (super_img_super) { GW_FreeImage(super_img_super); super_img_super = NULL; }
-                            if (super_img_abs)   { GW_FreeImage(super_img_abs);   super_img_abs = NULL; }
-
-                            super_img_trans = GW_LoadImage("super_transmittance.png");
-                            super_img_super = GW_LoadImage("super_superposition.png");
-                            super_img_abs   = GW_LoadImage("super_absorbance.png");
-                            if (super_img_trans && super_img_super && super_img_abs) {
-                                super_images_loaded = 1;
-                            }
-                        }
+                        extract_and_load_processed_files();
+                    } else {
+                        wchar_t wmsg[256];
+                        swprintf(wmsg, sizeof(wmsg)/sizeof(wchar_t), L"El pipeline de Python fallo con codigo de salida %d. Verifique que Python y las dependencias (matplotlib, numpy, pandas) esten instaladas.", result);
+                        GW_ShowMessageBox(app_win, "Error de Procesamiento", wmsg, NULL, 0);
                     }
 
                     remove("temp_groups.json");
                     draw_interface(app_win);
                 }
 
-                // Left Panel Action: Checkbox & delete clicks in groups list
+                // Left Panel Action: Checkbox & delete clicks in groups list (Table Layout)
                 int left_w = splitter_x;
-                int list_y = 80;
-                for (int i = 0; i < ngroups; i++) {
-                    if (list_y + 25 > 290) break;
+                int gt_table_w = left_w - 30;
+                int gt_col0_w = (int)(gt_table_w * 0.18f);
+                int gt_col1_w = (int)(gt_table_w * 0.36f);
+                int gt_col2_w = (int)(gt_table_w * 0.31f);
+                int gt_col3_w = gt_table_w - gt_col0_w - gt_col1_w - gt_col2_w;
 
-                    if (mx >= 15 && mx <= 29 && my >= list_y && my <= list_y + 14) {
+                int list_y = 105;
+                for (int i = 0; i < ngroups; i++) {
+                    if (list_y + 22 > groups_bottom_y - 30) break;
+
+                    int cb_x = 15 + (gt_col0_w - 14) / 2;
+                    int db_x = 15 + gt_col0_w + gt_col1_w + gt_col2_w + (gt_col3_w - 16) / 2;
+
+                    // Checkbox click
+                    if (mx >= cb_x && mx <= cb_x + 14 && my >= list_y && my <= list_y + 20) {
                         groups[i].enabled = !groups[i].enabled;
                         if (super_images_loaded) regenerate_superposition();
                         draw_interface(app_win);
                         break;
                     }
 
-                    if (mx >= left_w - 35 && mx <= left_w - 19 && my >= list_y && my <= list_y + 14) {
+                    // Delete button click
+                    if (mx >= db_x && mx <= db_x + 16 && my >= list_y && my <= list_y + 20) {
                         for (int j = i; j < ngroups - 1; j++) {
                             groups[j] = groups[j + 1];
                         }
@@ -567,11 +668,11 @@ int main(int argc, char* argv[]) {
                         draw_interface(app_win);
                         break;
                     }
-                    list_y += 25;
+                    list_y += 22;
                 }
 
                 // Left Panel Action: Inline Add Group Button trigger
-                if (add_state == ADD_STATE_NONE && mx >= 15 && mx <= left_w - 15 && my >= 295 && my <= 321) {
+                if (add_state == ADD_STATE_NONE && mx >= 15 && mx <= left_w - 15 && my >= groups_bottom_y - 28 && my <= groups_bottom_y - 2) {
                     add_state = ADD_STATE_NAME;
                     add_name[0] = '\0';
                     add_min_str[0] = '\0';
@@ -581,28 +682,28 @@ int main(int argc, char* argv[]) {
 
                 // Left Panel Action: CSV Table navigation buttons
                 // Ant button
-                if (mx >= left_w - 250 && mx <= left_w - 195 && my >= 340 && my <= 366) {
+                if (mx >= left_w - 250 && mx <= left_w - 195 && my >= groups_bottom_y + 10 && my <= groups_bottom_y + 36) {
                     if (current_sample_idx > 0) {
                         current_sample_idx--;
                         draw_interface(app_win);
                     }
                 }
                 // Sig button
-                if (mx >= left_w - 190 && mx <= left_w - 135 && my >= 340 && my <= 366) {
+                if (mx >= left_w - 190 && mx <= left_w - 135 && my >= groups_bottom_y + 10 && my <= groups_bottom_y + 36) {
                     if (current_sample_idx < nsamples - 1) {
                         current_sample_idx++;
                         draw_interface(app_win);
                     }
                 }
                 // Subir button
-                if (mx >= left_w - 130 && mx <= left_w - 75 && my >= 340 && my <= 366) {
+                if (mx >= left_w - 130 && mx <= left_w - 75 && my >= groups_bottom_y + 10 && my <= groups_bottom_y + 36) {
                     if (nsamples > 0 && samples[current_sample_idx].csv_scroll_offset > 0) {
                         samples[current_sample_idx].csv_scroll_offset--;
                         draw_interface(app_win);
                     }
                 }
                 // Bajar button
-                if (mx >= left_w - 70 && mx <= left_w - 15 && my >= 340 && my <= 366) {
+                if (mx >= left_w - 70 && mx <= left_w - 15 && my >= groups_bottom_y + 10 && my <= groups_bottom_y + 36) {
                     if (nsamples > 0 && samples[current_sample_idx].csv_scroll_offset < samples[current_sample_idx].ncsv_rows - 10) {
                         samples[current_sample_idx].csv_scroll_offset++;
                         draw_interface(app_win);
@@ -612,7 +713,7 @@ int main(int argc, char* argv[]) {
                 // Right Panel Action: Double-click to zoom an image slot
                 int right_x = splitter_x + 5;
                 int right_w = ww - right_x;
-                int total_cols = nsamples + (super_images_loaded ? 1 : 0);
+                int total_cols = nsamples + ((super_images_loaded && nsamples > 1) ? 1 : 0);
                 if (total_cols > 0 && mx >= right_x && mx <= ww) {
                     int col_w = right_w / total_cols;
                     int c = (mx - right_x) / col_w;
@@ -626,13 +727,13 @@ int main(int argc, char* argv[]) {
                         else if (my >= 42 + 18 + 2 * slot_h + 5 && my < wh - 5) slot = 3;
                         
                         if (slot != -1) {
-                            if (super_images_loaded && c == mid_idx) {
+                            if (super_images_loaded && nsamples > 1 && c == mid_idx) {
                                 if (slot == 1) zoom_img = super_img_trans;
                                 else if (slot == 2) zoom_img = super_img_super;
                                 else if (slot == 3) zoom_img = super_img_abs;
                                 if (zoom_img) { zoom_mode = 1; zoom_scale = 1.0f / 1.1f; }
                             } else {
-                                int s_idx = (super_images_loaded && c > mid_idx) ? (c - 1) : c;
+                                int s_idx = (super_images_loaded && nsamples > 1 && c > mid_idx) ? (c - 1) : c;
                                 if (samples[s_idx].images_loaded) {
                                     if (slot == 1) zoom_img = samples[s_idx].img_trans;
                                     else if (slot == 2) zoom_img = samples[s_idx].img_super;
@@ -654,6 +755,63 @@ int main(int argc, char* argv[]) {
         if (ev.type == GW_EVENT_KEY_DOWN) {
             if (is_processing) continue;
             int key = ev.key.keycode;
+            int mod = ev.key.mod;
+            if (mod & GW_MOD_CTRL) {
+                if (key == 'O' || key == 'o') {
+                    char* path = GW_ShowOpenFileDialog(app_win, "Abrir Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                    if (path) {
+                        load_project_zip(path);
+                        free(path);
+                        zoom_mode = 0;
+                        menu_active_subview = 0;
+                    }
+                    draw_interface(app_win);
+                    continue;
+                }
+                if (key == 'S' || key == 's') {
+                    char* path = GW_ShowSaveFileDialog(app_win, "Guardar Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                    if (path) {
+                        char final_path[512];
+                        strncpy(final_path, path, sizeof(final_path) - 1);
+                        final_path[sizeof(final_path) - 1] = '\0';
+                        int len = strlen(final_path);
+                        if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
+                            strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                        }
+                        create_new_project_zip(final_path);
+                        free(path);
+                        zoom_mode = 0;
+                        menu_active_subview = 0;
+                        GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como ZIP.", NULL, 0);
+                    }
+                    draw_interface(app_win);
+                    continue;
+                }
+                if (key == 'N' || key == 'n') {
+                    char* path = GW_ShowSaveFileDialog(app_win, "Nuevo Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                    if (path) {
+                        char final_path[512];
+                        strncpy(final_path, path, sizeof(final_path) - 1);
+                        final_path[sizeof(final_path) - 1] = '\0';
+                        int len = strlen(final_path);
+                        if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
+                            strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                        }
+                        create_new_project_zip(final_path);
+                        free(path);
+                        zoom_mode = 0;
+                        menu_active_subview = 0;
+                    }
+                    draw_interface(app_win);
+                    continue;
+                }
+            }
+            if (zoom_mode == 4 && key == GW_KEY_ESCAPE) {
+                zoom_mode = 0;
+                menu_active_subview = 0;
+                draw_interface(app_win);
+                continue;
+            }
             if (zoom_mode && !(zoom_mode == 2 && add_state != ADD_STATE_NONE)) {
                 if (zoom_mode == 3 && (key == GW_KEY_UP || key == GW_KEY_DOWN || key == GW_KEY_LEFT || key == GW_KEY_RIGHT)) {
                     if (key == GW_KEY_UP) {
@@ -748,6 +906,10 @@ int main(int argc, char* argv[]) {
     }
 
     // 7. Cleanup Resources
+    if (project_vfs) {
+        zipvfs_close(project_vfs);
+        project_vfs = NULL;
+    }
     for (int i = 0; i < nsamples; i++) {
         if (samples[i].img_trans) GW_FreeImage(samples[i].img_trans);
         if (samples[i].img_super) GW_FreeImage(samples[i].img_super);
