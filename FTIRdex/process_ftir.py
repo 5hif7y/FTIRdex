@@ -128,8 +128,10 @@ def main():
     parser.add_argument('--smooth', default='RAW', help="Smoothing algorithm option")
     parser.add_argument('--baseline', default='RAW', help="Baseline algorithm option")
     parser.add_argument('--mode', default='lines', help="Peak marker mode")
+    parser.add_argument('--out-dir', default='.', help="Directory to save generated plots and reports")
     
     args = parser.parse_args()
+    os.makedirs(args.out_dir, exist_ok=True)
 
     # Map Spanish mode names
     mode_lower = args.mode.strip().lower()
@@ -173,10 +175,10 @@ def main():
 
             y_abs = transmittance_to_absorbance(y_trans)
 
-            out_trans = f"transmittance_{s_idx}.png"
-            out_abs = f"absorbance_{s_idx}.png"
-            out_super = f"superposition_{s_idx}.png"
-            out_csv = f"reporte_picos_valleys_{s_idx}.csv"
+            out_trans = os.path.join(args.out_dir, f"transmittance_{s_idx}.png")
+            out_abs = os.path.join(args.out_dir, f"absorbance_{s_idx}.png")
+            out_super = os.path.join(args.out_dir, f"superposition_{s_idx}.png")
+            out_csv = os.path.join(args.out_dir, f"reporte_picos_valleys_{s_idx}.csv")
 
             # Generate transmittance plot
             plot_config(
@@ -370,9 +372,9 @@ def main():
                         idx = np.abs(spec['x'] - pw).argmin()
                         groups_norm[g_name].append((spec['x'][idx], y_norm[idx], spec['label']))
 
-            out_trans = "super_transmittance.png"
-            out_abs = "super_absorbance.png"
-            out_super = "super_superposition.png"
+            out_trans = os.path.join(args.out_dir, "super_transmittance.png")
+            out_abs = os.path.join(args.out_dir, "super_absorbance.png")
+            out_super = os.path.join(args.out_dir, "super_superposition.png")
 
             plt.rcParams["font.family"] = "sans-serif"
             plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Inter", "Liberation Sans"]
