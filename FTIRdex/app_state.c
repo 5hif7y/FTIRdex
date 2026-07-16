@@ -84,7 +84,7 @@ char project_zip_path[512] = "";
 zipvfs_t* project_vfs = NULL;
 char project_vfs_mount_dir[512] = "";
 int theme_light = 0;
-
+char app_dir[512] = "";
 
 int x_smooth = 0;
 int x_baseline = 0;
@@ -244,12 +244,19 @@ void regenerate_superposition() {
     if (super_img_abs)   { GW_FreeImage(super_img_abs);   super_img_abs = NULL; }
     super_images_loaded = 0;
 
-    save_groups_json("temp_groups.json");
+    char py_script_path[512];
+    snprintf(py_script_path, sizeof(py_script_path), "%s/process_ftir.py", app_dir);
+
+    char temp_groups_path[512];
+    snprintf(temp_groups_path, sizeof(temp_groups_path), "%s/temp_groups.json", project_vfs_mount_dir);
+
+    save_groups_json(temp_groups_path);
+
 
     const char* argv[64];
     int argc = 0;
     argv[argc++] = "python";
-    argv[argc++] = "process_ftir.py";
+    argv[argc++] = py_script_path;
     argv[argc++] = "--superimpose-files";
     
     int count = 0;
@@ -277,7 +284,7 @@ void regenerate_superposition() {
     argv[argc++] = mode_opts[sel_mode];
     
     argv[argc++] = "--groups";
-    argv[argc++] = "temp_groups.json";
+    argv[argc++] = temp_groups_path;
 
     argv[argc++] = "--out-dir";
     char out_dir_arg[512];
@@ -320,7 +327,7 @@ void regenerate_superposition() {
         }
     }
 
-    remove("temp_groups.json");
+    remove(temp_groups_path);
 }
 
 static void ensure_dir_exists(const char* filepath) {

@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           VERSION=$(cat VERSION | tr -d '[:space:]')
-          tar --exclude='./build' --exclude='./.git' --exclude='./.github' -czf ../FTIRdex-$VERSION-source.tar.gz .
+          tar --exclude='./build' --exclude='./.git' --exclude='./.github' --exclude='./FTIRlib/recuperacion-historica' --exclude='./FTIRdex-$VERSION-installer-x64.exe' -czf ../FTIRdex-$VERSION-source.tar.gz .
           mv ../FTIRdex-$VERSION-source.tar.gz .
 
       - name: Upload Artifacts
@@ -64,16 +64,16 @@ jobs:
           name: FTIRdex-Build-Artifacts
           path: |
             FTIRdex-*-portable.zip
-            **/FTIRdex-*-Installer-x64.exe
+            **/FTIRdex-*-installer-x64.exe
             FTIRdex-*-source.tar.gz
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             FTIRdex-*-portable.zip
-            **/FTIRdex-*-Installer-x64.exe
+            **/FTIRdex-*-installer-x64.exe
             FTIRdex-*-source.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

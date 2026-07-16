@@ -14,9 +14,10 @@ UninstallDisplayIcon={app}\FTIRdex.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=.
-OutputBaseFilename=FTIRdex-{#AppVersion}-Installer-x64
+OutputBaseFilename=FTIRdex-{#AppVersion}-installer-x64
 SetupIconFile=icono.ico
 ChangesAssociations=yes
+LicenseFile=LICENSE
 
 ; Force installation to Program Files (64-bit) instead of Program Files (x86) on 64-bit Windows
 ArchitecturesAllowed=x64
@@ -39,19 +40,21 @@ Name: "{group}\FTIRdex"; Filename: "{app}\FTIRdex.exe"
 Name: "{autodesktop}\FTIRdex"; Filename: "{app}\FTIRdex.exe"
 
 [Tasks]
-Name: envPath; Description: "Agregar FTIRdex a la variable de entorno PATH (permite ejecutarlo desde cmd/PowerShell)"; Flags: unchecked
+Name: envPath; Description: "Agregar FTIRdex a la variable de entorno PATH (permite ejecutarlo desde cmd/PowerShell)"
+Name: associateFiles; Description: "Asociar FTIRdex con la extensión de archivo .ftirzip (permite abrir archivos de proyecto haciendo doble clic)"
 
 [Registry]
 ; Append the application directory to the User's PATH environment variable
 Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; Tasks: envPath; Flags: preservestringtype
 
 ; File association for .ftirzip files
-Root: HKA; Subkey: "Software\Classes\.ftirzip"; ValueType: string; ValueName: ""; ValueData: "FTIRdex.Project"; Flags: uninsdeletevalue
-Root: HKA; Subkey: "Software\Classes\FTIRdex.Project"; ValueType: string; ValueName: ""; ValueData: "FTIRdex Project File"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\Classes\FTIRdex.Project\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\FTIRdex.exe,0"; Flags: uninsdeletekey
-Root: HKA; Subkey: "Software\Classes\FTIRdex.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\FTIRdex.exe"" ""%1"""; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\.ftirzip"; ValueType: string; ValueName: ""; ValueData: "FTIRdex.Project"; Flags: uninsdeletevalue; Tasks: associateFiles
+Root: HKA; Subkey: "Software\Classes\FTIRdex.Project"; ValueType: string; ValueName: ""; ValueData: "FTIRdex Project File"; Flags: uninsdeletekey; Tasks: associateFiles
+Root: HKA; Subkey: "Software\Classes\FTIRdex.Project\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\FTIRdex.exe,0"; Flags: uninsdeletekey; Tasks: associateFiles
+Root: HKA; Subkey: "Software\Classes\FTIRdex.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\FTIRdex.exe"" ""%1"""; Flags: uninsdeletekey; Tasks: associateFiles
 
 
 [Run]
 ; Checkbox option to launch the application once the installation finishes successfully
 Filename: "{app}\FTIRdex.exe"; Description: "Ejecutar FTIRdex al finalizar la instalación"; Flags: postinstall nowait skipifsilent
+

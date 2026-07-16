@@ -47,6 +47,7 @@ typedef struct {
 
 // App State Globals (External)
 extern int is_processing;
+extern char app_dir[512];
 extern int ww;
 extern int wh;
 extern struct GW_Window* app_win;
