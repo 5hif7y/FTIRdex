@@ -1,20 +1,29 @@
 cmake_minimum_required(VERSION 3.15)
-project(FTIRdex LANGUAGES C)
+
+# Read version from centralized VERSION file
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" FTIRDEX_VERSION)
+string(STRIP "${FTIRDEX_VERSION}" FTIRDEX_VERSION)
+
+project(FTIRdex VERSION ${FTIRDEX_VERSION} LANGUAGES C)
 
 # Set C standard
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# Add the libnativegui subdirectory
+# Add the libnativegui and libzipvfs subdirectories
 add_subdirectory(libnativegui)
-# Add the libzipvfs subdirectory
 add_subdirectory(libzipvfs)
 
 # Add FTIRdex executable
-add_executable(FTIRdex FTIRdex/main.c FTIRdex/app_state.c FTIRdex/gui_render.c)
+add_executable(FTIRdex
+    FTIRdex/main.c
+    FTIRdex/app_state.c
+    FTIRdex/gui_render.c
+)
 
 # Include directories
-target_include_directories(FTIRdex PRIVATE libnativegui libzipvfs/src FTIRdex)
+target_include_directories(FTIRdex PRIVATE libnativegui FTIRdex libzipvfs/src)
+target_compile_definitions(FTIRdex PRIVATE FTIRDEX_VERSION="${FTIRDEX_VERSION}")
 
 # Windows resource files and subsystem configuration
 if(WIN32)
@@ -22,7 +31,7 @@ if(WIN32)
     set_target_properties(FTIRdex PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
-# Link with nativegui and zipvfs static library target
+# Link with nativegui and zipvfs static libraries
 target_link_libraries(FTIRdex PRIVATE nativegui zipvfs)
 
 # Copy the Python scripts and resource folder to the output directory on build

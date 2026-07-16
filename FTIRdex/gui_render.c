@@ -375,15 +375,15 @@ static void draw_zoom_menu(GW_Window* win) {
         int ty = ry + (int)(60 * zoom_scale);
         int dy = (int)(24 * zoom_scale);
         
-        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty, "Inicio de Dev: 24/06/2026", 0xFFFFFFFF);
+        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty, "Inicio de Dev: Lunes 01/06/2026", 0xFFFFFFFF);
         
         char comp_str[128];
         snprintf(comp_str, sizeof(comp_str), "Compilación: %s %s", __DATE__, __TIME__);
         draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + dy, comp_str, 0xFFFFFFFF);
         
-        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 2 * dy, "Dueño: Ing. Mendoza Nicolas", 0xFFFFFFFF);
-        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 3 * dy, "DEV: Aleman Matias (5hif7y)", 0xFFFFFFFF);
-        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 4 * dy, "Versión: 1.0.0 (Modular VFS)", 0xFF00FFFF);
+        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 2 * dy, "Dueño: Ing. Mendoza Nicolás", 0xFFFFFFFF);
+        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 3 * dy, "DEV: Alemán Matías (5hif7y)", 0xFFFFFFFF);
+        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 4 * dy, "Versión: 0.0.5", 0xFF00FFFF);
 
         if (title_f != zf) GW_FreeFont(title_f);
     } else if (menu_active_subview == 2) { // Colores de Interfaz (Stub)
