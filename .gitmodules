@@ -1,6 +1,6 @@
 [submodule "libnativegui"]
 	path = libnativegui
 	url = https://github.com/5hif7y/libnativegui.git
-[submodule "zip"]
-	path = zip
-	url = https://github.com/kuba--/zip.git
+[submodule "libzipvfs"]
+	path = libzipvfs
+	url = https://github.com/5hif7y/libzipvfs.git
