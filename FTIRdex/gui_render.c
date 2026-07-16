@@ -343,9 +343,9 @@ static void draw_zoom_menu(GW_Window* win) {
     int sy = 150;
 
     const char* menu_opts[] = {
-        "Nuevo Proyecto (.zip)",
-        "Abrir Proyecto (.zip)",
-        "Guardar Proyecto (.zip)",
+        "Nuevo Proyecto (.ftirzip)",
+        "Abrir Proyecto (.ftirzip)",
+        "Guardar Proyecto (.ftirzip)",
         "Colores de Interfaz",
         "Sobre este software",
         "Salir"

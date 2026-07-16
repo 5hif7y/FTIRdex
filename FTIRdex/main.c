@@ -54,6 +54,15 @@ void update_dynamic_fonts(int window_width) {
 }
 
 int main(int argc, char* argv[]) {
+
+    #ifdef _WIN32
+        GetModuleFileNameA(NULL, app_dir, sizeof(app_dir));
+        char* last_slash = strrchr(app_dir, '\\');
+        if (last_slash) *last_slash = '\0';
+    #else
+        strncpy(app_dir, ".", sizeof(app_dir));
+    #endif
+    
     // 1. Initialize Default Functional Groups Database
     groups[ngroups++] = (FuncGroup){"O-H", 3000, 3600, 1};
     groups[ngroups++] = (FuncGroup){"C-H", 2800, 3000, 1};
@@ -576,12 +585,18 @@ int main(int argc, char* argv[]) {
                     draw_text_button_centered(app_win, ui_font, x_process, 8, 145, 26, "Procesando...", 0xFFFFFFFF);
                     GW_Present(app_win);
 
-                    save_groups_json("temp_groups.json");
+                    char py_script_path[512];
+                    snprintf(py_script_path, sizeof(py_script_path), "%s/process_ftir.py", app_dir);
+
+                    char temp_groups_path[512];
+                    snprintf(temp_groups_path, sizeof(temp_groups_path), "%s/temp_groups.json", project_vfs_mount_dir);
+
+                    save_groups_json(temp_groups_path);
 
                     const char* argv[128];
                     int argc = 0;
                     argv[argc++] = "python";
-                    argv[argc++] = "process_ftir.py";
+                    argv[argc++] = py_script_path;
                     
                     argv[argc++] = "--files";
                     for (int i = 0; i < nsamples; i++) {
@@ -621,7 +636,7 @@ int main(int argc, char* argv[]) {
                     argv[argc++] = "--mode";
                     argv[argc++] = mode_opts[sel_mode];
                     argv[argc++] = "--groups";
-                    argv[argc++] = "temp_groups.json";
+                    argv[argc++] = temp_groups_path;
                     argv[argc++] = "--out-dir";
                     char out_dir_arg[512];
                     snprintf(out_dir_arg, sizeof(out_dir_arg), "%s/processed_plots", project_vfs_mount_dir);
@@ -640,7 +655,7 @@ int main(int argc, char* argv[]) {
                         GW_ShowMessageBox(app_win, "Error de Procesamiento", wmsg, NULL, 0);
                     }
 
-                    remove("temp_groups.json");
+                    remove(temp_groups_path);
                     draw_interface(app_win);
                 }
 

@@ -84,9 +84,11 @@ build.bat
 
 El proyecto incluye un flujo de integración y entrega continua (CI/CD) automatizado a través de **GitHub Actions** (`.github/workflows/build-and-release.yml`). En cada confirmación a la rama `main` o al crear una etiqueta de versión (`v*`), el servidor compila y empaqueta de forma automática los siguientes entregables:
 
-1. **Versión Portable (`FTIRdex-portable.zip`)**: Un archivo comprimido listo para usar sin instalación previa.
-2. **Instalador de Windows (`FTIRdex-Installer-x64.exe`)**: Un instalador guiado estándar creado con Inno Setup que añade accesos directos al escritorio.
-3. **Código Fuente (`FTIRdex-source.tar.gz`)**: Tarball para entornos Linux/Unix donde los usuarios finales deseen compilar la aplicación utilizando el servidor gráfico X11.
+1. **Versión Portable (`FTIRdex-VERSION-portable.zip`)**: Un archivo comprimido listo para usar sin instalación previa.
+2. **Instalador de Windows (`FTIRdex-VERSION-nstaller-x64.exe`)**: Un instalador guiado estándar creado con Inno Setup que añade accesos directos al escritorio.
+3. **Código Fuente (`FTIRdex-VERSION-source.tar.gz`)**: Tarball para entornos Linux/Unix donde los usuarios finales deseen compilar la aplicación utilizando el servidor gráfico X11.
+
+Donde `VERSION` es la enumeración identificatoria del software.
 
 ---
 
@@ -96,4 +98,5 @@ El proyecto incluye un flujo de integración y entrega continua (CI/CD) automati
 
   2. El uso del código de la interfaz gráfica nativa se rige bajo la licencia **MIT** provista dentro de la subcarpeta `libnativegui`. La cual es una licencia libre para todo, que solo requiere referenciar el nombre o alias del autor.
 
+  3. El uso del código del sistema de archivos virtual se rige bajo la licencia **MIT** provista dentro de la subcarpeta `libzipvfs`. La cual es una licencia libre para todo, que solo requiere referenciar el nombre o alias del autor.
 

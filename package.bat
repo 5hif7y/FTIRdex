@@ -74,6 +74,6 @@ echo.
 echo All artifacts generated successfully:
 echo   - FTIRdex-%VERSION%-portable.zip
 echo   - FTIRdex-%VERSION%-source.tar.gz
-if exist "FTIRdex-%VERSION%-Installer-x64.exe" (
-    echo   - FTIRdex-%VERSION%-Installer-x64.exe
+if exist "FTIRdex-%VERSION%-installer-x64.exe" (
+    echo   - FTIRdex-%VERSION%-installer-x64.exe
 )
