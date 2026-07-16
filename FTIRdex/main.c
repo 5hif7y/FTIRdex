@@ -63,8 +63,17 @@ int main(int argc, char* argv[]) {
     groups[ngroups++] = (FuncGroup){"C-O", 1000, 1300, 1};
     groups[ngroups++] = (FuncGroup){"C-O-C", 800, 1000, 1};
 
-    // 1.5 Initialize Default VFS ZIP path
+    // 1.5 Initialize Default VFS FTIRzip path
     init_default_project_zip();
+
+    // If a project file (.ftirzip) was passed as command-line argument, load it!
+    if (argc > 1) {
+        FILE* f = fopen(argv[1], "rb");
+        if (f) {
+            fclose(f);
+            load_project_zip(argv[1]);
+        }
+    }
 
     // 2. Initialize GUI Window
     app_win = GW_CreateWindow("FTIRdex - Análisis de espectros FTIR", ww, wh);
@@ -158,14 +167,14 @@ int main(int argc, char* argv[]) {
                         }
                         
                         if (clicked_menu_item == 0) { // Nuevo Proyecto
-                            char* path = GW_ShowSaveFileDialog(app_win, "Nuevo Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                            char* path = GW_ShowSaveFileDialog(app_win, "Nuevo Proyecto (.ftirzip)", "Archivos FTIRzip (*.ftirzip)|*.ftirzip");
                             if (path) {
                                 char final_path[512];
                                 strncpy(final_path, path, sizeof(final_path) - 1);
                                 final_path[sizeof(final_path) - 1] = '\0';
                                 int len = strlen(final_path);
-                                if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
-                                    strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                                if (len < 8 || _stricmp(final_path + len - 8, ".ftirzip") != 0) {
+                                    strncat(final_path, ".ftirzip", sizeof(final_path) - len - 1);
                                 }
                                 create_new_project_zip(final_path);
                                 free(path);
@@ -174,7 +183,7 @@ int main(int argc, char* argv[]) {
                             }
                             draw_interface(app_win);
                         } else if (clicked_menu_item == 1) { // Abrir Proyecto
-                            char* path = GW_ShowOpenFileDialog(app_win, "Abrir Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                            char* path = GW_ShowOpenFileDialog(app_win, "Abrir Proyecto (.ftirzip)", "Archivos FTIRzip (*.ftirzip)|*.ftirzip");
                             if (path) {
                                 load_project_zip(path);
                                 free(path);
@@ -183,20 +192,20 @@ int main(int argc, char* argv[]) {
                             }
                             draw_interface(app_win);
                         } else if (clicked_menu_item == 2) { // Guardar Proyecto
-                            char* path = GW_ShowSaveFileDialog(app_win, "Guardar Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                            char* path = GW_ShowSaveFileDialog(app_win, "Guardar Proyecto (.ftirzip)", "Archivos FTIRzip (*.ftirzip)|*.ftirzip");
                             if (path) {
                                 char final_path[512];
                                 strncpy(final_path, path, sizeof(final_path) - 1);
                                 final_path[sizeof(final_path) - 1] = '\0';
                                 int len = strlen(final_path);
-                                if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
-                                    strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                                if (len < 8 || _stricmp(final_path + len - 8, ".ftirzip") != 0) {
+                                    strncat(final_path, ".ftirzip", sizeof(final_path) - len - 1);
                                 }
                                 create_new_project_zip(final_path);
                                 free(path);
                                 zoom_mode = 0;
                                 menu_active_subview = 0;
-                                GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como ZIP.", NULL, 0);
+                                GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como FTIRzip.", NULL, 0);
                             }
                             draw_interface(app_win);
                         } else if (clicked_menu_item == 3) { // Colores de interfaz
@@ -758,7 +767,7 @@ int main(int argc, char* argv[]) {
             int mod = ev.key.mod;
             if (mod & GW_MOD_CTRL) {
                 if (key == 'O' || key == 'o') {
-                    char* path = GW_ShowOpenFileDialog(app_win, "Abrir Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                    char* path = GW_ShowOpenFileDialog(app_win, "Abrir Proyecto (.ftirzip)", "Archivos FTIRzip (*.ftirzip)|*.ftirzip");
                     if (path) {
                         load_project_zip(path);
                         free(path);
@@ -769,33 +778,33 @@ int main(int argc, char* argv[]) {
                     continue;
                 }
                 if (key == 'S' || key == 's') {
-                    char* path = GW_ShowSaveFileDialog(app_win, "Guardar Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                    char* path = GW_ShowSaveFileDialog(app_win, "Guardar Proyecto (.ftirzip)", "Archivos FTIRzip (*.ftirzip)|*.ftirzip");
                     if (path) {
                         char final_path[512];
                         strncpy(final_path, path, sizeof(final_path) - 1);
                         final_path[sizeof(final_path) - 1] = '\0';
                         int len = strlen(final_path);
-                        if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
-                            strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                        if (len < 8 || _stricmp(final_path + len - 8, ".ftirzip") != 0) {
+                            strncat(final_path, ".ftirzip", sizeof(final_path) - len - 1);
                         }
                         create_new_project_zip(final_path);
                         free(path);
                         zoom_mode = 0;
                         menu_active_subview = 0;
-                        GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como ZIP.", NULL, 0);
+                        GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como FTIRzip.", NULL, 0);
                     }
                     draw_interface(app_win);
                     continue;
                 }
                 if (key == 'N' || key == 'n') {
-                    char* path = GW_ShowSaveFileDialog(app_win, "Nuevo Proyecto (.zip)", "Archivos ZIP (*.zip)|*.zip");
+                    char* path = GW_ShowSaveFileDialog(app_win, "Nuevo Proyecto (.ftirzip)", "Archivos FTIRzip (*.ftirzip)|*.ftirzip");
                     if (path) {
                         char final_path[512];
                         strncpy(final_path, path, sizeof(final_path) - 1);
                         final_path[sizeof(final_path) - 1] = '\0';
                         int len = strlen(final_path);
-                        if (len < 4 || _stricmp(final_path + len - 4, ".zip") != 0) {
-                            strncat(final_path, ".zip", sizeof(final_path) - len - 1);
+                        if (len < 8 || _stricmp(final_path + len - 8, ".ftirzip") != 0) {
+                            strncat(final_path, ".ftirzip", sizeof(final_path) - len - 1);
                         }
                         create_new_project_zip(final_path);
                         free(path);

@@ -16,6 +16,7 @@ SolidCompression=yes
 OutputDir=.
 OutputBaseFilename=FTIRdex-{#AppVersion}-Installer-x64
 SetupIconFile=icono.ico
+ChangesAssociations=yes
 
 ; Force installation to Program Files (64-bit) instead of Program Files (x86) on 64-bit Windows
 ArchitecturesAllowed=x64
@@ -43,6 +44,13 @@ Name: envPath; Description: "Agregar FTIRdex a la variable de entorno PATH (perm
 [Registry]
 ; Append the application directory to the User's PATH environment variable
 Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; Tasks: envPath; Flags: preservestringtype
+
+; File association for .ftirzip files
+Root: HKA; Subkey: "Software\Classes\.ftirzip"; ValueType: string; ValueName: ""; ValueData: "FTIRdex.Project"; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\FTIRdex.Project"; ValueType: string; ValueName: ""; ValueData: "FTIRdex Project File"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\FTIRdex.Project\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\FTIRdex.exe,0"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\FTIRdex.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\FTIRdex.exe"" ""%1"""; Flags: uninsdeletekey
+
 
 [Run]
 ; Checkbox option to launch the application once the installation finishes successfully
