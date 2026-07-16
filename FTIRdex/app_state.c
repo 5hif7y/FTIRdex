@@ -1,6 +1,7 @@
 #include "app_state.h"
 #include "gui_render.h"
 #include "iprocesses.h"
+#include "zipvfs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -77,6 +78,13 @@ int active_dropdown = 0;
 int zoom_mode = 0;
 GW_Image* zoom_img = NULL;
 float zoom_scale = 1.0f;
+int menu_active_subview = 0;
+
+char project_zip_path[512] = "";
+zipvfs_t* project_vfs = NULL;
+char project_vfs_mount_dir[512] = "";
+int theme_light = 0;
+
 
 int x_smooth = 0;
 int x_baseline = 0;
@@ -270,6 +278,11 @@ void regenerate_superposition() {
     
     argv[argc++] = "--groups";
     argv[argc++] = "temp_groups.json";
+
+    argv[argc++] = "--out-dir";
+    char out_dir_arg[512];
+    snprintf(out_dir_arg, sizeof(out_dir_arg), "%s/processed_plots", project_vfs_mount_dir);
+    argv[argc++] = out_dir_arg;
     
     argv[argc++] = NULL;
 
@@ -278,9 +291,29 @@ void regenerate_superposition() {
         int res = run_python_pump_events(argv);
         is_processing = 0;
         if (res == 0) {
-            super_img_trans = GW_LoadImage("super_transmittance.png");
-            super_img_super = GW_LoadImage("super_superposition.png");
-            super_img_abs   = GW_LoadImage("super_absorbance.png");
+
+            char st_path[512], ss_path[512], sa_path[512];
+            snprintf(st_path, sizeof(st_path), "%s/processed_plots/super_transmittance.png", project_vfs_mount_dir);
+            snprintf(ss_path, sizeof(ss_path), "%s/processed_plots/super_superposition.png", project_vfs_mount_dir);
+            snprintf(sa_path, sizeof(sa_path), "%s/processed_plots/super_absorbance.png", project_vfs_mount_dir);
+            
+            FILE* f = fopen(st_path, "rb");
+            if (f) {
+                fclose(f);
+                super_img_trans = GW_LoadImage(st_path);
+            }
+            f = fopen(ss_path, "rb");
+            if (f) {
+                fclose(f);
+                super_img_super = GW_LoadImage(ss_path);
+            }
+            f = fopen(sa_path, "rb");
+            if (f) {
+                fclose(f);
+                super_img_abs = GW_LoadImage(sa_path);
+            }
+
+
             if (super_img_trans && super_img_super && super_img_abs) {
                 super_images_loaded = 1;
             }
