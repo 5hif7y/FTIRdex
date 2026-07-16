@@ -200,7 +200,7 @@ static void draw_zoom_groups(GW_Window* win) {
     int zw_tmp = 0;
     wchar_t wtmp_z[4] = L"Ap";
     GW_MeasureText(zf, wtmp_z, &zw_tmp, &zh);
-    draw_text_button_centered(win, zf, 0, 50, ww, zh + 10, "Bases de Datos de Grupos Funcionales (Click izquierdo fuera para salir)", 0xFF0078D7);
+    draw_text_button_centered(win, zf, 0, 50, ww, zh + 10, "Tabla de Datos de Grupos Funcionales (Click izquierdo fuera para salir)", 0xFF0078D7);
     
     int box_size = (int)(16 * zoom_scale);
     int item_spacing = (int)(32 * zoom_scale);
@@ -588,7 +588,7 @@ void draw_interface(GW_Window* win) {
 
     // A. Title: "Grupos Funcionales a Detectar"
     GW_DrawRect(win, 10, 52, left_w - 20, 26, 0xFF3E3E42);
-    draw_text_button_centered(win, title_font ? title_font : ui_font, 10, 52, left_w - 20, 26, "Bases de Datos de Grupos Funcionales (cm-1)", 0xFF0078D7);
+    draw_text_button_centered(win, title_font ? title_font : ui_font, 10, 52, left_w - 20, 26, "Tabla de Datos de Grupos Funcionales (cm-1)", 0xFF0078D7);
 
     // Render checkable groups list as a table
     int gt_table_w = left_w - 30;
