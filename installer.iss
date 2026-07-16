@@ -1,18 +1,23 @@
 ; Inno Setup script for FTIRdex
+#define VerFile FileOpen(SourcePath + "\VERSION")
+#define AppVersion FileRead(VerFile)
+#expr FileClose(VerFile)
+#undef VerFile
+
 [Setup]
 AppName=FTIRdex
-AppVersion=0.0.5
+AppVersion={#AppVersion}
 AppPublisher=Alemán Matías R. (5hif7y)
 DefaultDirName={autopf}\FTIRdex
 DefaultGroupName=FTIRdex
 UninstallDisplayIcon={app}\FTIRdex.exe
 Compression=lzma2
 SolidCompression=yes
-OutputDir=.
-OutputBaseFilename=FTIRdex-0.0.5-Installer-x64
+OutputDir=output
+OutputBaseFilename=FTIRdex-{#AppVersion}-Installer-x64
 SetupIconFile=icono.ico
 
-; Install to Program Files (64-bit) instead of Program Files (x86) on 64-bit Windows
+; Force installation to Program Files (64-bit) instead of Program Files (x86) on 64-bit Windows
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
@@ -23,7 +28,9 @@ Name: "{app}"; Permissions: users-modify
 [Files]
 Source: "build\Release\FTIRdex.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\process_ftir.py"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\make_ico.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\icono.ico"; DestDir: "{app}"; Flags: ignoreversion
+; Exclude the large historical recovery folder to optimize installation size
 Source: "build\Release\FTIRlib\*"; DestDir: "{app}\FTIRlib"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "recuperacion-historica,recuperacion-historica\*"
 
 [Icons]
@@ -40,5 +47,3 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; Value
 [Run]
 ; Checkbox option to launch the application once the installation finishes successfully
 Filename: "{app}\FTIRdex.exe"; Description: "Ejecutar FTIRdex al finalizar la instalación"; Flags: postinstall nowait skipifsilent
-
-
