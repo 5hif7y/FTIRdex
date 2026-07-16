@@ -920,7 +920,7 @@ def generate_numerical_report(x, y_corr, sample_name, output_csv,
                 break
                 
         report_rows.append({
-            "Type": "Peak",
+            "Type": "Pico",
             "Wavenumber": f"{wavenumber:.2f}",
             "Absorbance": f"{val:.6f}",
             "Mapped_Group": mapped_group
@@ -931,7 +931,7 @@ def generate_numerical_report(x, y_corr, sample_name, output_csv,
         wavenumber = x[idx]
         val = y_corr[idx]
         report_rows.append({
-            "Type": "Valley",
+            "Type": "Valle",
             "Wavenumber": f"{wavenumber:.2f}",
             "Absorbance": f"{val:.6f}",
             "Mapped_Group": "N/A"
