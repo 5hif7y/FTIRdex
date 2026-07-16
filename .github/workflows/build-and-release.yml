@@ -32,7 +32,7 @@ jobs:
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy scipy matplotlib pillow pytest
+          pip install numpy scipy matplotlib pillow
 
       - name: Configure CMake
         run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
@@ -43,7 +43,8 @@ jobs:
       - name: Create Portable Zip
         shell: pwsh
         run: |
-          Compress-Archive -Path build\Release\* -DestinationPath FTIRdex-portable.zip
+          $version = (Get-Content VERSION).Trim()
+          Compress-Archive -Path build\Release\* -DestinationPath "FTIRdex-$version-portable.zip"
 
       - name: Compile Inno Setup Installer
         shell: pwsh
@@ -53,25 +54,26 @@ jobs:
       - name: Create Source Tarball
         shell: bash
         run: |
-          tar --exclude='./build' --exclude='./.git' --exclude='./.github' --exclude='./FTIRlib/recuperacion-historica' --exclude='./FTIRdex-0.0.5-Installer-x64.exe' -czf ../FTIRdex-source.tar.gz .
-          mv ../FTIRdex-source.tar.gz .
+          VERSION=$(cat VERSION | tr -d '[:space:]')
+          tar --exclude='./build' --exclude='./.git' --exclude='./.github' -czf ../FTIRdex-$VERSION-source.tar.gz .
+          mv ../FTIRdex-$VERSION-source.tar.gz .
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: FTIRdex-Build-Artifacts
           path: |
-            FTIRdex-portable.zip
-            output/FTIRdex-Installer-x64.exe
-            FTIRdex-source.tar.gz
+            FTIRdex-*-portable.zip
+            **/FTIRdex-*-Installer-x64.exe
+            FTIRdex-*-source.tar.gz
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
           files: |
-            FTIRdex-portable.zip
-            output/FTIRdex-Installer-x64.exe
-            FTIRdex-source.tar.gz
+            FTIRdex-*-portable.zip
+            **/FTIRdex-*-Installer-x64.exe
+            FTIRdex-*-source.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

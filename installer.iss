@@ -13,7 +13,7 @@ DefaultGroupName=FTIRdex
 UninstallDisplayIcon={app}\FTIRdex.exe
 Compression=lzma2
 SolidCompression=yes
-OutputDir=output
+OutputDir=.
 OutputBaseFilename=FTIRdex-{#AppVersion}-Installer-x64
 SetupIconFile=icono.ico
 
