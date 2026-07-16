@@ -33,6 +33,7 @@ copy build\Release\process_ftir.py "%PORTABLE_DIR%\"
 copy build\Release\make_ico.py "%PORTABLE_DIR%\"
 copy build\Release\icono.ico "%PORTABLE_DIR%\"
 copy build\Release\JetBrainsMono-Regular.ttf "%PORTABLE_DIR%\"
+copy associate_portable.ps1 "%PORTABLE_DIR%\"
 
 :: Copy FTIRlib excluding the large historical folder to match installer logic
 mkdir "%PORTABLE_DIR%\FTIRlib"

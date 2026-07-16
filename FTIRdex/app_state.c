@@ -359,7 +359,7 @@ void init_default_project_zip() {
     strncpy(temp_dir, t, sizeof(temp_dir));
 #endif
     
-    snprintf(project_zip_path, sizeof(project_zip_path), "%sFTIRdex-temp.zip", temp_dir);
+    snprintf(project_zip_path, sizeof(project_zip_path), "%sFTIRdex-temp.ftirzip", temp_dir);
     snprintf(project_vfs_mount_dir, sizeof(project_vfs_mount_dir), "%sFTIRdex-mount", temp_dir);
     
     if (project_vfs) {
