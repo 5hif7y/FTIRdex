@@ -302,7 +302,7 @@ static void draw_zoom_csv(GW_Window* win) {
         if (i % 2 == 0) {
             GW_FillRect(win, tx, sy, table_w, row_height, 0xFF252526);
         }
-        uint32_t text_col = strcmp(samples[current_sample_idx].csv_rows[i].type, "Peak") == 0 ? 0xFF00FF00 : 0xFFFFA500;
+        uint32_t text_col = strcmp(samples[current_sample_idx].csv_rows[i].type, "Pico") == 0 ? 0xFF00FF00 : 0xFFFFA500;
         wchar_t w_r1[64], w_r2[64], w_r3[64], w_r4[64];
         GW_UTF8ToWide(samples[current_sample_idx].csv_rows[i].type, w_r1, 64);
         GW_UTF8ToWide(samples[current_sample_idx].csv_rows[i].wavenumber, w_r2, 64);
@@ -719,7 +719,7 @@ void draw_interface(GW_Window* win) {
             GW_FillRect(win, 15, y, table_w, 20, 0xFF252526);
         }
 
-        uint32_t text_col = strcmp(samples[current_sample_idx].csv_rows[i].type, "Peak") == 0 ? 0xFF00FF00 : 0xFFFFA500;
+        uint32_t text_col = strcmp(samples[current_sample_idx].csv_rows[i].type, "Pico") == 0 ? 0xFF00FF00 : 0xFFFFA500;
         draw_text_utf8(win, ui_font, x0, y + 2, samples[current_sample_idx].csv_rows[i].type, text_col);
         draw_text_utf8(win, ui_font, x1, y + 2, samples[current_sample_idx].csv_rows[i].wavenumber, 0xFFFFFFFF);
         draw_text_utf8(win, ui_font, x2, y + 2, samples[current_sample_idx].csv_rows[i].absorbance, 0xFFFFFFFF);
