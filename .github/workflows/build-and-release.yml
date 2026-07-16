@@ -55,7 +55,11 @@ jobs:
         shell: bash
         run: |
           VERSION=$(cat VERSION | tr -d '[:space:]')
-          tar --exclude='./build' --exclude='./.git' --exclude='./.github' --exclude='./FTIRlib/recuperacion-historica' --exclude='./FTIRdex-$VERSION-installer-x64.exe' -czf ../FTIRdex-$VERSION-source.tar.gz .
+          tar --exclude='./build' --exclude='./.git' --exclude='./.github' \
+            --exclude='./FTIRlib/recuperacion-historica' \
+            --exclude="./FTIRdex-$VERSION-portable.zip" \
+            --exclude="./FTIRdex-$VERSION-installer-x64.exe" \
+            -czf ../FTIRdex-$VERSION-source.tar.gz .
           mv ../FTIRdex-$VERSION-source.tar.gz .
 
       - name: Upload Artifacts
