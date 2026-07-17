@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
         if (ev.type == GW_EVENT_MOUSE_MOTION) {
             if (is_dragging_splitter) {
                 splitter_x = ev.mouse_motion.x;
-                if (splitter_x < 250) splitter_x = 250;
+                if (splitter_x < 320) splitter_x = 320;
                 if (splitter_x > ww - 300) splitter_x = ww - 300;
                 draw_interface(app_win);
             }
@@ -451,7 +451,7 @@ int main(int argc, char* argv[]) {
             if (btn == 1) {
                 // Overlay dropdown menu option clicks
                 if (active_dropdown == 1) {
-                    if (mx >= x_smooth && mx <= x_smooth + 140 && my >= 34 && my < 34 + nsmooth_opts * 24) {
+                    if (mx >= x_smooth && mx <= x_smooth + header_btn_w && my >= 34 && my < 34 + nsmooth_opts * 24) {
                         sel_smooth = (my - 34) / 24;
                         active_dropdown = 0;
                         draw_interface(app_win);
@@ -461,7 +461,7 @@ int main(int argc, char* argv[]) {
                         draw_interface(app_win);
                     }
                 } else if (active_dropdown == 2) {
-                    if (mx >= x_baseline && mx <= x_baseline + 140 && my >= 34 && my < 34 + nbaseline_opts * 24) {
+                    if (mx >= x_baseline && mx <= x_baseline + header_btn_w && my >= 34 && my < 34 + nbaseline_opts * 24) {
                         sel_baseline = (my - 34) / 24;
                         active_dropdown = 0;
                         draw_interface(app_win);
@@ -471,7 +471,7 @@ int main(int argc, char* argv[]) {
                         draw_interface(app_win);
                     }
                 } else if (active_dropdown == 3) {
-                    if (mx >= x_mode && mx <= x_mode + 140 && my >= 34 && my < 34 + nmode_opts * 24) {
+                    if (mx >= x_mode && mx <= x_mode + header_btn_w && my >= 34 && my < 34 + nmode_opts * 24) {
                         sel_mode = (my - 34) / 24;
                         active_dropdown = 0;
                         if (super_images_loaded) regenerate_superposition();
@@ -482,7 +482,7 @@ int main(int argc, char* argv[]) {
                         draw_interface(app_win);
                     }
                 } else if (active_dropdown == 4) {
-                    if (mx >= x_super && mx <= x_super + 140 && my >= 34 && my < 34 + nsamples * 24) {
+                    if (mx >= x_super && mx <= x_super + header_btn_w && my >= 34 && my < 34 + nsamples * 24) {
                         int idx = (my - 34) / 24;
                         if (idx >= 0 && idx < nsamples) {
                             samples[idx].super_selected = !samples[idx].super_selected;
@@ -497,22 +497,22 @@ int main(int argc, char* argv[]) {
                 }
 
                 // Dropdown header activation triggers
-                if (mx >= x_smooth && mx <= x_smooth + 140 && my >= 8 && my <= 34) {
+                if (mx >= x_smooth && mx <= x_smooth + header_btn_w && my >= 8 && my <= 34) {
                     active_dropdown = (active_dropdown == 1) ? 0 : 1;
                     draw_interface(app_win);
                     continue;
                 }
-                if (mx >= x_baseline && mx <= x_baseline + 140 && my >= 8 && my <= 34) {
+                if (mx >= x_baseline && mx <= x_baseline + header_btn_w && my >= 8 && my <= 34) {
                     active_dropdown = (active_dropdown == 2) ? 0 : 2;
                     draw_interface(app_win);
                     continue;
                 }
-                if (mx >= x_mode && mx <= x_mode + 140 && my >= 8 && my <= 34) {
+                if (mx >= x_mode && mx <= x_mode + header_btn_w && my >= 8 && my <= 34) {
                     active_dropdown = (active_dropdown == 3) ? 0 : 3;
                     draw_interface(app_win);
                     continue;
                 }
-                if (mx >= x_super && mx <= x_super + 140 && my >= 8 && my <= 34) {
+                if (mx >= x_super && mx <= x_super + header_btn_w && my >= 8 && my <= 34) {
                     active_dropdown = (active_dropdown == 4) ? 0 : 4;
                     draw_interface(app_win);
                     continue;
@@ -527,7 +527,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 // Zoom CSV table header trigger
-                if (mx >= 15 && mx < splitter_x - 260 && my >= groups_bottom_y + 10 && my < groups_bottom_y + 40) {
+                if (mx >= 15 && mx < splitter_x - 240 && my >= groups_bottom_y + 10 && my < groups_bottom_y + 40) {
                     zoom_mode = 3;
                     zoom_scale = 1.0f;
                     draw_interface(app_win);
@@ -556,7 +556,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 // Header Action: Open FTIR .txt File Dialog
-                if (mx >= x_open && mx <= x_open + 140 && my >= 8 && my <= 34) {
+                if (mx >= x_open && mx <= x_open + header_btn_w && my >= 8 && my <= 34) {
                     if (nsamples >= MAX_SAMPLES) {
                         GW_ShowMessageBox(app_win, "Limite alcanzado", L"No se pueden cargar mas de 8 muestras simultaneamente.", NULL, 0);
                         continue;
@@ -575,14 +575,14 @@ int main(int argc, char* argv[]) {
                 }
 
                 // Header Action: Run Spectrum Python Processing pipeline
-                if (mx >= x_process && mx <= x_process + 145 && my >= 8 && my <= 34) {
+                if (mx >= x_process && mx <= x_process + header_btn_w && my >= 8 && my <= 34) {
                     if (nsamples == 0) {
                         GW_ShowMessageBox(app_win, "Error", L"Por favor cargue al menos una muestra FTIR (.txt) primero.", NULL, 0);
                         continue;
                     }
 
-                    GW_FillRect(app_win, x_process, 8, 145, 26, 0xFF888888);
-                    draw_text_button_centered(app_win, ui_font, x_process, 8, 145, 26, "Procesando...", 0xFFFFFFFF);
+                    GW_FillRect(app_win, x_process, 8, header_btn_w, 26, 0xFF888888);
+                    draw_text_button_centered(app_win, ui_font, x_process, 8, header_btn_w, 26, "Procesando...", 0xFFFFFFFF);
                     GW_Present(app_win);
 
                     char py_script_path[512];
