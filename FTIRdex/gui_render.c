@@ -80,9 +80,26 @@ void draw_text_button_centered(GW_Window* win, GW_Font* font, int bx, int by, in
     GW_UTF8ToWide(utf8, wide, 256);
     int tw = 0, th = 0;
     GW_MeasureText(font, wide, &tw, &th);
-    int tx = bx + (bw - tw) / 2;
-    int ty = by + (bh - th) / 2 + (int)(0.15f * th);
-    GW_DrawText(win, font, tx, ty, wide, color);
+    
+    if (tw <= bw - 6) {
+        int tx = bx + (bw - tw) / 2;
+        int ty = by + (bh - th) / 2;
+        GW_DrawText(win, font, tx, ty, wide, color);
+    } else {
+        int len = wcslen(wide);
+        while (len > 0 && tw > bw - 20) {
+            wide[--len] = L'\0';
+            GW_MeasureText(font, wide, &tw, &th);
+        }
+        if (len > 0) {
+            wcscat(wide, L"...");
+            GW_MeasureText(font, wide, &tw, &th);
+        }
+        int tx = bx + (bw - tw) / 2;
+        if (tx < bx) tx = bx;
+        int ty = by + (bh - th) / 2;
+        GW_DrawText(win, font, tx, ty, wide, color);
+    }
 }
 
 void draw_text_truncated(GW_Window* win, GW_Font* font, int x, int y, const char* text, int max_w, uint32_t color) {
@@ -106,12 +123,26 @@ void draw_text_truncated(GW_Window* win, GW_Font* font, int x, int y, const char
 void compute_header_layout(int ww) {
     int right_margin = 15;
     int gap = 10;
-    x_process  = ww - right_margin - 145;
-    x_open     = x_process - gap - 140;
-    x_super    = x_open - gap - 140;
-    x_mode     = x_super - gap - 140;
-    x_baseline = x_mode - gap - 140;
-    x_smooth   = x_baseline - gap - 140;
+    
+    // Allocate space for left sample info dynamically
+    int left_space = (int)(ww * 0.22f);
+    if (left_space < 180) left_space = 180;
+    if (left_space > 300) left_space = 300;
+    
+    // Remaining space for 6 header buttons
+    int avail_w = ww - left_space - right_margin - (5 * gap);
+    header_btn_w = avail_w / 6;
+    
+    // Safety boundaries for visual aesthetic
+    if (header_btn_w < 90) header_btn_w = 90;
+    if (header_btn_w > 160) header_btn_w = 160;
+    
+    x_process  = ww - right_margin - header_btn_w;
+    x_open     = x_process - gap - header_btn_w;
+    x_super    = x_open - gap - header_btn_w;
+    x_mode     = x_super - gap - header_btn_w;
+    x_baseline = x_mode - gap - header_btn_w;
+    x_smooth   = x_baseline - gap - header_btn_w;
 }
 
 void draw_image_fit(GW_Window* win, GW_Image* img, int dx, int dy, int dw, int dh) {
@@ -200,7 +231,7 @@ static void draw_zoom_groups(GW_Window* win) {
     int zw_tmp = 0;
     wchar_t wtmp_z[4] = L"Ap";
     GW_MeasureText(zf, wtmp_z, &zw_tmp, &zh);
-    draw_text_button_centered(win, zf, 0, 50, ww, zh + 10, "Bases de Datos de Grupos Funcionales (Click izquierdo fuera para salir)", 0xFF0078D7);
+    draw_text_button_centered(win, zf, 0, 50, ww, zh + 10, "Tabla de Datos de Grupos Funcionales (Click izquierdo fuera para salir)", 0xFF0078D7);
     
     int box_size = (int)(16 * zoom_scale);
     int item_spacing = (int)(32 * zoom_scale);
@@ -302,7 +333,7 @@ static void draw_zoom_csv(GW_Window* win) {
         if (i % 2 == 0) {
             GW_FillRect(win, tx, sy, table_w, row_height, 0xFF252526);
         }
-        uint32_t text_col = strcmp(samples[current_sample_idx].csv_rows[i].type, "Peak") == 0 ? 0xFF00FF00 : 0xFFFFA500;
+        uint32_t text_col = (strcmp(samples[current_sample_idx].csv_rows[i].type, "Peak") == 0 || strcmp(samples[current_sample_idx].csv_rows[i].type, "Pico") == 0) ? 0xFF00FF00 : 0xFFFFA500;
         wchar_t w_r1[64], w_r2[64], w_r3[64], w_r4[64];
         GW_UTF8ToWide(samples[current_sample_idx].csv_rows[i].type, w_r1, 64);
         GW_UTF8ToWide(samples[current_sample_idx].csv_rows[i].wavenumber, w_r2, 64);
@@ -381,8 +412,8 @@ static void draw_zoom_menu(GW_Window* win) {
         snprintf(comp_str, sizeof(comp_str), "Compilación: %s %s", __DATE__, __TIME__);
         draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + dy, comp_str, 0xFFFFFFFF);
         
-        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 2 * dy, "Dueño: Ing. Mendoza Nicolás", 0xFFFFFFFF);
-        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 3 * dy, "DEV: Alemán Matías (5hif7y)", 0xFFFFFFFF);
+        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 2 * dy, "Dueño: Ing. Mendoza Pablo Nicolás", 0xFFFFFFFF);
+        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 3 * dy, "DEV: Alemán Matías Roberto (5hif7y)", 0xFFFFFFFF);
         draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 4 * dy, "Versión: 0.0.5", 0xFF00FFFF);
 
         if (title_f != zf) GW_FreeFont(title_f);
@@ -418,29 +449,29 @@ static void draw_dropdowns(GW_Window* win) {
     if (active_dropdown == 1) {
         for (int i = 0; i < nsmooth_opts; i++) {
             int oy = 34 + i * 24;
-            GW_FillRect(win, x_smooth, oy, 140, 24, 0xFF252526);
-            GW_DrawRect(win, x_smooth, oy, 140, 24, 0xFF3E3E42);
-            draw_text_button_centered(win, ui_font, x_smooth, oy, 140, 24, get_smooth_display_name(i), (i == sel_smooth) ? 0xFF00FF00 : 0xFFFFFFFF);
+            GW_FillRect(win, x_smooth, oy, header_btn_w, 24, 0xFF252526);
+            GW_DrawRect(win, x_smooth, oy, header_btn_w, 24, 0xFF3E3E42);
+            draw_text_button_centered(win, ui_font, x_smooth, oy, header_btn_w, 24, get_smooth_display_name(i), (i == sel_smooth) ? 0xFF00FF00 : 0xFFFFFFFF);
         }
     } else if (active_dropdown == 2) {
         for (int i = 0; i < nbaseline_opts; i++) {
             int oy = 34 + i * 24;
-            GW_FillRect(win, x_baseline, oy, 140, 24, 0xFF252526);
-            GW_DrawRect(win, x_baseline, oy, 140, 24, 0xFF3E3E42);
-            draw_text_button_centered(win, ui_font, x_baseline, oy, 140, 24, get_baseline_display_name(i), (i == sel_baseline) ? 0xFF00FF00 : 0xFFFFFFFF);
+            GW_FillRect(win, x_baseline, oy, header_btn_w, 24, 0xFF252526);
+            GW_DrawRect(win, x_baseline, oy, header_btn_w, 24, 0xFF3E3E42);
+            draw_text_button_centered(win, ui_font, x_baseline, oy, header_btn_w, 24, get_baseline_display_name(i), (i == sel_baseline) ? 0xFF00FF00 : 0xFFFFFFFF);
         }
     } else if (active_dropdown == 3) {
         for (int i = 0; i < nmode_opts; i++) {
             int oy = 34 + i * 24;
-            GW_FillRect(win, x_mode, oy, 140, 24, 0xFF252526);
-            GW_DrawRect(win, x_mode, oy, 140, 24, 0xFF3E3E42);
-            draw_text_button_centered(win, ui_font, x_mode, oy, 140, 24, get_mode_display_name(i), (i == sel_mode) ? 0xFF00FF00 : 0xFFFFFFFF);
+            GW_FillRect(win, x_mode, oy, header_btn_w, 24, 0xFF252526);
+            GW_DrawRect(win, x_mode, oy, header_btn_w, 24, 0xFF3E3E42);
+            draw_text_button_centered(win, ui_font, x_mode, oy, header_btn_w, 24, get_mode_display_name(i), (i == sel_mode) ? 0xFF00FF00 : 0xFFFFFFFF);
         }
     } else if (active_dropdown == 4) {
         for (int i = 0; i < nsamples; i++) {
             int oy = 34 + i * 24;
-            GW_FillRect(win, x_super, oy, 140, 24, 0xFF252526);
-            GW_DrawRect(win, x_super, oy, 140, 24, 0xFF3E3E42);
+            GW_FillRect(win, x_super, oy, header_btn_w, 24, 0xFF252526);
+            GW_DrawRect(win, x_super, oy, header_btn_w, 24, 0xFF3E3E42);
             
             // Draw checkbox
             GW_FillRect(win, x_super + 10, oy + 5, 14, 14, 0xFF3E3E42);
@@ -449,7 +480,7 @@ static void draw_dropdowns(GW_Window* win) {
             }
             
             // Truncate name inside dropdown item
-            draw_text_truncated(win, ui_font, x_super + 30, oy + 4, samples[i].filename, 100, samples[i].super_selected ? 0xFFFFFFFF : 0xFF888888);
+            draw_text_truncated(win, ui_font, x_super + 30, oy + 4, samples[i].filename, header_btn_w - 40, samples[i].super_selected ? 0xFFFFFFFF : 0xFF888888);
         }
     }
 }
@@ -539,45 +570,45 @@ void draw_interface(GW_Window* win) {
     // Dropdown 1: Smoothing
     char smooth_lbl[128];
     snprintf(smooth_lbl, sizeof(smooth_lbl), "Suavizar: %s", get_smooth_display_name(sel_smooth));
-    GW_FillRect(win, x_smooth, 8, 140, 26, 0xFF2D2D30);
-    GW_DrawRect(win, x_smooth, 8, 140, 26, 0xFF3E3E42);
-    draw_text_button_centered(win, ui_font, x_smooth, 8, 140, 26, smooth_lbl, 0xFFFFFFFF);
+    GW_FillRect(win, x_smooth, 8, header_btn_w, 26, 0xFF2D2D30);
+    GW_DrawRect(win, x_smooth, 8, header_btn_w, 26, 0xFF3E3E42);
+    draw_text_button_centered(win, ui_font, x_smooth, 8, header_btn_w, 26, smooth_lbl, 0xFFFFFFFF);
 
     // Dropdown 2: Baseline
     char base_lbl[128];
     snprintf(base_lbl, sizeof(base_lbl), "L. Base: %s", get_baseline_display_name(sel_baseline));
-    GW_FillRect(win, x_baseline, 8, 140, 26, 0xFF2D2D30);
-    GW_DrawRect(win, x_baseline, 8, 140, 26, 0xFF3E3E42);
-    draw_text_button_centered(win, ui_font, x_baseline, 8, 140, 26, base_lbl, 0xFFFFFFFF);
+    GW_FillRect(win, x_baseline, 8, header_btn_w, 26, 0xFF2D2D30);
+    GW_DrawRect(win, x_baseline, 8, header_btn_w, 26, 0xFF3E3E42);
+    draw_text_button_centered(win, ui_font, x_baseline, 8, header_btn_w, 26, base_lbl, 0xFFFFFFFF);
 
     // Dropdown 3: Group Marking Mode (lines / boxes)
     char mode_lbl[128];
     snprintf(mode_lbl, sizeof(mode_lbl), "Ver: %s", get_mode_display_name(sel_mode));
-    GW_FillRect(win, x_mode, 8, 140, 26, 0xFF2D2D30);
-    GW_DrawRect(win, x_mode, 8, 140, 26, 0xFF3E3E42);
-    draw_text_button_centered(win, ui_font, x_mode, 8, 140, 26, mode_lbl, 0xFFFFFFFF);
+    GW_FillRect(win, x_mode, 8, header_btn_w, 26, 0xFF2D2D30);
+    GW_DrawRect(win, x_mode, 8, header_btn_w, 26, 0xFF3E3E42);
+    draw_text_button_centered(win, ui_font, x_mode, 8, header_btn_w, 26, mode_lbl, 0xFFFFFFFF);
 
     // Dropdown 4: Superposition samples selector
-    GW_FillRect(win, x_super, 8, 140, 26, 0xFF2D2D30);
-    GW_DrawRect(win, x_super, 8, 140, 26, 0xFF3E3E42);
-    draw_text_button_centered(win, ui_font, x_super, 8, 140, 26, "Superponer", 0xFFFFFFFF);
+    GW_FillRect(win, x_super, 8, header_btn_w, 26, 0xFF2D2D30);
+    GW_DrawRect(win, x_super, 8, header_btn_w, 26, 0xFF3E3E42);
+    draw_text_button_centered(win, ui_font, x_super, 8, header_btn_w, 26, "Superponer", 0xFFFFFFFF);
 
     // File Selector Button in header
     if (is_processing) {
-        GW_FillRect(win, x_open, 8, 140, 26, 0xFF888888);
-        draw_text_button_centered(win, ui_font, x_open, 8, 140, 26, "Abrir FTIR .txt", 0xFFCCCCCC);
+        GW_FillRect(win, x_open, 8, header_btn_w, 26, 0xFF888888);
+        draw_text_button_centered(win, ui_font, x_open, 8, header_btn_w, 26, "Abrir FTIR .txt", 0xFFCCCCCC);
     } else {
-        GW_FillRect(win, x_open, 8, 140, 26, 0xFF0078D7);
-        draw_text_button_centered(win, ui_font, x_open, 8, 140, 26, "Abrir FTIR .txt", 0xFFFFFFFF);
+        GW_FillRect(win, x_open, 8, header_btn_w, 26, 0xFF0078D7);
+        draw_text_button_centered(win, ui_font, x_open, 8, header_btn_w, 26, "Abrir FTIR .txt", 0xFFFFFFFF);
     }
 
     // Process Button in header
     if (is_processing) {
-        GW_FillRect(win, x_process, 8, 145, 26, 0xFF888888);
-        draw_text_button_centered(win, ui_font, x_process, 8, 145, 26, "Procesando...", 0xFFFFFFFF);
+        GW_FillRect(win, x_process, 8, header_btn_w, 26, 0xFF888888);
+        draw_text_button_centered(win, ui_font, x_process, 8, header_btn_w, 26, "Procesando...", 0xFFFFFFFF);
     } else {
-        GW_FillRect(win, x_process, 8, 145, 26, 0xFF107C41);
-        draw_text_button_centered(win, ui_font, x_process, 8, 145, 26, "Procesar Espectro", 0xFFFFFFFF);
+        GW_FillRect(win, x_process, 8, header_btn_w, 26, 0xFF107C41);
+        draw_text_button_centered(win, ui_font, x_process, 8, header_btn_w, 26, "Procesar Espectro", 0xFFFFFFFF);
     }
 
     // 2. Left Panel (Width: splitter_x)
@@ -588,7 +619,7 @@ void draw_interface(GW_Window* win) {
 
     // A. Title: "Grupos Funcionales a Detectar"
     GW_DrawRect(win, 10, 52, left_w - 20, 26, 0xFF3E3E42);
-    draw_text_button_centered(win, title_font ? title_font : ui_font, 10, 52, left_w - 20, 26, "Bases de Datos de Grupos Funcionales (cm-1)", 0xFF0078D7);
+    draw_text_button_centered(win, title_font ? title_font : ui_font, 10, 52, left_w - 20, 26, "Tabla de Datos de Grupos Funcionales (cm-1)", 0xFF0078D7);
 
     // Render checkable groups list as a table
     int gt_table_w = left_w - 30;
@@ -719,7 +750,7 @@ void draw_interface(GW_Window* win) {
             GW_FillRect(win, 15, y, table_w, 20, 0xFF252526);
         }
 
-        uint32_t text_col = strcmp(samples[current_sample_idx].csv_rows[i].type, "Peak") == 0 ? 0xFF00FF00 : 0xFFFFA500;
+        uint32_t text_col = (strcmp(samples[current_sample_idx].csv_rows[i].type, "Peak") == 0 || strcmp(samples[current_sample_idx].csv_rows[i].type, "Pico") == 0) ? 0xFF00FF00 : 0xFFFFA500;
         draw_text_utf8(win, ui_font, x0, y + 2, samples[current_sample_idx].csv_rows[i].type, text_col);
         draw_text_utf8(win, ui_font, x1, y + 2, samples[current_sample_idx].csv_rows[i].wavenumber, 0xFFFFFFFF);
         draw_text_utf8(win, ui_font, x2, y + 2, samples[current_sample_idx].csv_rows[i].absorbance, 0xFFFFFFFF);

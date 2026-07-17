@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ftir_library"
-version = "0.0.4"
+version = "0.0.5"
 description = "Biblioteca avanzada para preprocesamiento y analisis de espectros FTIR"
 readme = "README.md"
 authors = [{ name = "Matias Roberto Aleman" }]

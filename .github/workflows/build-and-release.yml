@@ -44,7 +44,28 @@ jobs:
         shell: pwsh
         run: |
           $version = (Get-Content VERSION).Trim()
-          Compress-Archive -Path build\Release\* -DestinationPath "FTIRdex-$version-portable.zip"
+          $portableDir = "FTIRdex-$version-portable"
+          New-Item -ItemType Directory -Path $portableDir | Out-Null
+          
+          # Copy release binary and assets
+          Copy-Item "build\Release\FTIRdex.exe" -Destination "$portableDir\"
+          Copy-Item "build\Release\process_ftir.py" -Destination "$portableDir\"
+          Copy-Item "build\Release\make_ico.py" -Destination "$portableDir\"
+          Copy-Item "build\Release\icono.ico" -Destination "$portableDir\"
+          Copy-Item "build\Release\JetBrainsMono-Regular.ttf" -Destination "$portableDir\"
+          Copy-Item "associate_portable.ps1" -Destination "$portableDir\"
+          
+          # Copy FTIRlib recursively
+          Copy-Item -Path "build\Release\FTIRlib" -Destination "$portableDir\" -Recurse
+          
+          # Exclude the heavy recuperacion-historica folder
+          $excludePath = Join-Path $portableDir "FTIRlib\recuperacion-historica"
+          if (Test-Path $excludePath) {
+              Remove-Item -Path $excludePath -Recurse -Force
+          }
+          
+          Compress-Archive -Path "$portableDir" -DestinationPath "FTIRdex-$version-portable.zip"
+          Remove-Item -Path $portableDir -Recurse -Force
 
       - name: Compile Inno Setup Installer
         shell: pwsh
