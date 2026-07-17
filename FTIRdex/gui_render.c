@@ -83,7 +83,7 @@ void draw_text_button_centered(GW_Window* win, GW_Font* font, int bx, int by, in
     
     if (tw <= bw - 6) {
         int tx = bx + (bw - tw) / 2;
-        int ty = by + (bh - th) / 2 + (int)(0.15f * th);
+        int ty = by + (bh - th) / 2;
         GW_DrawText(win, font, tx, ty, wide, color);
     } else {
         int len = wcslen(wide);
@@ -97,7 +97,7 @@ void draw_text_button_centered(GW_Window* win, GW_Font* font, int bx, int by, in
         }
         int tx = bx + (bw - tw) / 2;
         if (tx < bx) tx = bx;
-        int ty = by + (bh - th) / 2 + (int)(0.15f * th);
+        int ty = by + (bh - th) / 2;
         GW_DrawText(win, font, tx, ty, wide, color);
     }
 }
