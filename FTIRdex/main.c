@@ -216,7 +216,14 @@ int main(int argc, char* argv[]) {
                                 free(path);
                                 zoom_mode = 0;
                                 menu_active_subview = 0;
-                                GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como FTIRzip.", NULL, 0);
+                                
+                                const char* fname = strrchr(final_path, '\\');
+                                if (!fname) fname = strrchr(final_path, '/');
+                                if (fname) fname++; else fname = final_path;
+                                
+                                wchar_t w_msg[512];
+                                swprintf(w_msg, 512, L"El proyecto se ha guardado correctamente como %hs", fname);
+                                GW_ShowMessageBox(app_win, "Proyecto Guardado", w_msg, NULL, 0);
                             }
                             draw_interface(app_win);
                         } else if (clicked_menu_item == 3) { // Colores de interfaz
@@ -842,7 +849,14 @@ int main(int argc, char* argv[]) {
                         free(path);
                         zoom_mode = 0;
                         menu_active_subview = 0;
-                        GW_ShowMessageBox(app_win, "Proyecto Guardado", L"El proyecto se ha guardado correctamente como FTIRzip.", NULL, 0);
+                        
+                        const char* fname = strrchr(final_path, '\\');
+                        if (!fname) fname = strrchr(final_path, '/');
+                        if (fname) fname++; else fname = final_path;
+                        
+                        wchar_t w_msg[512];
+                        swprintf(w_msg, 512, L"El proyecto se ha guardado correctamente como %hs", fname);
+                        GW_ShowMessageBox(app_win, "Proyecto Guardado", w_msg, NULL, 0);
                     }
                     draw_interface(app_win);
                     continue;
