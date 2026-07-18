@@ -18,6 +18,9 @@ OutputBaseFilename=FTIRdex-{#AppVersion}-installer-x64
 SetupIconFile=icono.ico
 ChangesAssociations=yes
 LicenseFile=LICENSE
+WizardImageFile=assets\sidebar_banner.bmp
+WizardSmallImageFile=assets\logo_top_small.bmp
+WizardImageStretch=yes
 
 ; Force installation to Program Files (64-bit) instead of Program Files (x86) on 64-bit Windows
 ArchitecturesAllowed=x64

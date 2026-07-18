@@ -56,14 +56,25 @@ echo Source tar.gz created: FTIRdex-%VERSION%-source.tar.gz
 :: 5. Create the Inno Setup installer
 echo.
 echo [4/4] Creating Inno Setup installer...
+
+:: Convert PNG assets to BMP for Inno Setup compiler using Python Pillow
+echo Converting PNG assets to BMP...
+python -c "from PIL import Image; Image.open('assets/sidebar_banner.png').convert('RGB').save('assets/sidebar_banner.bmp')"
+python -c "from PIL import Image; Image.open('assets/logo_top_small.png').convert('RGB').save('assets/logo_top_small.bmp')"
+
 set "ISCC=C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 if not exist "%ISCC%" goto no_iscc
 
 "%ISCC%" installer.iss
 if %ERRORLEVEL% neq 0 (
     echo Error: Inno Setup compilation failed!
+    if exist "assets\sidebar_banner.bmp" del "assets\sidebar_banner.bmp"
+    if exist "assets\logo_top_small.bmp" del "assets\logo_top_small.bmp"
     exit /b 1
 )
+:: Clean up temporary BMP files
+if exist "assets\sidebar_banner.bmp" del "assets\sidebar_banner.bmp"
+if exist "assets\logo_top_small.bmp" del "assets\logo_top_small.bmp"
 goto build_done
 
 :no_iscc
