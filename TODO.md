@@ -1,6 +1,6 @@
-# To do
+To do
 
-## 1. Extender FTIRdex:
+1. Extender FTIRdex:
 
   1.1. **Agregar** soporte de temas personalizables en un archivo `.ini` (actualmente solo uno *hardcodeado*, con modo oscuro y claro)
 
@@ -15,24 +15,11 @@
   1.6. **Auditar**: Algunas imágenes sufren compresión horizontal, la cual reduce o borra la visibilidad de las lineas de marcado de grupos funcionales de los gráficos en el modo normal
 
 
-## 2. Extender FTIRlib:
+2. Extender FTIRlib:
 
   2.1. **Añadir** más algoritmos de suavizado y corrección de línea base
 
   2.2. **Añadir** algoritmos de ampliación y atenuación de picos.
 
   2.3. **Añadir** Modulo C++ OR/CV para generar muestras desde imágenes, accesible desde Python
-
-
-## 3. Extender documentación:
-
-  3.1 Manual de FTIRdex (manual simple de la interfaz y uso de la aplicación)
-
-  3.2 Manual de FTIRlib (manual de la librería para manipular manualmente las muestras)
-
-  3.3 Informe Ejecutivo (informe del proyecto resumido)
-
-  3.4 Informe Técnico (informe del proyecto al detalle)
-
-  3.5 Documentación de especificación (este es de carácter confidencial, transparenta todo el proyecto para que un Junior lo pueda relevar)
 

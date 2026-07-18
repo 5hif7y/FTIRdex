@@ -82,26 +82,9 @@ void draw_text_button_centered(GW_Window* win, GW_Font* font, int bx, int by, in
     GW_UTF8ToWide(utf8, wide, 256);
     int tw = 0, th = 0;
     GW_MeasureText(font, wide, &tw, &th);
-    
-    if (tw <= bw - 6) {
-        int tx = bx + (bw - tw) / 2;
-        int ty = by + (bh - th) / 2;
-        GW_DrawText(win, font, tx, ty, wide, color);
-    } else {
-        int len = wcslen(wide);
-        while (len > 0 && tw > bw - 20) {
-            wide[--len] = L'\0';
-            GW_MeasureText(font, wide, &tw, &th);
-        }
-        if (len > 0) {
-            wcscat(wide, L"...");
-            GW_MeasureText(font, wide, &tw, &th);
-        }
-        int tx = bx + (bw - tw) / 2;
-        if (tx < bx) tx = bx;
-        int ty = by + (bh - th) / 2;
-        GW_DrawText(win, font, tx, ty, wide, color);
-    }
+    int tx = bx + (bw - tw) / 2;
+    int ty = by + (bh - th) / 2 + (int)(0.15f * th);
+    GW_DrawText(win, font, tx, ty, wide, color);
 }
 
 void draw_text_truncated(GW_Window* win, GW_Font* font, int x, int y, const char* text, int max_w, uint32_t color) {
@@ -125,26 +108,12 @@ void draw_text_truncated(GW_Window* win, GW_Font* font, int x, int y, const char
 void compute_header_layout(int ww) {
     int right_margin = 15;
     int gap = 10;
-    
-    // Allocate space for left sample info dynamically
-    int left_space = (int)(ww * 0.22f);
-    if (left_space < 180) left_space = 180;
-    if (left_space > 300) left_space = 300;
-    
-    // Remaining space for 6 header buttons
-    int avail_w = ww - left_space - right_margin - (5 * gap);
-    header_btn_w = avail_w / 6;
-    
-    // Safety boundaries for visual aesthetic
-    if (header_btn_w < 90) header_btn_w = 90;
-    if (header_btn_w > 160) header_btn_w = 160;
-    
-    x_process  = ww - right_margin - header_btn_w;
-    x_open     = x_process - gap - header_btn_w;
-    x_super    = x_open - gap - header_btn_w;
-    x_mode     = x_super - gap - header_btn_w;
-    x_baseline = x_mode - gap - header_btn_w;
-    x_smooth   = x_baseline - gap - header_btn_w;
+    x_process  = ww - right_margin - 145;
+    x_open     = x_process - gap - 140;
+    x_super    = x_open - gap - 140;
+    x_mode     = x_super - gap - 140;
+    x_baseline = x_mode - gap - 140;
+    x_smooth   = x_baseline - gap - 140;
 }
 
 void draw_image_fit(GW_Window* win, GW_Image* img, int dx, int dy, int dw, int dh) {
