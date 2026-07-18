@@ -1,0 +1,15 @@
+Presets de exportación
+
+Export:
+
+  logo_top_small: 55x55 px   @x4 220x220 px
+  sidebar_banner: 164x314 px @x3 165x165 px
+
+
+Preset:
+
+  Resample: Lanczos 3 (Non-separable)
+  Color space: RGB
+  ICC Profile: sRGB IEC61966-2.1
+  Embed ICC profile: Activado (Checked)
+
