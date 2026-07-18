@@ -316,11 +316,18 @@ int main(int argc, char* argv[]) {
                                 strncat(final_path, ".csv", sizeof(final_path) - len - 1);
                             }
                             
-                            char src_csv[256];
-                            snprintf(src_csv, sizeof(src_csv), "reporte_picos_valleys_%d.csv", current_sample_idx);
+                            char src_csv[512];
+                            snprintf(src_csv, sizeof(src_csv), "%s/processed_plots/reporte_picos_valleys_%d.csv", project_vfs_mount_dir, current_sample_idx);
                             copy_file(src_csv, final_path);
                             free(path);
-                            GW_ShowMessageBox(app_win, "Reporte Guardado", L"El reporte de picos y valles se ha exportado correctamente.", NULL, 0);
+
+                            const char* fname = strrchr(final_path, '\\');
+                            if (!fname) fname = strrchr(final_path, '/');
+                            if (fname) fname++; else fname = final_path;
+                            
+                            wchar_t w_msg[512];
+                            swprintf(w_msg, 512, L"La tabla se ha guardado correctamente como %hs", fname);
+                            GW_ShowMessageBox(app_win, "Reporte Guardado", w_msg, NULL, 0);
                         }
                     } else if (zoom_mode == 1 && zoom_img) {
                         char* path = GW_ShowSaveFileDialog(app_win, "Guardar imagen como PNG", "Archivos PNG (*.png)|*.png");
@@ -417,9 +424,19 @@ int main(int argc, char* argv[]) {
                                     strncat(final_path, ".png", sizeof(final_path) - len - 1);
                                 }
                                 
-                                copy_file(src_file, final_path);
+                                char full_src[512];
+                                snprintf(full_src, sizeof(full_src), "%s/processed_plots/%s", project_vfs_mount_dir, src_file);
+                                copy_file(full_src, final_path);
+
                                 free(path);
-                                GW_ShowMessageBox(app_win, "Imagen Guardada", L"La imagen se ha exportado correctamente.", NULL, 0);
+                                                                
+                                const char* fname = strrchr(final_path, '\\');
+                                if (!fname) fname = strrchr(final_path, '/');
+                                if (fname) fname++; else fname = final_path;
+                                
+                                wchar_t w_msg[512];
+                                swprintf(w_msg, 512, L"El grafico se ha guardado correctamente como %hs", fname);
+                                GW_ShowMessageBox(app_win, "Imagen Guardada", w_msg, NULL, 0);
                             }
                         }
                     }
@@ -440,11 +457,19 @@ int main(int argc, char* argv[]) {
                             strncat(final_path, ".csv", sizeof(final_path) - len - 1);
                         }
                         
-                        char src_csv[256];
-                        snprintf(src_csv, sizeof(src_csv), "reporte_picos_valleys_%d.csv", current_sample_idx);
+                        char src_csv[512];
+                        snprintf(src_csv, sizeof(src_csv), "%s/processed_plots/reporte_picos_valleys_%d.csv", project_vfs_mount_dir, current_sample_idx);
                         copy_file(src_csv, final_path);
                         free(path);
-                        GW_ShowMessageBox(app_win, "Reporte Guardado", L"El reporte de picos y valles se ha exportado correctamente.", NULL, 0);
+
+                        const char* fname = strrchr(final_path, '\\');
+                        if (!fname) fname = strrchr(final_path, '/');
+                        if (fname) fname++; else fname = final_path;
+                        
+                        wchar_t w_msg[512];
+                        swprintf(w_msg, 512, L"La tabla se ha guardado correctamente como %hs", fname);
+                        GW_ShowMessageBox(app_win, "Reporte Guardado", w_msg, NULL, 0);
+
                     }
                 }
             }
