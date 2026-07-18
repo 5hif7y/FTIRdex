@@ -2,14 +2,18 @@ import os
 from PIL import Image
 
 def main():
-    # Look for icono.jpg in project root or current folder
+    # Look for icon.jpg in project root or current folder
     src_paths = [
-        os.path.join("..", "icono.png"),
-        os.path.join("..", "icono.jpg"),
-        "icono.png",
-        "icono.jpg",
-        os.path.join(".", "icono.png"),
-        os.path.join(".", "icono.jpg")
+        os.path.join("..", "assets", "icon.png"),
+        os.path.join("..", "assets", "icon.jpg"),
+        os.path.join("assets", "icon.png"),
+        os.path.join("assets", "icon.jpg"),
+        os.path.join("..", "icon.png"),
+        os.path.join("..", "icon.jpg"),
+        "icon.png",
+        "icon.jpg",
+        os.path.join(".", "icon.png"),
+        os.path.join(".", "icon.jpg")
     ]
     
     src_path = None
@@ -19,7 +23,7 @@ def main():
             break
             
     if not src_path:
-        print("Error: Could not find icono.jpg in root or current directory.")
+        print("Error: Could not find icon.jpg in root or current directory.")
         return
         
     try:
@@ -27,7 +31,7 @@ def main():
         if img.mode not in ("RGB", "RGBA"):
             img = img.convert("RGBA")
             
-        dest_path = "icono.ico"
+        dest_path = "icon.ico"
         # Compile multi-resolution icon sizes: 16x16, 32x32, 48x48, 256x256
         img.save(dest_path, format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (256, 256)])
         print(f"Successfully generated local Windows icon '{dest_path}' from '{src_path}'!")

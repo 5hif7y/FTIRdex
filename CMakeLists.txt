@@ -39,8 +39,8 @@ target_link_libraries(FTIRdex PRIVATE nativegui zipvfs)
 add_custom_command(TARGET FTIRdex POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/FTIRdex/process_ftir.py" "$<TARGET_FILE_DIR:FTIRdex>/"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/FTIRdex/make_ico.py" "$<TARGET_FILE_DIR:FTIRdex>/"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/icono.ico" "$<TARGET_FILE_DIR:FTIRdex>/"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JetBrainsMono-Regular.ttf" "$<TARGET_FILE_DIR:FTIRdex>/"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon.ico" "$<TARGET_FILE_DIR:FTIRdex>/"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/assets/JetBrainsMono-Regular.ttf" "$<TARGET_FILE_DIR:FTIRdex>/"
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/FTIRlib" "$<TARGET_FILE_DIR:FTIRdex>/FTIRlib"
     COMMENT "Copying Python assets, fonts and library folders to build folder"
 )

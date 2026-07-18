@@ -15,7 +15,7 @@ Compression=lzma2
 SolidCompression=yes
 OutputDir=.
 OutputBaseFilename=FTIRdex-{#AppVersion}-installer-x64
-SetupIconFile=icono.ico
+SetupIconFile=assets\icon.ico
 ChangesAssociations=yes
 LicenseFile=LICENSE
 WizardImageFile=assets\sidebar_banner.bmp
@@ -34,7 +34,7 @@ Name: "{app}"; Permissions: users-modify
 Source: "build\Release\FTIRdex.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\process_ftir.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\make_ico.py"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\icono.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; Exclude the large historical recovery folder to optimize installation size
 Source: "build\Release\FTIRlib\*"; DestDir: "{app}\FTIRlib"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "recuperacion-historica,recuperacion-historica\*"
 
