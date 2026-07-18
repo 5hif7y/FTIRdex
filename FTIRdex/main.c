@@ -880,11 +880,15 @@ int main(int argc, char* argv[]) {
                     continue;
                 }
             }
-            if (zoom_mode == 4 && key == GW_KEY_ESCAPE) {
-                zoom_mode = 0;
-                menu_active_subview = 0;
-                draw_interface(app_win);
-                continue;
+            if (zoom_mode && key == GW_KEY_ESCAPE) {
+                if (!(zoom_mode == 2 && add_state != ADD_STATE_NONE)) {
+                    zoom_mode = 0;
+                    zoom_img = NULL;
+                    csv_horizontal_scroll = 0;
+                    menu_active_subview = 0;
+                    draw_interface(app_win);
+                    continue;
+                }
             }
             if (zoom_mode && !(zoom_mode == 2 && add_state != ADD_STATE_NONE)) {
                 if (zoom_mode == 3 && (key == GW_KEY_UP || key == GW_KEY_DOWN || key == GW_KEY_LEFT || key == GW_KEY_RIGHT)) {
@@ -905,6 +909,9 @@ int main(int argc, char* argv[]) {
                     } else if (key == '-' || key == '_' || key == GW_KEY_DOWN) {
                         zoom_scale /= 1.1f;
                         if (zoom_scale < 0.1f) zoom_scale = 0.1f;
+                        draw_interface(app_win);
+                    } else if (key == '0' || key == '*') {
+                        zoom_scale = 1.0f;
                         draw_interface(app_win);
                     }
                 }
