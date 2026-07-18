@@ -366,8 +366,17 @@ int main(int argc, char* argv[]) {
                             }
                             
                             if (src_file && src_file[0] != '\0') {
-                                copy_file(src_file, final_path);
-                                GW_ShowMessageBox(app_win, "Imagen Guardada", L"La imagen se ha exportado correctamente.", NULL, 0);
+                                char full_src[512];
+                                snprintf(full_src, sizeof(full_src), "%s/processed_plots/%s", project_vfs_mount_dir, src_file);
+                                copy_file(full_src, final_path);
+
+                                const char* fname = strrchr(final_path, '\\');
+                                if (!fname) fname = strrchr(final_path, '/');
+                                if (fname) fname++; else fname = final_path;
+
+                                wchar_t w_msg[512];
+                                swprintf(w_msg, 512, L"El grafico se ha guardado correctamente como %hs", fname);
+                                GW_ShowMessageBox(app_win, "Imagen Guardada", w_msg, NULL, 0);
                             }
                             free(path);
                         }
