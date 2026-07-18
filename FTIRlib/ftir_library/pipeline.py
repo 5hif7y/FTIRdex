@@ -449,69 +449,77 @@ def plot_config(x, y, smooth_algorithm, baseline_algorithm, *args, **kwargs):
                 
         sorted_peaks.sort(key=lambda item: item[0], reverse=invert_x)
         
-        if mode == 'box':
-            for group_name in group_order:
-                if group_name in matched_groups:
-                    w_min, w_max = groups_db[group_name]
-                    ax.axvspan(w_min, w_max, facecolor='red', alpha=0.06, 
-                               edgecolor='red', linestyle='--', linewidth=0.8)
-                    x_text = (w_min + w_max) / 2
-                    if space == 'absorbance':
-                        mask_band = (x >= w_min) & (x <= w_max)
-                        y_local_max = np.max(y_corrected[mask_band]) if np.any(mask_band) else y_max
-                        label_h = len(group_name) * 0.02 * y_range
-                        y_plot_top = y_max + 0.40 * y_range
-                        if (y_plot_top - y_local_max) > (label_h + 0.05 * y_range):
-                            y_text = y_plot_top - 0.02 * y_range
-                            va_align = 'top'
+        if mode != 'none' and mode != 'desactivado':
+            if mode == 'box':
+                for group_name in group_order:
+                    if group_name in matched_groups:
+                        w_min, w_max = groups_db[group_name]
+                        ax.axvspan(w_min, w_max, facecolor='red', alpha=0.06, 
+                                   edgecolor='red', linestyle='--', linewidth=0.8)
+                        x_text = (w_min + w_max) / 2
+                        if space == 'absorbance':
+                            mask_band = (x >= w_min) & (x <= w_max)
+                            y_local_max = np.max(y_corrected[mask_band]) if np.any(mask_band) else y_max
+                            label_h = len(group_name) * 0.02 * y_range
+                            y_plot_top = y_max + 0.40 * y_range
+                            if (y_plot_top - y_local_max) > (label_h + 0.05 * y_range):
+                                y_text = y_plot_top - 0.02 * y_range
+                                va_align = 'top'
+                            else:
+                                y_text = y_local_max + 0.02 * y_range
+                                va_align = 'bottom'
+                            ax.text(
+                                x_text, y_text, group_name,
+                                rotation=270, color='blue', ha='center', va=va_align, 
+                                fontsize=12, fontweight='bold'
+                            )
                         else:
-                            y_text = y_local_max + 0.02 * y_range
-                            va_align = 'bottom'
-                        ax.text(
-                            x_text, y_text, group_name,
-                            rotation=270, color='blue', ha='center', va=va_align, 
-                            fontsize=12, fontweight='bold'
-                        )
+                            y_text = y_min - 0.12 * y_range
+                            ax.text(
+                                x_text, y_text, group_name,
+                                rotation=270, color='blue', ha='center', va='top', 
+                                fontsize=12, fontweight='bold'
+                            )
+            else:
+                # Lines or Full-lines mode
+                alternate = False
+                text_offset = 0.10 * y_range if space == 'absorbance' else 0.12 * y_range
+                
+                for i, (peak_w_exact, peak_val, group_name) in enumerate(sorted_peaks):
+                    current_offset = text_offset
+                    if i > 0 and abs(peak_w_exact - sorted_peaks[i-1][0]) < 160:
+                        if not alternate:
+                            current_offset = text_offset + 0.15 * y_range
+                            alternate = True
+                        else:
+                            current_offset = text_offset
+                            alternate = False
                     else:
-                        y_text = y_min - 0.12 * y_range
-                        ax.text(
-                            x_text, y_text, group_name,
-                            rotation=270, color='blue', ha='center', va='top', 
-                            fontsize=12, fontweight='bold'
-                        )
-        else:
-            alternate = False
-            text_offset = 0.10 * y_range if space == 'absorbance' else 0.12 * y_range
-            
-            for i, (peak_w_exact, peak_val, group_name) in enumerate(sorted_peaks):
-                current_offset = text_offset
-                if i > 0 and abs(peak_w_exact - sorted_peaks[i-1][0]) < 160:
-                    if not alternate:
-                        current_offset = text_offset + 0.15 * y_range
-                        alternate = True
-                    else:
-                        current_offset = text_offset
                         alternate = False
-                else:
-                    alternate = False
-                    
-                if space == 'absorbance':
-                    y_text = peak_val + current_offset
-                    ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
-                    ax.text(
-                        peak_w_exact, y_text + 0.02 * y_range, group_name,
-                        rotation=270, color='blue', ha='center', va='bottom', fontsize=12, fontweight='bold'
-                    )
-                else:
-                    y_text = peak_val - current_offset
-                    ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
-                    ax.text(
-                        peak_w_exact, y_text - 0.02 * y_range, group_name,
-                        rotation=270, color='blue', ha='center', va='top', fontsize=12, fontweight='bold'
-                    )
+                        
+                    if space == 'absorbance':
+                        y_text = (y_max if mode == 'full-lines' else peak_val) + current_offset
+                        if mode == 'full-lines':
+                            ax.plot([peak_w_exact, peak_w_exact], [y_min - 0.05 * y_range, y_text], color='red', linestyle='--', linewidth=1.0)
+                        else:
+                            ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
+                        ax.text(
+                            peak_w_exact, y_text + 0.02 * y_range, group_name,
+                            rotation=270, color='blue', ha='center', va='bottom', fontsize=12, fontweight='bold'
+                        )
+                    else:
+                        y_text = (y_min if mode == 'full-lines' else peak_val) - current_offset
+                        if mode == 'full-lines':
+                            ax.plot([peak_w_exact, peak_w_exact], [y_text, y_max + 0.05 * y_range], color='red', linestyle='--', linewidth=1.0)
+                        else:
+                            ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
+                        ax.text(
+                            peak_w_exact, y_text - 0.02 * y_range, group_name,
+                            rotation=270, color='blue', ha='center', va='top', fontsize=12, fontweight='bold'
+                        )
                     
     plt.tight_layout()
-    plt.savefig(output_image, bbox_inches='tight', dpi=120)
+    plt.savefig(output_image, bbox_inches='tight', dpi=300)
     plt.close()
     print(f"Plot saved to '{output_image}'.")
 
@@ -602,70 +610,77 @@ def plot_best_configuration(x, y, best_cfg, output_image, space='absorbance', pr
     # Sort left to right
     sorted_peaks.sort(key=lambda item: item[0], reverse=invert_x)
     
-    if mode == 'box':
-        for group_name in group_order:
-            if group_name in matched_groups:
-                w_min, w_max = groups_db[group_name]
-                ax.axvspan(w_min, w_max, facecolor='red', alpha=0.06, 
-                           edgecolor='red', linestyle='--', linewidth=0.8)
-                x_text = (w_min + w_max) / 2
-                if space == 'absorbance':
-                    # Calculate local max in the band to place label dynamically
-                    mask_band = (x >= w_min) & (x <= w_max)
-                    y_local_max = np.max(y_corrected[mask_band]) if np.any(mask_band) else y_max
-                    label_h = len(group_name) * 0.02 * y_range
-                    y_plot_top = y_max + 0.40 * y_range
-                    if (y_plot_top - y_local_max) > (label_h + 0.05 * y_range):
-                        y_text = y_plot_top - 0.02 * y_range
-                        va_align = 'top'
+    if mode != 'none' and mode != 'desactivado':
+        if mode == 'box':
+            for group_name in group_order:
+                if group_name in matched_groups:
+                    w_min, w_max = groups_db[group_name]
+                    ax.axvspan(w_min, w_max, facecolor='red', alpha=0.06, 
+                               edgecolor='red', linestyle='--', linewidth=0.8)
+                    x_text = (w_min + w_max) / 2
+                    if space == 'absorbance':
+                        # Calculate local max in the band to place label dynamically
+                        mask_band = (x >= w_min) & (x <= w_max)
+                        y_local_max = np.max(y_corrected[mask_band]) if np.any(mask_band) else y_max
+                        label_h = len(group_name) * 0.02 * y_range
+                        y_plot_top = y_max + 0.40 * y_range
+                        if (y_plot_top - y_local_max) > (label_h + 0.05 * y_range):
+                            y_text = y_plot_top - 0.02 * y_range
+                            va_align = 'top'
+                        else:
+                            y_text = y_local_max + 0.02 * y_range
+                            va_align = 'bottom'
+                        ax.text(
+                            x_text, y_text, group_name,
+                            rotation=270, color='blue', ha='center', va=va_align, 
+                            fontsize=12, fontweight='bold'
+                        )
                     else:
-                        y_text = y_local_max + 0.02 * y_range
-                        va_align = 'bottom'
-                    ax.text(
-                        x_text, y_text, group_name,
-                        rotation=270, color='blue', ha='center', va=va_align, 
-                        fontsize=12, fontweight='bold'
-                    )
+                        y_text = y_min - 0.12 * y_range
+                        ax.text(
+                            x_text, y_text, group_name,
+                            rotation=270, color='blue', ha='center', va='top', 
+                            fontsize=12, fontweight='bold'
+                        )
+        else:
+            alternate = False
+            text_offset = 0.10 * y_range if space == 'absorbance' else 0.12 * y_range
+            
+            for i, (peak_w_exact, peak_val, group_name) in enumerate(sorted_peaks):
+                current_offset = text_offset
+                if i > 0 and abs(peak_w_exact - sorted_peaks[i-1][0]) < 160:
+                    if not alternate:
+                        current_offset = text_offset + 0.15 * y_range
+                        alternate = True
+                    else:
+                        current_offset = text_offset
+                        alternate = False
                 else:
-                    y_text = y_min - 0.12 * y_range
-                    ax.text(
-                        x_text, y_text, group_name,
-                        rotation=270, color='blue', ha='center', va='top', 
-                        fontsize=12, fontweight='bold'
-                    )
-    else:
-        alternate = False
-        text_offset = 0.10 * y_range if space == 'absorbance' else 0.12 * y_range
-        
-        for i, (peak_w_exact, peak_val, group_name) in enumerate(sorted_peaks):
-            current_offset = text_offset
-            if i > 0 and abs(peak_w_exact - sorted_peaks[i-1][0]) < 160:
-                if not alternate:
-                    current_offset = text_offset + 0.15 * y_range
-                    alternate = True
-                else:
-                    current_offset = text_offset
                     alternate = False
-            else:
-                alternate = False
-                
-            if space == 'absorbance':
-                y_text = peak_val + current_offset
-                ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
-                ax.text(
-                    peak_w_exact, y_text + 0.02 * y_range, group_name,
-                    rotation=270, color='blue', ha='center', va='bottom', fontsize=12, fontweight='bold'
-                )
-            else:
-                y_text = peak_val - current_offset
-                ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
-                ax.text(
-                    peak_w_exact, y_text - 0.02 * y_range, group_name,
-                    rotation=270, color='blue', ha='center', va='top', fontsize=12, fontweight='bold'
-                )
+                    
+                if space == 'absorbance':
+                    y_text = (y_max if mode == 'full-lines' else peak_val) + current_offset
+                    if mode == 'full-lines':
+                        ax.plot([peak_w_exact, peak_w_exact], [y_min - 0.05 * y_range, y_text], color='red', linestyle='--', linewidth=1.0)
+                    else:
+                        ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
+                    ax.text(
+                        peak_w_exact, y_text + 0.02 * y_range, group_name,
+                        rotation=270, color='blue', ha='center', va='bottom', fontsize=12, fontweight='bold'
+                    )
+                else:
+                    y_text = (y_min if mode == 'full-lines' else peak_val) - current_offset
+                    if mode == 'full-lines':
+                        ax.plot([peak_w_exact, peak_w_exact], [y_text, y_max + 0.05 * y_range], color='red', linestyle='--', linewidth=1.0)
+                    else:
+                        ax.plot([peak_w_exact, peak_w_exact], [peak_val, y_text], color='red', linestyle='--', linewidth=1.0)
+                    ax.text(
+                        peak_w_exact, y_text - 0.02 * y_range, group_name,
+                        rotation=270, color='blue', ha='center', va='top', fontsize=12, fontweight='bold'
+                    )
             
     plt.tight_layout()
-    plt.savefig(output_image, bbox_inches='tight', dpi=120)
+    plt.savefig(output_image, bbox_inches='tight', dpi=300)
     plt.close()
     print(f"Plot saved to '{output_image}'.")
 
@@ -1041,7 +1056,7 @@ def plot_raman_pca(X, y, class_map, output_image):
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Inter", "Liberation Sans"]
     
-    fig, ax = plt.subplots(figsize=(8, 6), dpi=120)
+    fig, ax = plt.subplots(figsize=(8, 6), dpi=300)
     colors = {0: 'red', 1: 'green', 2: 'blue'}
     
     for c in np.unique(y):
@@ -1060,7 +1075,7 @@ def plot_raman_pca(X, y, class_map, output_image):
     ax.grid(True, linestyle='--', alpha=0.5)
     
     plt.tight_layout()
-    plt.savefig(output_image, bbox_inches='tight', dpi=120)
+    plt.savefig(output_image, bbox_inches='tight', dpi=300)
     plt.close()
     print(f"PCA score plot saved to '{output_image}'.")
 

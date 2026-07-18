@@ -691,7 +691,34 @@ int main(int argc, char* argv[]) {
                     is_processing = 0;
                     
                     if (result == 0) {
+
+                        int was_zoom_super_trans = (zoom_img == super_img_trans);
+                        int was_zoom_super_super = (zoom_img == super_img_super);
+                        int was_zoom_super_abs = (zoom_img == super_img_abs);
+                        int was_zoom_sample_idx = -1;
+                        int was_zoom_sample_type = 0; // 1 = trans, 2 = super, 3 = abs
+                        
+                        if (zoom_mode == 1) {
+                            for (int i = 0; i < nsamples; i++) {
+                                if (zoom_img == samples[i].img_trans) { was_zoom_sample_idx = i; was_zoom_sample_type = 1; break; }
+                                if (zoom_img == samples[i].img_super) { was_zoom_sample_idx = i; was_zoom_sample_type = 2; break; }
+                                if (zoom_img == samples[i].img_abs)   { was_zoom_sample_idx = i; was_zoom_sample_type = 3; break; }
+                            }
+                        }
+
                         extract_and_load_processed_files();
+
+
+                        if (was_zoom_super_trans) zoom_img = super_img_trans;
+                        else if (was_zoom_super_super) zoom_img = super_img_super;
+                        else if (was_zoom_super_abs) zoom_img = super_img_abs;
+                        else if (was_zoom_sample_idx >= 0) {
+                            if (was_zoom_sample_type == 1) zoom_img = samples[was_zoom_sample_idx].img_trans;
+                            else if (was_zoom_sample_type == 2) zoom_img = samples[was_zoom_sample_idx].img_super;
+                            else if (was_zoom_sample_type == 3) zoom_img = samples[was_zoom_sample_idx].img_abs;
+                        }
+
+
                     } else {
                         wchar_t wmsg[256];
                         swprintf(wmsg, sizeof(wmsg)/sizeof(wchar_t), L"El pipeline de Python fallo con codigo de salida %d. Verifique que Python y las dependencias (matplotlib, numpy, pandas) esten instaladas.", result);
