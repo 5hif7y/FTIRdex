@@ -6,15 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Add local library path to sys.path so we don't depend on PYTHONPATH environment variable
-# Try both relative to app directory (production/portable layout) and workspace root (development layout)
-possible_paths = [
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "FTIRlib")),
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "FTIRlib"))
-]
-for path in possible_paths:
-    if os.path.exists(path):
-        sys.path.insert(0, path)
-        break
+local_lib_path = os.path.join(os.path.dirname(__file__), "..", "FTIRlib")
+if os.path.exists(local_lib_path):
+    sys.path.insert(0, local_lib_path)
 
 # Import from installed ftir_library
 from ftir_library import (

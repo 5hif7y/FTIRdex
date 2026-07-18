@@ -92,7 +92,6 @@ int x_mode = 0;
 int x_super = 0;
 int x_open = 0;
 int x_process = 0;
-int header_btn_w = 140;
 
 const char* get_smooth_display_name(int idx) {
     if (idx == 0) return "RAW";

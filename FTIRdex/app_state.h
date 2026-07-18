@@ -116,7 +116,6 @@ extern int x_mode;
 extern int x_super;
 extern int x_open;
 extern int x_process;
-extern int header_btn_w;
 
 // String formatting helpers
 const char* get_smooth_display_name(int idx);
