@@ -32,14 +32,16 @@ FTIRdex/
 │   ├── make_ico.py            # Script regenerador del icono local (.png a .ico)
 │   └── resource.rc            # Archivo de recursos de Windows para el icono
 ├── FTIRlib/                   # Biblioteca núcleo de análisis espectral en Python
-│   └── recuperacion-historica # Carpeta de recuperación de entregas anteriores
 ├── libnativegui/              # Submódulo Git de la librería gráfica nativa
 ├── Docs/                      # Manuales y documentación del proyecto
+│   └── recuperacion-historica # Carpeta de recuperación de entregas anteriores
 ├── CMakeLists.txt             # Configuración del sistema de construcción CMake
 ├── build.bat                  # Script de compilación rápida para MSVC
 ├── installer.iss              # Script de empaquetado para Inno Setup
-├── Icono.png/.ico/.Aseprite   # Elementos gráficos y logos del programa
+├── assets/                    # Elementos gráficos, fuentes y logos del programa
 ├── LICENSE                    # Declaración de términos de licencia comercial
+├── CONTRIBUTING.md            # Reglas y normas de contribución al proyecto
+├── TODO.md                    # Lista de tareas pendientes
 └── README.md                  # Esta documentación
 ```
 
