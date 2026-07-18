@@ -903,15 +903,19 @@ int main(int argc, char* argv[]) {
                     }
                     draw_interface(app_win);
                 } else {
-                    if (key == '+' || key == '=' || key == GW_KEY_UP) {
+                    if (key == '+' || key == '=' || key == 107 || key == 187 || key == GW_KEY_UP) {
                         zoom_scale *= 1.1f;
                         draw_interface(app_win);
-                    } else if (key == '-' || key == '_' || key == GW_KEY_DOWN) {
+                    } else if (key == '-' || key == '_' || key == 109 || key == 189 || key == GW_KEY_DOWN) {
                         zoom_scale /= 1.1f;
                         if (zoom_scale < 0.1f) zoom_scale = 0.1f;
                         draw_interface(app_win);
-                    } else if (key == '0' || key == '*') {
-                        zoom_scale = 1.0f;
+                    } else if (key == '0' || key == '*' || key == 48 || key == 42 || key == 96 || key == 106) {
+                        if (zoom_mode == 1) {
+                            zoom_scale = 1.0f / 1.1f;
+                        } else {
+                            zoom_scale = 1.0f;
+                        }
                         draw_interface(app_win);
                     }
                 }
