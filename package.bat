@@ -30,8 +30,7 @@ mkdir "%PORTABLE_DIR%"
 :: Copy executable and python assets
 copy build\Release\FTIRdex.exe "%PORTABLE_DIR%\"
 copy build\Release\process_ftir.py "%PORTABLE_DIR%\"
-copy build\Release\make_ico.py "%PORTABLE_DIR%\"
-copy build\Release\icono.ico "%PORTABLE_DIR%\"
+copy build\Release\icon.ico "%PORTABLE_DIR%\"
 copy build\Release\JetBrainsMono-Regular.ttf "%PORTABLE_DIR%\"
 copy associate_portable.ps1 "%PORTABLE_DIR%\"
 

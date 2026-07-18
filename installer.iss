@@ -33,8 +33,8 @@ Name: "{app}"; Permissions: users-modify
 [Files]
 Source: "build\Release\FTIRdex.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\process_ftir.py"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\make_ico.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\JetBrainsMono-Regular.ttf"; DestDir: "{app}"; Flags: ignoreversion
 ; Exclude the large historical recovery folder to optimize installation size
 Source: "build\Release\FTIRlib\*"; DestDir: "{app}\FTIRlib"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "recuperacion-historica,recuperacion-historica\*"
 
@@ -60,4 +60,10 @@ Root: HKA; Subkey: "Software\Classes\FTIRdex.Project\shell\open\command"; ValueT
 [Run]
 ; Checkbox option to launch the application once the installation finishes successfully
 Filename: "{app}\FTIRdex.exe"; Description: "Ejecutar FTIRdex al finalizar la instalación"; Flags: postinstall nowait skipifsilent
+
+[UninstallDelete]
+; Clean up Python compiled bytecode caches dynamically generated at runtime
+Type: filesandordirs; Name: "{app}\FTIRlib\ftir_library\__pycache__"
+Type: filesandordirs; Name: "{app}\FTIRlib\__pycache__"
+Type: filesandordirs; Name: "{app}\FTIRlib\tests\__pycache__"
 
