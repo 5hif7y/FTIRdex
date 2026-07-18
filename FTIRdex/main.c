@@ -1,3 +1,5 @@
+#include "hexcolors.h"
+
 #include "app_state.h"
 #include "gui_render.h"
 #include "gw_internal.h"
@@ -581,8 +583,8 @@ int main(int argc, char* argv[]) {
                         continue;
                     }
 
-                    GW_FillRect(app_win, x_process, 8, header_btn_w, 26, 0xFF888888);
-                    draw_text_button_centered(app_win, ui_font, x_process, 8, header_btn_w, 26, "Procesando...", 0xFFFFFFFF);
+                    GW_FillRect(app_win, x_process, 8, header_btn_w, 26, COLOR_TEXT_DARK);
+                    draw_text_button_centered(app_win, ui_font, x_process, 8, header_btn_w, 26, "Procesando...", COLOR_WHITE);
                     GW_Present(app_win);
 
                     char py_script_path[512];
