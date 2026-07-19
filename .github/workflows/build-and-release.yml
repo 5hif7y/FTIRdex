@@ -50,8 +50,7 @@ jobs:
           # Copy release binary and assets
           Copy-Item "build\Release\FTIRdex.exe" -Destination "$portableDir\"
           Copy-Item "build\Release\process_ftir.py" -Destination "$portableDir\"
-          Copy-Item "build\Release\make_ico.py" -Destination "$portableDir\"
-          Copy-Item "build\Release\icono.ico" -Destination "$portableDir\"
+          Copy-Item "build\Release\icon.ico" -Destination "$portableDir\"
           Copy-Item "build\Release\JetBrainsMono-Regular.ttf" -Destination "$portableDir\"
           Copy-Item "associate_portable.ps1" -Destination "$portableDir\"
           
