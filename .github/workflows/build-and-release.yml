@@ -66,6 +66,12 @@ jobs:
           Compress-Archive -Path "$portableDir" -DestinationPath "FTIRdex-$version-portable.zip"
           Remove-Item -Path $portableDir -Recurse -Force
 
+      - name: Convert PNG assets to BMP
+        shell: pwsh
+        run: |
+          python -c "from PIL import Image; Image.open('assets/sidebar_banner.png').convert('RGB').save('assets/sidebar_banner.bmp')"
+          python -c "from PIL import Image; Image.open('assets/logo_top_small.png').convert('RGB').save('assets/logo_top_small.bmp')"
+
       - name: Compile Inno Setup Installer
         shell: pwsh
         run: |
