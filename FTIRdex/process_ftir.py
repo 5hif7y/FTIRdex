@@ -225,7 +225,7 @@ def main():
 
                 plt.xlim(max(x), min(x))
                 plt.xlabel("Número de onda (cm$^{-1}$)", fontsize=13)
-                plt.ylabel("Intensidad Normalizada (u.a.)", fontsize=13)
+                plt.ylabel("Superposición (u.a.)", fontsize=13)
                 plt.title(f"Superposición (Smooth: {args.smooth}, Baseline: {args.baseline})", fontsize=12, fontweight='bold', pad=10)
                 plt.legend(loc='best', frameon=True, edgecolor='black', fontsize=11)
                 plt.grid(True, linestyle='--', alpha=0.5)
@@ -440,8 +440,8 @@ def main():
                 ax.plot(spec['x'], y_norm, color=color, linewidth=1.2, label=spec['label'])
             ax.set_xlim(max(x_all), min(x_all))
             ax.set_xlabel("Número de onda (cm$^{-1}$)", fontsize=13)
-            ax.set_ylabel("Absorbancia Normalizada (u.a.)", fontsize=13)
-            ax.set_title("Superposición de Absorbancias Normalizadas", fontsize=12, fontweight='bold', pad=10)
+            ax.set_ylabel("Superposición (u.a.)", fontsize=13)
+            ax.set_title("Superposición de Muestras", fontsize=12, fontweight='bold', pad=10)
             ax.legend(loc='best', frameon=True, edgecolor='black', fontsize=10)
             ax.grid(True, linestyle='--', alpha=0.5)
             

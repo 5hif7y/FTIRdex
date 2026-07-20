@@ -174,7 +174,7 @@ static void draw_zoom_image(GW_Window* win) {
     const char* name_str = "";
     
     if (zoom_img == super_img_trans) { mode_str = "Transmitancia"; name_str = "Superposición"; }
-    else if (zoom_img == super_img_super) { mode_str = "Intensidad normalizada"; name_str = "Superposición"; }
+    else if (zoom_img == super_img_super) { mode_str = "Superposición"; name_str = "Superposición"; }
     else if (zoom_img == super_img_abs) { mode_str = "Absorbancia"; name_str = "Superposición"; }
     else {
         for (int i = 0; i < nsamples; i++) {
