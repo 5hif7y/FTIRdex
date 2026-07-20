@@ -302,7 +302,7 @@ static void draw_zoom_csv(GW_Window* win) {
     int zw_tmp = 0;
     wchar_t wtmp_z[4] = L"Ap";
     GW_MeasureText(zf, wtmp_z, &zw_tmp, &zh);
-    draw_text_button_centered(win, zf, 0, 50, ww, zh + 10, "Visor CSV - Peaks & Valleys Report (Click izquierdo para salir. Click derecho para guardar).", COLOR_DARK_ACCENT);
+    draw_text_button_centered(win, zf, 0, 50, ww, zh + 10, "Visor CSV - Reporte de Picos y Valles (Click izquierdo para salir. Click derecho para guardar).", COLOR_DARK_ACCENT);
     int col_width = (int)(160 * zoom_scale);
     int row_height = (int)(28 * zoom_scale);
     int table_w = col_width * 4;
