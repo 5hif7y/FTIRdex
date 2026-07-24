@@ -14,6 +14,12 @@
   
   1.6. **Auditar**: Algunas imágenes sufren compresión horizontal, la cual reduce o borra la visibilidad de las lineas de marcado de grupos funcionales de los gráficos en el modo normal
 
+  1.7 **Auditar**: VirusTotal arroja advertencias de seguridad, tal vez sea porque no usamos la libreria oficial de Python o por no usar la compilacion directa de Github, investigar
+
+  1.8 **Auditar**: Agregar testing para lenguaje C
+
+  1.9 **Auditar**: Revisar el algoritmo de separación de etiquetas de grupos funcionales, del modo de marcado 'Lineas Completas'.
+
 
 ## 2. Extender FTIRlib:
 
