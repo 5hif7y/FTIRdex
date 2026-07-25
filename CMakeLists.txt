@@ -44,3 +44,8 @@ add_custom_command(TARGET FTIRdex POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/FTIRlib" "$<TARGET_FILE_DIR:FTIRdex>/FTIRlib"
     COMMENT "Copying Python assets, fonts and library folders to build folder"
 )
+
+# Enable CTest suite 
+enable_testing()
+add_subdirectory(Tests/FTIRdex)
+
