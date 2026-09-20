@@ -414,7 +414,7 @@ static void draw_zoom_menu(GW_Window* win) {
         snprintf(comp_str, sizeof(comp_str), "Compilación: %s %s", __DATE__, __TIME__);
         draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + dy, comp_str, COLOR_WHITE);
         
-        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 2 * dy, "Dueño: Ing. Mendoza Pablo Nicolás", COLOR_WHITE);
+        draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 2 * dy, "Former collaborator", COLOR_WHITE);
         draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 3 * dy, "DEV: Alemán Matías Roberto (5hif7y)", COLOR_WHITE);
         draw_text_utf8(win, zf, rx + (int)(20 * zoom_scale), ty + 4 * dy, "Versión: 0.0.5", COLOR_CYAN);
 

@@ -1,104 +1,209 @@
 # FTIRdex
 
-**FTIRdex** es una aplicación de escritorio nativa y liviana diseñada para el **análisis espectroscópico FTIR** (Infrarrojo por Transformada de Fourier). 
+**FTIRdex** is a lightweight native desktop application designed for **FTIR spectroscopy analysis** (Fourier-transform infrared spectroscopy).
 
-La aplicación combina una interfaz de usuario nativa de alto rendimiento desarrollada en C con un potente motor de procesamiento numérico y graficación basado en Python.
-
----
-
-## Características Principales
-
-* **Visualización en Tiempo Real**: Carga y superposición simultánea de múltiples muestras espectrales.
-* **Procesamiento de Señal**: Algoritmos de suavizado (Smooth) y corrección de línea base (Baseline) aplicados al instante.
-* **Identificación de Picos**: Detección inteligente de picos y valles espectrales asignando automáticamente sus grupos funcionales.
-* **Visor de tabla CSV Integrado**: Reporte tabular en tiempo real con opción de navegación y scroll dinámico.
-* **Hilos de Ejecución Asíncronos**: Interfaz fluida sin congelamientos gracias al procesamiento asíncrono multiplataforma.
-* **Diseño Ultra Ligero**: Consumo mínimo de recursos del sistema.
+The application combines a high-performance native user interface written in C with a Python-based backend for numerical processing and plotting.
 
 ---
 
-## Estructura del Proyecto
+## Project Background
 
-El repositorio está organizado de forma limpia y simplificada:
+This project originally began as a gift for a former classmate, now a university faculty member and doctoral researcher at my institution, and for his laboratory.
+
+After several weeks of development, the project was put on hold and remained unfinished. Rather than leaving the software unused, I decided to publish the project so that others can use it, improve it, or simply find it useful in their own FTIR-related work.
+
+The project is released as a **work in progress**. Some components are incomplete, experimental, or still need cleanup and documentation.
+
+---
+
+## Main Features
+
+* **Interactive Visualization**: Load and overlay multiple spectral samples simultaneously.
+* **Signal Processing**: Apply smoothing and baseline-correction algorithms directly to loaded spectra.
+* **Peak Identification**: Detect spectral peaks and valleys and associate them with corresponding functional groups.
+* **Integrated CSV Table Viewer**: Inspect processed data in a built-in tabular view with scrolling and navigation.
+* **Asynchronous Processing**: Keep the user interface responsive while analysis tasks are executed in separate threads.
+* **Lightweight Design**: Minimal system resource usage compared with heavier scientific analysis environments.
+
+---
+
+## Project Structure
+
+The repository is organized into a small native frontend, a Python analysis backend, and supporting libraries:
+
+```text
+FTIRdex/
+├── FTIRdex/                   # Main C application and UI logic
+│   ├── app_state.h/.c         # Application state and processing logic
+│   ├── gui_render.h/.c        # UI rendering and drawing
+│   ├── main.c                 # Application entry point and event loop
+│   ├── iprocesses.h           # Asynchronous process execution API
+│   ├── process_ftir.py        # Numerical analysis and plotting backend
+│   ├── make_ico.py             # Local PNG-to-ICO icon generation script
+│   └── resource.rc            # Windows resource definition
+├── FTIRlib/                   # Core Python spectral-analysis library
+├── libnativegui/              # Native GUI library Git submodule
+├── libzipvfs/                 # Virtual filesystem library
+├── Docs/                      # Project documentation
+│   └── recuperacion-historica # Historical recovery material
+├── CMakeLists.txt             # Cross-platform CMake build configuration
+├── build.bat                  # Quick MSVC build script
+├── installer.iss              # Inno Setup packaging script
+├── assets/                    # Application graphics, fonts, and logos
+├── LICENSE                    # Project licensing terms
+├── CONTRIBUTING.md            # Contribution guidelines
+├── TODO.md                    # Known issues and future work
+└── README.md                  # Project documentation
+```
+
+---
+
+## Requirements
+
+The numerical backend requires **Python 3.9 or newer** together with the following packages:
 
 ```sh
-FTIRdex/
-├── FTIRdex/                   # Código fuente en C (interfaz y lógica de procesos)
-│   ├── app_state.h/.c         # Gestión de datos y lógica de ejecución
-│   ├── gui_render.h/.c        # Renderizado y dibujo UI
-│   ├── main.c                 # Punto de entrada y bucle de eventos
-│   ├── iprocesses.h           # API de ejecución de subprocesos asíncronos
-│   ├── process_ftir.py        # Backend de análisis numérico y matplotlib
-│   ├── make_ico.py            # Script regenerador del icono local (.png a .ico)
-│   └── resource.rc            # Archivo de recursos de Windows para el icono
-├── FTIRlib/                   # Biblioteca núcleo de análisis espectral en Python
-├── libnativegui/              # Submódulo Git de la librería gráfica nativa
-├── Docs/                      # Manuales y documentación del proyecto
-│   └── recuperacion-historica # Carpeta de recuperación de entregas anteriores
-├── CMakeLists.txt             # Configuración del sistema de construcción CMake
-├── build.bat                  # Script de compilación rápida para MSVC
-├── installer.iss              # Script de empaquetado para Inno Setup
-├── assets/                    # Elementos gráficos, fuentes y logos del programa
-├── LICENSE                    # Declaración de términos de licencia comercial
-├── CONTRIBUTING.md            # Reglas y normas de contribución al proyecto
-├── TODO.md                    # Lista de tareas pendientes
-└── README.md                  # Esta documentación
+pip install numpy scipy matplotlib pillow
 ```
+
+For development and testing:
+
+```sh
+pip install pytest
+```
+
+At present, Python must be installed separately on the target system.
+
+A future release may bundle a small Python distribution so that end users do not need to manage the Python runtime and dependencies manually.
 
 ---
 
-## Requisitos de Ejecución
+## Building
 
-El backend numérico requiere una instalación de **Python (3.9 o superior)** con las siguientes librerías de análisis científico:
+### Method 1: CMake (Recommended)
 
-```bash
-pip install numpy scipy matplotlib pillow pytest
-```
-Pero se planea embeber una pequeña distribución Python que no requiera atención extra del usuario en el futuro
+The project uses **CMake** as its build system and is intended to support a modern cross-platform toolchain.
 
----
-
-## Instrucciones de Compilación y Construcción
-
-### Método 1: Compilación Moderna con CMake (Recomendado)
-El proyecto utiliza CMake como sistema de construcción multiplataforma. Genera automáticamente los ejecutables y copia todos los archivos auxiliares necesarios (los scripts de Python, la carpeta `FTIRlib` y el icono) a la carpeta de salida.
+Configure the build directory:
 
 ```bash
-# 1. Configurar el directorio de construcción
 cmake -B build -S .
+```
 
-# 2. Compilar el proyecto en modo optimizado (Release)
+Build the project in Release mode:
+
+```bash
 cmake --build build --config Release
 ```
-*El ejecutable final y sus recursos listos para entregar se ubicarán en `build/Release/`.*
 
-### Método 2: Compilación Clásica con MSVC (`build.bat`)
-Si utiliza el toolchain nativo de Visual Studio en Windows (Developer Command Prompt), se puede compilar de forma rápida ejecutando el archivo batch en la raíz:
+The resulting executable and copied runtime resources will be placed under:
+
+```text
+build/Release/
+```
+
+### Method 2: MSVC (`build.bat`)
+
+On Windows, the project can also be built directly from a **Visual Studio Developer Command Prompt** using the provided batch script:
 
 ```cmd
 build.bat
 ```
-*Esto generará el archivo `FTIRdex.exe` directamente en la raíz de tu proyecto.*
+
+This produces the `FTIRdex.exe` executable in the project root.
 
 ---
 
-## Distribución y CI/CD
+## Distribution and CI/CD
 
-El proyecto incluye un flujo de integración y entrega continua (CI/CD) automatizado a través de **GitHub Actions** (`.github/workflows/build-and-release.yml`). En cada confirmación a la rama `main` o al crear una etiqueta de versión (`v*`), el servidor compila y empaqueta de forma automática los siguientes entregables:
+The repository includes an automated **GitHub Actions** workflow under:
 
-1. **Versión Portable (`FTIRdex-VERSION-portable.zip`)**: Un archivo comprimido listo para usar sin instalación previa.
-2. **Instalador de Windows (`FTIRdex-VERSION-nstaller-x64.exe`)**: Un instalador guiado estándar creado con Inno Setup que añade accesos directos al escritorio.
-3. **Código Fuente (`FTIRdex-VERSION-source.tar.gz`)**: Tarball para entornos Linux/Unix donde los usuarios finales deseen compilar la aplicación utilizando el servidor gráfico X11.
+```text
+.github/workflows/build-and-release.yml
+```
 
-Donde `VERSION` es la enumeración identificatoria del software.
+The workflow builds and packages the project for supported releases.
+
+The generated artifacts include:
+
+1. **Portable version**
+
+   ```text
+   FTIRdex-VERSION-portable.zip
+   ```
+
+   A standalone archive intended to run without a traditional installation process.
+
+2. **Windows installer**
+
+   ```text
+   FTIRdex-VERSION-installer-x64.exe
+   ```
+
+   A standard Inno Setup installer for 64-bit Windows.
+
+3. **Source package**
+
+   ```text
+   FTIRdex-VERSION-source.tar.gz
+   ```
+
+   A source archive for users who want to build the project manually on Linux/Unix systems with an X11 environment.
+
+`VERSION` refers to the corresponding software release version.
 
 ---
 
-## Licencia
+## Project Status
 
-  1. Este software es propiedad comercial y propietaria de Ing. Mendoza Pablo Nicolás. Todos los derechos reservados.
+FTIRdex is currently a **work in progress**.
 
-  2. El uso del código de la interfaz gráfica nativa se rige bajo la licencia **MIT** provista dentro de la subcarpeta `libnativegui`. La cual es una licencia libre para todo, que solo requiere referenciar el nombre o alias del autor.
+Some parts of the repository reflect the project's history and were preserved because they may still be useful for future development. Other parts require cleanup, regeneration, restructuring, or additional documentation.
 
-  3. El uso del código del sistema de archivos virtual se rige bajo la licencia **MIT** provista dentro de la subcarpeta `libzipvfs`. La cual es una licencia libre para todo, que solo requiere referenciar el nombre o alias del autor.
+The current public release should therefore be considered a development snapshot rather than a finished scientific software package.
+
+---
+
+## TODO
+
+### Documentation
+
+* Clean up the documentation and rewrite the remaining Spanish material in English.
+* Make English the main language for project documentation, development guidelines, and repository conventions.
+
+### Codebase Cleanup
+
+One of the main sources of technical debt in the current repository is that I originally overestimated how much programming and scripting the intended users would be comfortable maintaining themselves.
+
+I assumed that their interest in advanced programming courses meant that they would be comfortable modifying and maintaining a codebase themselves. Because of that assumption, I did not establish proper version-control and repository-management practices from the beginning.
+
+As a result, the repository contains some broken, experimental, or unrelated code that was accumulated during development. Some of these files need to be regenerated, cleaned up, reorganized, and properly referenced.
+
+### Future Development
+
+* Extend the software beyond FTIR spectroscopy and experiment with support for other spectrometric and spectroscopic techniques.
+* Improve the architecture so additional analysis methods and instrument formats can be integrated more easily.
+* Continue improving the standalone distribution so end users require fewer external dependencies.
+
+---
+
+## Licensing
+
+FTIRdex is released under the **GNU General Public License v3.0 (GPLv3)**.
+
+In simple terms, the software can be freely used, studied, modified, and redistributed, including for commercial purposes. Anyone may charge money for their own distribution or services based on the software.
+
+When a modified version of FTIRdex is redistributed, the corresponding source code must remain available under the same GPLv3 freedoms. This means that modified versions cannot be redistributed as closed-source software under incompatible terms.
+
+The project also contains components with their own licenses:
+
+| Component      | License    | What you can do                                                                                                                                                              |
+| -------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FTIRdex`      | **GPLv3**  | Use, modify, and redistribute it, including commercially. Modified versions that are redistributed must preserve the GPL freedoms and provide the corresponding source code. |
+| `FTIRlib`      | **LGPLv3** | Use it as a library from software under other licenses, including proprietary software, subject to the LGPL terms.                                                           |
+| `libnativegui` | **MIT**    | Use, modify, and redistribute it with very few restrictions, including in proprietary software. The original copyright and license notice must be retained.                  |
+| `libzipvfs`    | **MIT**    | Use, modify, and redistribute it with very few restrictions, including in proprietary software. The original copyright and license notice must be retained.                  |
+
+Please refer to the individual license files included with each component for the complete legal terms.
+
 
